@@ -23,6 +23,10 @@ copy-paste Windows installation, no-key verification path, authentic run path,
 capability matrix, troubleshooting guide, and implementation map. Start there
 if you need to run this repository on a fresh computer.
 
+**Architecture:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) shows the
+deterministic safety floor, GPT-5.6 trust boundary, receipts, caps, and the
+observed pre-freeze rehearsal.
+
 This is a complementary controlled-autonomy experiment, not a repudiation of
 Sentinel Ensemble's production-oriented deterministic trust layer. It measures
 what happens in a reproducible model-directed case when adaptive semantic agency
