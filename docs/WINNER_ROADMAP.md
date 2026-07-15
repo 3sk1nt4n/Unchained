@@ -1,8 +1,8 @@
 # Sentinel Unchained: Winner Roadmap
 
 > **Role:** priority, sequencing, positioning, and go/no-go overlay
-> **Status:** active execution contract
-> **Last deep review:** 2026-07-14
+> **Status:** Local native Gate A leg green, provenance anchor red
+> **Last deep review:** 2026-07-14 22:22 ET
 > **Track:** Developer Tools
 > **Internal submission deadline:** 2026-07-20
 > **Hard deadline:** 2026-07-21 17:00 PT / 20:00 ET
@@ -27,6 +27,33 @@ If these files conflict, apply this precedence:
 ## 1. Winner verdict
 
 Proceed with Sentinel Unchained. Do not pivot and do not re-scaffold.
+
+### Current execution snapshot: 2026-07-14 22:22 ET
+
+| Stage | State | Evidence and remaining boundary |
+|---|---|---|
+| C0 provenance | **PARTIAL** | Honest local history exists through Gate A commit `6e696a0`; no public remote or independent server timestamp exists |
+| C1 correctness | **GREEN** | The three reproduced defects and Windows prompt consistency are fixed and regression-tested |
+| C2 proof and reliability | **GREEN OFFLINE** | Content-addressed outputs, provider-returned identity fields, response/request IDs, validated usage, bounded audited retries, manifest, summary, environment record, offline verifier, exact constraints, and `pylock` are implemented |
+| Build evidence | **GREEN LOCALLY** | 14 source modules, 8,779 total text lines, 7,889 nonblank lines, 128 tests, Ruff and format, wheel plus sdist build, pip check, and diff check pass |
+| Python environment | **GREEN** | Official CPython 3.11.9; clean primary and lockcheck virtual environments; `pip check` clean in both |
+| Native readiness | **GREEN LOCALLY** | Official DC01 memory verified outside Git; Windows memory-only profile and symbols ready; 14 sealed tools; authoritative sanitized process batch and post-fix large netscan output retained; custody matched |
+| C2 CLI exercise | **LIMITED** | An empty-input terminal `INVALID` bundle verifies. It is not `COMPLETE`, authentic, evidence-backed, tool-backed, or GPT-5.6-backed |
+| Gate A | **LOCAL NATIVE LEG GREEN; OVERALL BLOCKED** | Gate A hardening is committed locally; public remote and independent server timestamp remain red |
+| C4 freeze | **NOT STARTED** | No public protocol/rubric/scorer/run-selection freeze exists |
+| C5 live proof | **NOT STARTED** | No `OPENAI_API_KEY`, funded runtime proof, authentic GPT-5.6 response, or primary run exists |
+| C6 and C7 | **NOT STARTED** | No evaluation, viewer, video, submission tag, or Devpost submission exists |
+
+These states are cumulative. The local native smoke makes the real-tool leg
+green but does not make the project public or authentic-model proven. A
+verifier PASS on an `INVALID` empty case remains separate and does not establish
+live model, forensic, or custody claims.
+
+Historical checkpoint discipline: commit `7b05d6a` remains the C2 baseline at
+14 modules, 7,767 repository-counted nonblank source lines, and 123 passing
+tests. The 8,779 total/7,889 nonblank line and 128-test figures describe the
+later 22:22 ET Gate A commit state and must not be back-attributed
+to that commit.
 
 The strongest product is not another autonomous DFIR analyst. It is a
 developer-facing trust-measurement harness for model-directed investigators,
@@ -107,7 +134,7 @@ Therefore:
 - confirm Windows symbols, output parsing, timeouts, containment, retention,
   hashing, cleanup, and exact partition handling;
 - inspect the supplied evidence to determine which reference facts are actually
-  observable through the frozen tool surface;
+  observable through the candidate tool surface that C4 will bind;
 - rehearse GPT-5.6 function calling against fake typed tools, synthetic
   receipts, generic non-case data, or a different explicitly unscored case.
 
@@ -127,19 +154,22 @@ described as an untouched preregistered evaluation.
 ## 4. Correct critical path
 
 ```text
-C0 HONEST PROVENANCE BASELINE
+C0 HONEST PROVENANCE BASELINE [LOCAL GREEN, PUBLIC TIMESTAMP RED]
         |
         v
-C1 THREE CORRECTNESS FIXES + WINDOWS PROMPT CONSISTENCY
+C1 THREE CORRECTNESS FIXES + WINDOWS PROMPT CONSISTENCY [GREEN]
         |
         v
-C2 DURABLE PROOF CONTRACT + VERIFIER + LOCKED ENVIRONMENT
+C2 DURABLE PROOF CONTRACT + VERIFIER + LOCKED ENVIRONMENT [GREEN OFFLINE]
         |
         v
-C3 CLEAN PYTHON 3.11 + DETERMINISTIC REAL-TOOL SMOKE
+C3 CLEAN PYTHON 3.11 + DETERMINISTIC REAL-TOOL SMOKE [GREEN LOCALLY]
         |
         v
-C4 PUBLIC PROTOCOL AND RUBRIC FREEZE
+C0 PUBLIC REMOTE + SERVER TIMESTAMP [RED]
+        |
+        v
+C4 PUBLIC PROTOCOL AND RUBRIC FREEZE [RED]
         |
         v
 C5 FIRST GPT-5.6 DC01 RUN IS THE PRIMARY RESULT
@@ -157,19 +187,26 @@ disclosure.
 
 ## 5. C0: immediate provenance baseline
 
-Do this before further material feature work:
+The local provenance baseline is complete. Commits `5309e5c` and `7b05d6a`
+retain the current C1/C2 work after the honest root history and
+`BUILD_PROVENANCE.md`. The successful `/feedback` ID and screenshot are
+preserved.
 
-1. Initialize Git without backdating.
-2. Create an honest baseline commit containing the current implemented state.
-3. Add `BUILD_PROVENANCE.md` distinguishing prior work from Build Week work.
-4. Preserve the current successful `/feedback` ID and screenshot.
-5. Push to a public remote when the repository has passed a secret and evidence
-   scan.
-6. Do not force-push, rewrite, or delete the public Build Week history.
-7. Request Codex credits and retain the confirmation if not already complete.
-8. Start or verify the DC01 acquisition outside the repository.
-9. Open a Devpost draft early so every live form requirement is visible.
-10. Identify the intended adjudicator before the scored run.
+Remaining C0 work before the public experiment freeze:
+
+1. Push the existing history to a public remote only after the secret and
+   evidence scan passes.
+2. Do not force-push, rewrite, squash away, or delete the public Build Week
+   history.
+3. Establish an independent server timestamp with CI or an equivalent public
+   service.
+4. Request Codex credits and retain the confirmation if not already complete.
+5. Retain the completed DC01 memory acquisition manifest outside the repository;
+   do not add the archive, image, or raw outputs to Git.
+6. Commit the reviewed native routing, launcher, sanitization, transport, and
+   bounded-model-view hardening before publication.
+7. Open a Devpost draft early so every live form requirement is visible.
+8. Identify the intended adjudicator before the scored run.
 
 Local Git gives exact content binding but not an independently trustworthy
 timestamp. Git author and committer dates can be edited, and local history can
@@ -185,16 +222,21 @@ server-side timestamp exist.
 
 ### C0 acceptance evidence
 
-- local repository initialized;
-- secret/evidence exclusion and scan pass;
-- honest baseline commit and provenance map;
-- public remote URL and remote commit, or an explicit blocker if remote access
-  requires a human login;
-- retained credit request result;
-- acquisition manifest in progress or complete;
-- Devpost draft state recorded.
+- [x] local repository initialized;
+- [x] secret/evidence exclusion and scan pass at the retained local checkpoint;
+- [x] honest baseline, C1/C2 commits, and provenance map;
+- [ ] public remote URL and remote commit;
+- [ ] independent server timestamp;
+- [ ] retained credit request result;
+- [x] DC01 memory archive and extracted-image size/hash evidence retained
+      outside the repository;
+- [ ] Devpost draft state recorded.
 
 ## 6. C1: focused correctness gate
+
+**Current state: GREEN.** This gate was completed at the historical 80-test
+checkpoint. C2 reached 123 tests at `7b05d6a`; the current Gate A-hardened
+working tree reaches 128 without reopening the three defects.
 
 Fix exactly the reproduced defects before adding proof features:
 
@@ -213,39 +255,47 @@ defects, plus regression testing and documentation/handover duties.
 
 ### C1 acceptance evidence
 
-- adversarial sanitizer fixtures are inert after rendering;
-- the exact detected partition offset is retained and used;
-- ordinary text logs remain logs;
-- focused tests pass;
-- full tests pass;
-- Ruff passes;
-- handover and any changed durable decisions are updated.
+- [x] adversarial sanitizer fixtures are inert after rendering;
+- [x] the exact detected partition offset is retained and used;
+- [x] ordinary text logs remain logs;
+- [x] focused tests pass;
+- [x] current full suite passes with 128 tests;
+- [x] Ruff passes;
+- [x] Windows investigator prompt and flagship scope agree.
 
 ## 7. C2: proof and reliability contract
 
-C2 may be split into small commits, but all required pieces must be working and
-frozen before the primary run:
+**Current state: GREEN OFFLINE.** Commits `5309e5c` and `7b05d6a` complete the
+C2 implementation contract:
 
-- full accepted tool outputs stored content-addressably;
+- full accepted tool outputs are stored content-addressably before a completion
+  receipt is accepted;
 - call ID, tool, typed arguments, status, duration, encoding, media type, byte
-  count, truncation state, relative path, and SHA-256 retained;
-- requested model alias and provider-returned `response.model` stored
-  separately;
-- response IDs, request IDs when available, status, usage, and timestamps
-  retained for every request attempt;
-- `manifest.json`, `summary.json`, and `environment.json` generated;
-- prompt, catalog, dependency, cap, retry, rubric, scoring, and price-table
-  digests bound into the manifest;
-- audit chain and terminal state bound into the manifest;
-- a no-network `verify-run` command;
-- deterministic validation of artifact hashes, citation identity, successful
-  receipt status, exact quoted-span presence, and summary consistency;
-- a small bounded transient provider retry policy that cannot duplicate a
-  forensic tool execution;
-- exact Python 3.11 dependency lock or constraints;
-- every request attempt audited, including ambiguous dispatch failures;
-- conservative local estimated-cost enforcement and explicit unknown billing
-  exposure when a dispatched failure returns no usage.
+  count, completeness state, relative path, and SHA-256 are retained;
+- the requested model alias and provider-returned `response.model` are distinct
+  fields;
+- response IDs, request IDs when available, status, validated usage, and every
+  bounded attempt are audited;
+- application-owned transient retries are capped at two, audited, wall/cost
+  bounded, and cannot replay a forensic tool execution;
+- `manifest.json`, `manifest.sha256`, `summary.json`, and `environment.json`
+  are generated through an explicit non-self-referential artifact list;
+- audit chain, terminal state, exact artifact bytes, tool receipts, citations,
+  quote resolution, judge monotonicity, strict live-provider fields, and
+  recorded custody rules are checked by a standard-library offline verifier;
+- exact Windows CPython 3.11 constraints and a source/hash-bearing `pylock` are
+  committed;
+- official CPython 3.11.9 passes in clean primary and lockcheck environments,
+  including `pip check`, 123 tests, Ruff, build, installed-package smoke,
+  Volatility help, and catalog load.
+
+The later public C4 freeze, not C2 alone, must bind the final protocol, rubric,
+exact code, prompts, eligible catalog, caps, retries, scorer, and run-selection
+rule, together with the exact 16,000,000-byte worker-response ceiling,
+case-insensitive slash-variant public-path sanitization across success and
+failure surfaces, and exact 65,536 UTF-8-byte investigator-model-view ceiling
+with native-order prefix selection and an explicit completeness receipt. Those
+experiment artifacts do not exist yet.
 
 `MAX_COST_USD` is not a provider invoice guarantee. The safe claim is:
 
@@ -258,15 +308,30 @@ the local cap. Provider billing remains authoritative when available.
 
 ### C2 acceptance evidence
 
-- fake-model dry run creates a complete bundle;
-- every accepted output is present and hash-valid;
-- provider-returned-model fixtures verify requested-versus-returned capture;
-- retries are bounded, audited, and tool-idempotent;
-- `verify-run` passes the untouched fixture and fails every tampered fixture;
-- dependency lock exists;
-- tests, Ruff, build, and applicable `pip check` pass.
+- [x] synthetic verifier fixtures prove successful strict-live structure and
+      fail on tampered blobs, audit records, paths, checksums, extra blobs, and
+      missing live-provider proof;
+- [x] every fixture-accepted output is present and hash-valid;
+- [x] provider-returned-model fixtures verify requested-versus-returned capture;
+- [x] retries are bounded, audited, and tool-idempotent;
+- [x] the CLI finalizer emits and verifies a terminal `INVALID` empty-input
+      bundle;
+- [x] exact constraints and `pylock` exist;
+- [x] 123 tests, Ruff, build, two clean-environment `pip check` runs, installed
+      smoke, Volatility help, and catalog import pass.
+
+The empty-input bundle is not a fake-model complete run. It contains no model
+response, no tool call, no evidence profile, and no custody baseline. Calling
+it authentic, evidence-backed, or `COMPLETE` would be false.
 
 ## 8. C3: clean environment and deterministic native proof
+
+**Current state: GREEN LOCALLY.** The official CPython 3.11.9 environment,
+exact dependency state, quality gates, Volatility console help, catalog load,
+verified DC01 memory, Windows symbols, sealed tools, real native rows,
+large-output boundary, path sanitization, and custody all pass. Commit
+`6e696a0` binds the changes locally, but they are not publicly timestamped, so
+the overall Gate A remains red on public-provenance anchoring.
 
 Do not build a new cross-platform Volatility Python API adapter unless the
 existing reviewed path is reproduced as incapable of running the Windows
@@ -281,16 +346,30 @@ and expanding scope.
 
 C3 sequence:
 
-1. Create a clean Python 3.11 environment.
-2. Install the pinned project and locked dependencies.
-3. Require `pip check`, tests, Ruff, wheel build, and installed-package smoke.
-4. Load the existing real catalog.
-5. Run actual catalog functions such as `vol_pstree` and `vol_netscan` or
-   another eligible second memory function directly, without GPT-5.6.
-6. Confirm real rows, symbol readiness, retained outputs, timeouts, cleanup, and
-   custody.
-7. Run paired-disk mount/probes only while that route remains within Gate A.
-8. If the disk route misses Gate A, freeze the flagship to Windows memory-only.
+1. [x] Create clean primary and lockcheck official CPython 3.11.9
+   environments.
+2. [x] Install the pinned project and exact locked dependencies.
+3. [x] Pass `pip check`, 128 tests, Ruff and format, wheel plus sdist build,
+   installed-package smoke, and diff check.
+4. [x] Reach Volatility help and load the exact real catalog with 25 direct
+   plus 5 dynamic entries.
+5. [x] Acquire and verify the official DC01 memory archive and extracted image
+   outside Git.
+6. [x] Resolve Windows OS and symbols through `windows.info`; profile the case
+   as Windows, memory-only, ready, symbols ready, with 14 sealed tools.
+7. [x] Retain an authoritative sanitized parallel process batch using
+   `vol_pstree` and `vol_psscan` without GPT-5.6.
+8. [x] Preserve the first netscan transport failure, increase the worker
+   boundary from 2,000,000 to 16,000,000 bytes, and pass a sanitized post-fix
+   `vol_netscan` smoke.
+9. [x] Retain full accepted-output hashes while bounding the model view to
+   65,536 UTF-8 bytes with an explicit incomplete-view receipt.
+10. [x] Scrub runner-local evidence and mount paths from successful results,
+    nested strings, and case-varied worker exceptions, with subprocess
+    regressions.
+11. [x] Recheck custody successfully.
+12. [x] Cut paired disk from the Build Week primary and select the already
+    proven Windows memory-only shape as the scored route.
 
 Do not require `windows.pslist` if that function is not in the project-visible
 catalog. Use the actual exposed typed functions. Do not claim symbol download
@@ -303,18 +382,69 @@ adversarial boundary tests.
 
 ### C3 acceptance evidence
 
-- Python 3.11 version transcript;
-- clean install and `pip check`;
-- full tests, Ruff, wheel, and installed smoke pass;
-- existing real catalog loads;
-- at least one existing native Windows-memory function returns real rows;
-- exact output persists and verifies;
-- cleanup and recorded custody pass;
-- disk route either passes or is explicitly cut.
+- [x] official CPython 3.11.9 version transcript;
+- [x] clean primary and lockcheck installs with clean `pip check`;
+- [x] 128 tests, Ruff and format, wheel plus sdist build, installed smoke, and
+      diff check pass;
+- [x] Volatility help and the exact 25-direct/5-dynamic real catalog load;
+- [x] authoritative `gate-a-final-20260715T015251Z` process batch succeeds in
+      5,968 ms with `evidence_id` `E001`, no private path, and custody match;
+- [x] `vol_pstree` returns 40 records and a complete sanitized 15,277-byte
+      output with SHA-256
+      `e2e70d5164939f5a735c450ecc0f2c268e48f22ae4a4dab76a92fa67f04ecac6`;
+- [x] `vol_psscan` returns 72 records and a complete sanitized 16,526-byte
+      output with SHA-256
+      `836951c95fdcc131064b52cfc229bb3753e389567fcb534174ac3f40d14a7fe4`;
+- [x] post-fix `gate-a-netscan-20260715T014947Z` returns 19,685 records and a
+      complete sanitized 3,961,843-byte accepted output with SHA-256
+      `efced1af66f99ec2064d14f30a5f018d90e5c169027672be9e3c0110122cb421`;
+- [x] the netscan investigator model view is exactly 65,536 UTF-8 bytes, contains a
+      native-order 55,732-character prefix, declares
+      `model_view_complete=false`, and retains the accepted-output byte count
+      and SHA-256 in its delivery receipt;
+- [x] successful and failed worker responses scrub runner-local evidence and
+      mount paths across slash and case variants;
+- [x] paired disk is explicitly cut from the Build Week primary and is not a
+      Gate A or C4 blocker.
 
-No full GPT-5.6 DC01 investigation is allowed yet.
+The archive is 561,424,278 bytes, matches official MD5
+`64A4E2CB47138084A5C2878066B2D7B1`, and has SHA-256
+`86658D85D8254E8D30DCCC4F50D9C2A8B550A101D2E78A6D932316849E37AD80`.
+Extracted `citadeldc01.mem` is 2,147,483,648 bytes with SHA-256
+`8079A7459B1739CAF7D4FBF6DDE5EB0AE7A9D24DBDE657DEBF4D5202C8DC6B62`.
+Both remain outside the repository.
+
+The first parallel netscan attempt failed at the former 2,000,000-byte worker
+boundary and is preserved as a diagnostic. It is not hidden, deleted, or
+relabeled. Earlier process outputs from before path sanitization are diagnostics
+only. The authoritative public-safe local process proof is the final sanitized
+batch above.
+
+The complete sanitized accepted output and the bounded investigator model view
+have distinct meanings. The first is retained and hashed. The second is a
+deterministic native-order prefix plus a completeness receipt. A quote resolving
+in either artifact proves occurrence and traceability, not semantic entailment.
+
+No GPT-5.6 DC01 investigation occurred. This was permitted deterministic
+pre-freeze native smoke, not a scored, model-directed, API, or authentic primary
+run. Continue using the existing fixed Volatility console adapter. Do not
+schedule a broad Python API rewrite.
 
 ## 9. C4: public experiment freeze
+
+**Current state: NOT STARTED.** No rubric, protocol, scorer, run-selection file,
+public tag, remote commit, or server timestamp exists. Therefore no GPT-5.6
+DC01 investigator call is permitted.
+
+The public freeze is indivisible. It must bind the protocol, reference rubric,
+exact code commit, prompts, eligible tool catalog, caps, retry policy, scorer,
+the exact 16,000,000-byte worker-response ceiling, case-insensitive
+slash-variant public-path sanitization across success and failure surfaces, the
+exact 65,536 UTF-8-byte investigator-model-view ceiling with native-order prefix
+selection and an explicit completeness receipt, and the first-valid-run
+selection rule. It must also retain the dependency, evidence, model-alias,
+native-version, and price-table context needed to reproduce the evaluation. A
+rubric-only freeze is not enough.
 
 Before any GPT-5.6 DC01 investigator call, create and freeze:
 
@@ -342,7 +472,8 @@ Each reference fact needs:
 - source and independent-evidence-check notes;
 - ambiguity and timestamp-basis notes.
 
-Exclude PCAP-only, desktop-only, disk-only when memory-only is frozen,
+Exclude PCAP-only, desktop-only, and disk-only facts because the frozen route is
+memory-only. Also exclude
 approximate without an accepted tolerance, ambiguous, unobservable, and broad
 narrative facts from scored denominators.
 
@@ -396,7 +527,8 @@ a denominator is zero.
 | Metric | Frozen definition |
 |---|---|
 | Investigator proposal support rate | receipt-supported investigator proposals / all investigator proposals |
-| Final-confirmed precision | receipt-supported final `CONFIRMED` findings / all final `CONFIRMED` findings |
+| Final-confirmed factual precision | factually `CORRECT` in-rubric final `CONFIRMED` findings / all factually adjudicable in-rubric final `CONFIRMED` findings |
+| Final-confirmed receipt-support rate | receipt-`SUPPORTED` final `CONFIRMED` findings / all final `CONFIRMED` findings |
 | Discovered-fact recall | scored reference facts correctly surfaced at any status / all scored observable facts |
 | Confirmed-fact recall | scored reference facts correctly surfaced and finally `CONFIRMED` / all scored observable facts |
 | Reviewer catch rate | receipt-unsupported proposals downgraded / all receipt-unsupported proposals |
@@ -448,7 +580,9 @@ infrastructure failure.
 - all metrics, denominators, thresholds, fault rules, and selection rules
   frozen;
 - code, prompts, catalog, caps, retries, dependencies, price table, evidence
-  hashes, rubric, and scorer bound by digest;
+  hashes, rubric, scorer, exact 16,000,000-byte worker ceiling,
+  success/failure public-path sanitization contract, and exact 65,536-byte UTF-8
+  model-view ceiling with prefix/completeness rules bound by digest;
 - public commit and freeze tag;
 - server-timestamped CI/release verification;
 - no prior GPT-5.6 DC01 investigation, or an explicit disclosure if this claim
@@ -468,11 +602,14 @@ Only after C4 passes:
    continue with one function per later turn.
 6. Retain concise decision summaries, not hidden chain-of-thought.
 7. Preserve every exact accepted output and all failures.
-8. Enforce evidence pre/post hashing, cleanup, caps, and terminal status.
-9. Do not discard the primary because its semantic result is weak.
-10. Run deterministic verification before any public metric is computed.
-11. Apply the frozen two-axis adjudication.
-12. Run one or two identical replicates only after the primary, if stable and
+8. Retain each investigator model view separately, mark whether it is complete,
+   and bind every bounded view to the complete accepted-output byte count and
+   SHA-256.
+9. Enforce evidence pre/post hashing, cleanup, caps, and terminal status.
+10. Do not discard the primary because its semantic result is weak.
+11. Run deterministic verification before any public metric is computed.
+12. Apply the frozen two-axis adjudication.
+13. Run one or two identical replicates only after the primary, if stable and
     affordable, and publish every valid replicate.
 
 The model alias in an environment variable proves only what was requested. The
@@ -485,6 +622,8 @@ provider-returned response object is required to show what was returned.
 - real native execution on DC01;
 - `COMPLETE` primary status;
 - full retained proof bundle;
+- complete accepted outputs plus explicit, hash-bound investigator model-view
+  receipts;
 - every deterministic bundle and citation check passes;
 - recorded pre/post custody values agree;
 - frozen two-axis evaluation complete;
@@ -540,7 +679,8 @@ under 5 minutes to verify the core value
 
 The viewer should show the case card, opening selections, turn sequence,
 findings, model-reviewer changes, two-axis adjudication, metric numerators and
-denominators, provider proof, audit state, output hashes, and recorded custody.
+denominators including factual precision and receipt-support as separate
+measures, provider proof, audit state, output hashes, and recorded custody.
 
 A resolving citation makes a claim inspectable. It does not prove the claim is
 supported. The evaluator must expose irrelevant or insufficient receipts.
@@ -602,14 +742,29 @@ run may not be replaced or tuned away.
 
 ### Gate A: 2026-07-15 20:00 ET
 
-- C1 green;
-- proof structure substantially working;
-- Python 3.11 clean environment;
-- real catalog load;
-- deterministic native memory-tool smoke;
-- honest Git and provenance.
+- [x] C1 green;
+- [x] C2 proof structure and offline verifier green;
+- [x] official CPython 3.11.9 in clean primary and lockcheck environments;
+- [x] exact constraints and `pylock`, clean `pip check`, 128 tests, Ruff and
+      format, wheel plus sdist build, and diff check;
+- [x] Volatility help and exact catalog load of 25 direct plus 5 dynamic
+      entries;
+- [x] honest local Git and provenance through Gate A commit `6e696a0`;
+- [x] deterministic real-evidence `vol_pstree`, `vol_psscan`, and post-fix
+      `vol_netscan` outputs persist outside Git, scrub runner-local paths from
+      public success/failure surfaces, and verify with matching custody;
+- [x] reviewed Gate A hardening is committed as `6e696a0` on top of `7b05d6a`
+      without rewriting history;
+- [ ] public remote and independent server timestamp exist.
 
-If disk is the blocker, cut to memory-only immediately.
+**Current result: LOCAL NATIVE LEG GREEN, OVERALL BLOCKED.** The remaining Gate
+A proof class is provenance anchoring: push the full unchanged history through
+`6e696a0` and obtain an independent server timestamp.
+The empty-input terminal `INVALID` bundle remains only a separate
+finalization/verifier exercise.
+
+The proven and selected scored shape is Windows memory-only. Paired disk is
+future work and is not a Gate A or C4 blocker.
 
 ### Gate B: before the first GPT-5.6 DC01 call
 
@@ -619,6 +774,11 @@ If disk is the blocker, cut to memory-only immediately.
 - infrastructure faults and run-selection rule frozen;
 - code, prompts, catalog, dependencies, caps, retry policy, and price table
   frozen;
+- exact 16,000,000-byte worker ceiling, success/failure public-path sanitization
+  contract, and exact 65,536-byte UTF-8 model-view ceiling with
+  prefix/completeness rules frozen with the same exact code and prompt set;
+- protocol, rubric, scorer, and first-valid-run selection rule frozen with the
+  same exact code and prompt set;
 - public remote freeze commit and tag;
 - server-timestamped digest verification.
 
@@ -658,7 +818,9 @@ A screencast alone does not pass.
 
 Apply cuts in this order:
 
-1. If disk mounting misses Gate A, flagship becomes Windows memory-only.
+1. **Already applied:** cut the scored flagship scope to Windows memory-only,
+   matching the demonstrated route; C4 must still freeze it publicly, and
+   paired disk is future work.
 2. Remove Linux, macOS, Plaso, Docker, Qwen reruns, and extra tool families.
 3. Keep one authentic primary run and label it a single-run, single-case study.
 4. Cut replicates before cutting primary proof.
@@ -674,18 +836,19 @@ tuning, unsupported claims, or replay presented as live execution.
 ## 15. Red-to-green scoreboard
 
 ```text
-LOCAL GIT + PROVENANCE
-        -> PUBLIC REMOTE
-        -> C1 CORRECTNESS
-        -> C2 PROOF CONTRACT
-        -> PYTHON 3.11 + PIP CHECK
-        -> REAL DETERMINISTIC TOOL OUTPUT
-        -> PUBLIC EXPERIMENT FREEZE
-        -> AUTHENTIC GPT-5.6 PRIMARY
-        -> VERIFIED EVALUATION BUNDLE
-        -> HOSTED + OFFLINE VIEWER
-        -> PUBLIC VIDEO
-        -> DEVPOST CONFIRMATION
+[GREEN] LOCAL GIT + PROVENANCE
+        -> [YELLOW] COMMIT REVIEWED GATE A HARDENING
+        -> [RED] PUBLIC REMOTE + SERVER TIMESTAMP
+        -> [GREEN] C1 CORRECTNESS
+        -> [GREEN OFFLINE] C2 PROOF CONTRACT
+        -> [GREEN] CPYTHON 3.11.9 + LOCK + PIP CHECK
+        -> [GREEN LOCALLY] REAL DETERMINISTIC EVIDENCE ROWS + CUSTODY
+        -> [RED] PUBLIC EXPERIMENT FREEZE
+        -> [RED] FIRST-VALID AUTHENTIC GPT-5.6 PRIMARY
+        -> [RED] VERIFIED FROZEN EVALUATION BUNDLE
+        -> [RED] HOSTED + OFFLINE VIEWER
+        -> [RED] PUBLIC VIDEO
+        -> [RED] DEVPOST CONFIRMATION
 ```
 
 Turn these green in order. A later green state never excuses an earlier red
@@ -693,31 +856,37 @@ state.
 
 ## 16. Paste-ready Codex sequence
 
-The saved C1 and C2 prompts in the master plan remain the detailed
-implementation prompts. The following prompts correct the later sequence.
+The saved C1 and C2 prompts in the master plan and the C3 prompt below are
+completed historical build records. Do not paste them again. First commit and
+publish the reviewed Gate A hardening without rewriting history. Then use the
+C4 prompt as the next implementation task.
 
-### C3 prompt: real environment and deterministic native proof
+### Completed C3 prompt: real environment and deterministic native proof
 
 ```text
 Continue the existing sentinel-unchained repository after C1 and C2. Do not add
 product features and do not run GPT-5.6 against DC01 yet.
 
-1. Create and prove a clean Python 3.11 environment. Install the project and
-   locked dependencies. Run pip check, full pytest, Ruff, wheel build, and an
-   installed-package CLI/import smoke.
-2. Load the existing reviewed real tool catalog and worker boundary. Use the
-   existing fixed Volatility tool path before considering any new adapter.
-3. Against the real DC01 Windows memory image, directly execute at least one
+1. Reuse the proven official CPython 3.11.9 primary environment and committed
+   exact constraints plus pylock. Reconfirm pip check and the installed smoke;
+   do not regenerate dependency state without a reproduced defect.
+2. Acquire, verify, and hash the real DC01 Windows memory image outside the
+   repository. Record source archive and extracted evidence hashes without
+   committing evidence bytes.
+3. Load the existing reviewed real tool catalog and worker boundary. Confirm
+   the exact 25-direct/5-dynamic inventory and use the existing fixed
+   Volatility console path before considering any new adapter.
+4. Against the real DC01 Windows memory image, directly execute at least one
    actually exposed native memory function such as vol_pstree, plus one second
    eligible memory function if time permits. Do not require windows.pslist when
    it is not in the model-visible catalog.
-4. Prove real returned rows, symbol readiness, complete content-addressed output,
+5. Prove real returned rows, symbol readiness, complete content-addressed output,
    timeout behavior, credential-free child environment, cleanup, and matching
    recorded custody.
-5. Exercise paired-disk mounting/probes only if it remains inside Gate A. If it
-   fails the gate, freeze the flagship to Windows memory-only and update every
-   scope matrix.
-6. Add a regression fixture based on a sanitized captured real output shape.
+6. Keep paired-disk mounting/probes outside the Build Week primary. The scored
+   flagship is definitively Windows memory-only; treat E01 validation as future
+   work after submission.
+7. Add a regression fixture based on a sanitized captured real output shape.
 
 Do not create a direct cross-platform Volatility Python API adapter unless the
 existing reviewed path is first reproduced as incapable of the Windows-memory
@@ -750,7 +919,10 @@ Do not call the model on DC01 in this task.
    selection rule before seeing model proposals.
 5. Bind the exact Git commit, prompts, catalog, dependency lock, Python/native
    versions, evidence hashes, rubric, scorer, caps, retry policy, model alias,
-   price table, and selection rule by digest.
+   price table, exact 16,000,000-byte worker ceiling, case-insensitive
+   slash-variant public-path sanitization across success/failure surfaces, exact
+   65,536-byte UTF-8 investigator-model-view ceiling with native-order prefix
+   selection and explicit completeness receipt, and selection rule by digest.
 6. Commit and push without rewriting history. Tag experiment-freeze-v1. Add a
    server-timestamped CI job that recomputes and publishes the digest table.
 7. Save the public commit, tag, workflow, and release URLs in the handover.
@@ -779,9 +951,11 @@ this task.
 4. Execute the 1-to-6 model-selected opening concurrently, then one typed
    function per later turn. Preserve concise decision summaries, not hidden
    chain-of-thought.
-5. Retain all exact outputs, failures, audit events, manifests, summaries,
-   environment records, prompt/catalog/rubric digests, and pre/post evidence
-   hashes. Enforce cleanup and caps.
+5. Retain all exact accepted outputs, failures, audit events, manifests,
+   summaries, environment records, prompt/catalog/rubric digests, and pre/post
+   evidence hashes. Retain each investigator model view separately with its
+   completeness flag, exact byte count, and binding to the complete accepted
+   output's byte count and SHA-256. Enforce cleanup and caps.
 6. Run verify-run. Then apply the frozen two-axis evaluation and publish counts
    with every rate.
 7. Never replace a valid primary for a nicer result. Later identical runs are
@@ -876,6 +1050,17 @@ an invoice guarantee, or present replay as authentic execution.
 
 ## 18. Single next action
 
-Complete C0 and C1, then execute the proof-artifact prompt already saved in the
-master plan. Do not start a GPT-5.6 DC01 run until C2, C3, and the public C4
-freeze are green.
+Commit the reviewed Windows direct-tool routing, absolute-venv launcher,
+public-path sanitization, 16,000,000-byte worker transport, and 65,536-byte
+bounded model-view hardening. Preserve the failed pre-fix netscan diagnostic.
+Push the full history without rewriting it and establish an independent server
+timestamp. This closes the remaining Gate A provenance leg.
+
+Then publicly freeze the protocol, rubric, exact code, prompts, eligible
+catalog, caps, retries, scorer, exact 16,000,000-byte worker ceiling,
+case-insensitive slash-variant public-path sanitization across success/failure
+surfaces, exact 65,536-byte UTF-8 model-view ceiling with native-order prefix
+selection and explicit completeness receipt, and first-valid-run selection
+rule. Do not expose DC01 to GPT-5.6 before that freeze. The first post-freeze run
+that completes without a predeclared infrastructure fault is the primary, even
+when its semantic result is disappointing.

@@ -1,7 +1,7 @@
 # Sentinel Unchained: Build Week Winner Master Plan
 
-> **Status:** CONDITIONAL GO, Windows flagship scope frozen
-> **Last deep review:** 2026-07-14 20:50 ET
+> **Status:** CONDITIONAL GO, local native Gate A leg green, provenance anchor red
+> **Last deep review:** 2026-07-14 22:22 ET
 > **Track:** Developer Tools
 > **Internal submission deadline:** 2026-07-20
 > **Hard deadline:** 2026-07-21 17:00 PT / 20:00 ET
@@ -24,6 +24,28 @@ Official Rules control.
 
 Sentinel Unchained has a winning core idea and a substantial offline-tested
 controller. It is not submission-ready today.
+
+### Current proof snapshot: 2026-07-14 22:22 ET
+
+This is the controlling current-state snapshot. Older counts remain below as
+an explicitly historical baseline and must not be quoted as the present build.
+
+| Area | Evidence-backed state | Public claim boundary |
+|---|---|---|
+| Local provenance | Commits `5309e5c`, `7b05d6a`, and `6e696a0` retain the provider/reviewer, C2 proof/lock, and real Windows-memory Gate A hardening | Publish without rewriting history; no public remote or independent server timestamp exists yet |
+| Implementation | 14 Python source modules, 8,779 total text lines and 7,889 nonblank lines, 128 passing tests, Ruff and format clean, wheel plus sdist build passing, and diff check clean | Strong local implementation evidence, not an authentic GPT-5.6 investigation |
+| Python environment | Official CPython 3.11.9; clean primary and lockcheck virtual environments; `pip check` clean in both; exact Windows CPython 3.11 constraints and `pylock` committed | Reproducible tested Windows Python environment, not universal host portability |
+| Native-tool readiness | **GREEN LOCALLY:** verified DC01 memory-only profile, resolved Windows symbols, 14 sealed Windows-memory tools, real `vol_pstree`, `vol_psscan`, and post-fix `vol_netscan` results, and matching custody | Deterministic pre-freeze engineering proof only; no GPT-5.6 or scored run occurred |
+| C2 proof contract | Durable content-addressed outputs, requested and provider-returned model identity, response/request IDs, validated usage, bounded audited retries, manifest, summary, environment record, and offline `verify-run` are implemented and tested | Proof machinery is verified offline; it does not prove a live GPT-5.6 or native forensic run |
+| Retained CLI bundle | One empty-input run produced a hash-valid terminal `INVALID` bundle that passes ordinary offline verification | This proves invalid-path finalization only. It is not `COMPLETE`, authentic, evidence-backed, native-tool-backed, or GPT-5.6-backed |
+| Gate A | **LOCAL NATIVE LEG GREEN; OVERALL BLOCKED** | Publish the full unchanged history and establish an independent server timestamp |
+| Live runtime | `OPENAI_API_KEY` is absent and no funded runtime has been demonstrated | No authentic GPT-5.6 claim is allowed |
+| Downstream submission work | No public freeze/rubric, authentic primary run, viewer, video, or Devpost submission | All remain open and must follow the gate order in this document |
+
+The immediate priority is not another native adapter or more controller breadth.
+Publish the history through Gate A commit `6e696a0` without rewriting it,
+establish an independent server timestamp, then publicly freeze the full
+experiment before any GPT-5.6 DC01 investigation.
 
 Proceed with this project. Do not pivot to a registry project. Do not add
 Linux, macOS, Plaso, Docker portability, or broad new tool families before the
@@ -212,7 +234,7 @@ model.” The accurate statement is:
 | GPT-5.6 investigator | Opening strategy, next-tool choice, concise decision summaries, hypotheses, interpretation, provisional atomic findings, stopping decision |
 | Fresh GPT-5.6 reviewer | Finding-scoped receipt review, preservation or downgrade only, rationale and cited spans |
 | GPT-5.6 reporter | Narrative and tables from already reviewed findings, without new evidence or new findings |
-| External evaluator | Known-fact scoring and the final statement of what is actually supported |
+| Disclosed reference evaluator | Known-fact scoring and the final statement of what is actually supported, labeled independent or project-authored as applicable |
 
 The model has no model-selected shell authority. Trusted code may invoke fixed,
 allowlisted native subprocesses. The model cannot compose a command, choose a
@@ -249,7 +271,7 @@ GPT-5.6 REPORT
 DETERMINISTIC CLEANUP, POST-HASH, MANIFEST, VERIFY-RUN
         |
         v
-EXTERNAL KNOWN-FACT EVALUATION
+FROZEN REFERENCE EVALUATION, AUTHORSHIP DISCLOSED
 ```
 
 The opening batch is one model decision followed by concurrent code execution.
@@ -274,9 +296,11 @@ independently proven true.
 
 ### Scope freeze
 
-The flagship is one Windows public-evidence investigation. Paired DC01 memory
-plus E01 disk is the target. DC01 memory-only is the explicit fallback if the
-disk mount route misses Gate A.
+The scored flagship is one Windows public-evidence investigation using the
+demonstrated DC01 memory-only route. This scope cut is final for the Build Week
+primary. Paired E01 disk is outside the scored route and may be revisited only
+as future work after the authentic primary, viewer, video, and submission are
+green. It is not a Gate A or C4 blocker.
 
 The following work is frozen until the authentic run, evaluation, viewer, and
 video are green:
@@ -293,9 +317,9 @@ video are green:
 
 | Evidence route | Current honest state | Public claim allowed now |
 |---|---|---|
-| Windows memory | Substantial implementation, synthetic/offline tests, no retained authentic run | IMPLEMENTED, NOT YET DEMONSTRATED |
-| Windows mounted disk artifacts | Substantial reviewed subset, native route not cleanly proven | IMPLEMENTED, NOT YET DEMONSTRATED |
-| Windows paired memory plus disk | Intended flagship, not yet end-to-end proven | TARGET, NOT YET DEMONSTRATED |
+| Windows memory | Locally demonstrated with verified DC01, resolved symbols, 14 sealed tools, three successful native functions, sanitized retained outputs, and custody; no authentic GPT-5.6 run | VERIFIED LOCALLY, NOT AUTHENTICALLY DEMONSTRATED |
+| Windows mounted disk artifacts | Substantial reviewed subset, native route not cleanly proven, outside the Build Week primary | IMPLEMENTED, FUTURE VALIDATION |
+| Windows paired memory plus disk | Explicitly cut from the Build Week primary | OUT OF PRIMARY SCOPE |
 | Linux memory | Conditional on an exact matching symbol table; no end-to-end proof | EXPERIMENTAL |
 | Linux disk | Fixed TSK metadata probes only; no Plaso or full timeline route | LIMITED METADATA ONLY |
 | macOS memory | Conditional best effort; no end-to-end proof | BEST EFFORT, UNDEMONSTRATED |
@@ -315,8 +339,10 @@ Host OS and evidence OS are different axes.
 
 | Host path | Current state |
 |---|---|
-| Current Windows Python 3.14 environment | Offline tests pass; live dependencies are incomplete; not the target proof environment |
-| Windows 11 plus WSL2 | Target flagship runner; TSK present, `ewfmount` and `ntfs-3g` currently missing |
+| Windows x86-64 plus official CPython 3.11.9 | VERIFIED for clean primary and lockcheck virtual environments, exact locked dependencies, `pip check`, 128 tests, Ruff and format, wheel plus sdist build, installed-package smoke, Volatility help, and catalog load |
+| Existing fixed Volatility console adapter | VERIFIED LOCALLY on real DC01 memory: symbols ready, 14 sealed Windows-memory tools, real `vol_pstree`, `vol_psscan`, and post-fix `vol_netscan` output, and matching custody |
+| Earlier Windows Python 3.14 environment | Historical development environment only; it is not the target proof environment |
+| Windows 11 plus WSL2 | Optional disk-support route; TSK was observed while `ewfmount` and `ntfs-3g` were missing at the earlier checkpoint |
 | Native Ubuntu/Linux | Plausible target, not yet clean-machine demonstrated |
 | Native macOS runner | Unverified |
 | Browser static viewer | Required cross-platform judge path, not yet built |
@@ -330,52 +356,140 @@ were actually tested.
 
 ## 6. Current implementation truth
 
-Verified on July 14, 2026:
+### Historical C1 baseline, retained for traceability
 
-- 12 source modules and 6,068 physical source lines;
-- 80 offline tests pass;
+The following checkpoint was accurate earlier on July 14, before commits
+`5309e5c` and `7b05d6a`. It is preserved as build history, not as the current
+project count:
+
+| Historical checkpoint | Earlier verified value |
+|---|---:|
+| Python source modules | 12 |
+| Physical source lines | 6,068 |
+| Offline tests | 80 passing |
+| Quality gates | Ruff check, Ruff format check, and wheel build passing |
+
+The C2 commit checkpoint is also historical and must remain distinguishable
+from the later Gate A hardening in commit `6e696a0`:
+
+| C2 checkpoint at `7b05d6a` | Verified value |
+|---|---:|
+| Python source modules | 14 |
+| Repository-counted nonblank source lines | 7,767 |
+| Tests | 123 passing |
+| Quality gates | Ruff and build passing; both CPython 3.11.9 environments clean |
+
+### Current implementation proof at 22:22 ET
+
+- 14 Python source modules, 8,779 total text lines, and 7,889 nonblank lines;
+- 128 tests pass;
 - Ruff check and format check pass;
-- a wheel builds;
-- core control-plane behavior is substantial and tested offline;
-- the prior MIT tool dependency is pinned to an exact commit;
-- the feedback ID and screenshot are retained.
+- wheel and sdist builds pass;
+- diff check passes;
+- official CPython 3.11.9 is proven in clean primary and independent lockcheck
+  virtual environments;
+- `pip check` is clean in both environments;
+- `requirements/constraints.windows-amd64-cp311.txt` and
+  `requirements/pylock.windows-amd64-cp311.toml` retain exact dependency state,
+  including source and wheel hashes where the lock format supplies them;
+- Volatility console help succeeds and the pinned Qwen catalog loads exactly
+  25 direct plus 5 dynamic entries through the existing fixed adapter;
+- commit `5309e5c` retains provider-returned model identity, response/request
+  identifiers, validated usage, evidence-grounded quote structure, and bounded
+  audited application retries;
+- commit `7b05d6a` retains content-addressed accepted outputs, environment and
+  summary generation, non-self-referential manifest finalization, detached
+  manifest checksum, offline `verify-run`, tamper tests, and the locked Python
+  3.11 path;
+- the prior MIT tool dependency remains pinned to its exact commit;
+- the feedback ID and screenshot remain retained.
 
-Not yet proven:
+The post-`7b05d6a` Gate A hardening is locally verified and bound by commit
+`6e696a0`, but it is not publicly timestamped. It fixes three real integration
+boundaries:
 
-- a clean Python 3.11 install;
-- a passing `pip check` in the live environment;
-- a genuine GPT-5.6 request and real-tool investigation;
-- a complete public run bundle;
-- a no-key viewer or replay;
-- a public video;
-- a Devpost submission;
-- a public Git remote and independently timestamped commit history.
+1. Windows direct tools no longer depend on the Linux/macOS dynamic-plugin
+   catalog.
+2. An absolute virtual-environment interpreter path can resolve its adjacent
+   `vol.exe` launcher.
+3. The private worker accepts up to 16,000,000 response bytes, sanitizes local
+   evidence and mount paths from successful results, nested strings, and
+   case-varied failure messages, and gives the model at most 65,536 UTF-8 bytes
+   while retaining the complete accepted output and its exact receipt.
 
-Current environment blockers:
+The retained empty-input CLI run ended `INVALID` with zero model responses,
+zero tool calls, no evidence profile, and no custody baseline. Its manifest and
+audit verify. This is useful proof that the finalizer preserves and validates
+an invalid terminal path. It is not a `COMPLETE` bundle and must never be used
+as evidence of GPT-5.6, real evidence, native tools, findings, or matched
+custody.
 
-- active Python is 3.14.3, not the intended 3.11 proof environment;
-- `sift-sentinel`, `tiktoken`, and `volatility3` are missing from the active
-  environment according to `pip check`;
-- `OPENAI_API_KEY` is absent from the current process;
-- WSL lacks `ewfmount` and `ntfs-3g`;
-- a local `main` Git repository and honest root commit exist, but no public
-  remote or independent server timestamp exists yet.
+### Local Gate A native proof, not a model run
+
+The official DC01 memory archive and extracted image remain outside the
+repository and must never be committed or redistributed:
+
+| Artifact | Exact local proof |
+|---|---|
+| Official `DC01-memory.zip` | 561,424,278 bytes; official MD5 matches `64A4E2CB47138084A5C2878066B2D7B1`; SHA-256 `86658D85D8254E8D30DCCC4F50D9C2A8B550A101D2E78A6D932316849E37AD80` |
+| Extracted `citadeldc01.mem` | 2,147,483,648 bytes; SHA-256 `8079A7459B1739CAF7D4FBF6DDE5EB0AE7A9D24DBDE657DEBF4D5202C8DC6B62` |
+| Deterministic profile | Windows, memory-only, ready, symbols ready; `windows.info` resolved OS and symbols; 14 typed Windows-memory tools exposed |
+| Authoritative process batch | `gate-a-final-20260715T015251Z`; wall time 5,968 ms; `evidence_id` `E001`; no private path; custody matched |
+| Batch `vol_pstree` | Success with 40 records; complete sanitized accepted output 15,277 bytes; SHA-256 `e2e70d5164939f5a735c450ecc0f2c268e48f22ae4a4dab76a92fa67f04ecac6` |
+| Batch `vol_psscan` | Success with 72 records; complete sanitized accepted output 16,526 bytes; SHA-256 `836951c95fdcc131064b52cfc229bb3753e389567fcb534174ac3f40d14a7fe4` |
+| First parallel `vol_netscan` | Failed at the former 2,000,000-byte worker transport boundary; preserved as a diagnostic and not hidden or relabeled |
+| `gate-a-netscan-20260715T014947Z` | Post-fix success with 19,685 records; complete sanitized accepted output 3,961,843 bytes; SHA-256 `efced1af66f99ec2064d14f30a5f018d90e5c169027672be9e3c0110122cb421`; `evidence_id` `E001`; no private path; custody matched |
+| Bounded netscan model view | Exactly 65,536 UTF-8 bytes containing a native-order prefix of 55,732 characters plus an explicit delivery receipt; `model_view_complete=false`; receipt retains the full accepted-output byte count and SHA-256 |
+
+This smoke proves the local deterministic Windows-memory route and the output
+boundary. It did not invoke GPT-5.6, did not use an API key, did not score the
+case, and did not expose DC01 to a model. It is allowed pre-freeze engineering
+work, not the post-freeze authentic primary.
+
+Earlier `vol_pstree` and `vol_psscan` outputs were produced before public-path
+sanitization and remain diagnostics only. Their hashes must not be presented as
+the current public-safe Gate A proof. The authoritative process proof is the
+sanitized `gate-a-final-20260715T015251Z` batch above.
+
+The accepted output and model view are different artifacts with different
+claims. The complete sanitized accepted output is retained and content-hashed.
+The investigator tool-result channel receives either that complete output when
+it fits or a deterministic native-order prefix plus an explicit incomplete-view
+receipt when it exceeds 65,536 bytes. Never call the prefix the full output,
+and never infer semantic truth merely because a quote resolves inside it.
+
+Still not proven:
+
+- a public copy of retained Gate A hardening commit `6e696a0`;
+- a public Git remote or independent server timestamp;
+- a funded authentic GPT-5.6 request, because no `OPENAI_API_KEY` or funded
+  runtime proof is present;
+- a public protocol, rubric, scorer, and run-selection freeze;
+- a first-valid post-freeze authentic primary run;
+- a frozen evaluation, hosted/offline viewer, public video, or Devpost
+  submission.
 
 ### Stop-ship code and proof gaps
 
 | ID | State | Gap or result | Required next evidence |
 |---|---|---|---|
 | P0-1 | RESOLVED OFFLINE | Fail-closed link-free Markdown subset makes malformed/reference/inline links and images inert | Authentic report artifact and viewer-safe rendering |
-| P0-2 | RESOLVED OFFLINE | Exact matched byte offset propagates into mounting and sealed partition-aware `fsstat`; tool is withheld when unknown | Native paired-disk proof if disk remains flagship |
+| P0-2 | RESOLVED OFFLINE | Exact matched byte offset propagates into mounting and sealed partition-aware `fsstat`; tool is withheld when unknown | Optional post-submission paired-disk validation, not a primary gate |
 | P0-3 | RESOLVED OFFLINE | Printable log classification precedes generic memory-banner inference | Authentic evidence-profile artifact |
-| P0-4 | OPEN | Audit retains output SHA-256 plus only the first 2 KiB, not independently inspectable full accepted output | Content-addressed full outputs, metadata, hashes, and a verifier |
-| P0-5 | OPEN | Runtime prompt says Windows only while later text and docs imply multi-OS | Flagship prompt and public scope are one consistent Windows contract |
-| P0-6 | OPEN | OpenAI client uses `max_retries=0` | Small audited transient retry policy bounded by wall/cost caps and incapable of duplicating tool execution |
-| P0-7 | OPEN | Dependencies are not locked for the live proof | Exact lock or constraints, Python 3.11 install transcript, CI result, and `pip check` |
-| P0-8 | OPEN | Audit records the configured model string, but does not retain the provider-returned `response.model` value | Provider-returned model, response ID, request ID, status, usage, and retrieval time retained for every live response |
+| P0-4 | RESOLVED OFFLINE IN C2 | Every accepted output is persisted content-addressably before completion is accepted; manifest and verifier bind exact bytes | Real native output in the authentic primary bundle |
+| P0-5 | RESOLVED OFFLINE | Runtime investigator prompt and flagship public scope consistently describe the Windows evidence route | Authentic Windows profile and run artifacts |
+| P0-6 | RESOLVED OFFLINE IN C2 | SDK auto-retries stay disabled; a code-owned maximum-two transient retry policy is bounded, audited, and separated from tool execution | Live provider attempt receipts |
+| P0-7 | RESOLVED FOR WINDOWS CPYTHON 3.11 | Exact constraints and `pylock`, official CPython 3.11.9, two clean environments, and clean `pip check` are retained | Public CI/server timestamp and final freeze digest |
+| P0-8 | RESOLVED OFFLINE IN C2 | Requested alias, provider-returned model, response ID, request ID, status, and validated usage are modeled, audited, summarized, and strict-verifier tested | Authentic provider-returned values from the primary run |
+| P0-9 | RESOLVED LOCALLY | Real `vol_pstree`, `vol_psscan`, and post-fix `vol_netscan` accepted outputs are retained outside the repository with matching custody | Publish non-evidence proof metadata, then repeat inside the authentic primary |
+| P0-10 | PARTIAL | Gate A hardening is bound locally by `6e696a0`, but no public remote or server timestamp exists | Publish and server-verify the unchanged history without rewriting it |
+| P0-11 | RESOLVED LOCALLY | The old 2,000,000-byte worker ceiling rejected a real netscan response; the failure is preserved and the boundary is now 16,000,000 bytes with a separate 65,536-byte model view | Freeze its exact committed values before the primary |
+| P0-12 | RESOLVED LOCALLY | Worker success and failure surfaces scrub runner-local evidence/mount paths, including slash and case variants; a subprocess regression covers the exception path | Freeze the exact committed contract before the primary |
 
-The provider-model gap is important. `UNCHAINED_MODEL=gpt-5.6` proves what was
-requested. It does not by itself prove what the provider returned. Capture both.
+The provider-model implementation gap is closed, but the authentic proof gap is
+not. `UNCHAINED_MODEL=gpt-5.6` will prove only what was requested. The first
+live proof must retain the distinct provider-returned model and response/request
+identifiers before any authentic-model claim is published.
 
 ## 7. Correct experiment
 
@@ -430,9 +544,18 @@ truth.
 
 ### Freeze before any GPT-5.6 investigation of DC01
 
+The public freeze is one indivisible experiment contract. It must cover the
+protocol, reference rubric, exact code commit, prompts, eligible tool catalog,
+caps, retry policy, scorer, the 16,000,000-byte worker-response ceiling,
+case-insensitive slash-variant public-path sanitization across success and
+failure surfaces, the 65,536 UTF-8-byte investigator-model-view ceiling with
+native-order prefix selection and an explicit completeness receipt, and the
+first-valid-run selection rule. Freezing only the rubric is insufficient.
+
 Before the first GPT-5.6 investigation of DC01, retain and hash:
 
-- Git commit;
+- protocol version;
+- exact Git commit containing the bound code;
 - evidence archive and extracted-file hashes;
 - prompt hashes;
 - tool-catalog digest;
@@ -440,10 +563,15 @@ Before the first GPT-5.6 investigation of DC01, retain and hash:
 - Python and native-tool versions;
 - requested model alias and API configuration excluding secrets;
 - cap configuration;
+- worker response ceiling of exactly 16,000,000 bytes;
+- recursive, case-insensitive, slash-variant public-path sanitization across
+  success and failure surfaces;
+- investigator model-view ceiling of exactly 65,536 UTF-8 bytes, native-order
+  prefix selection, and explicit completeness receipt;
 - versioned price table;
 - retry configuration;
 - reference-rubric version;
-- evaluation script version;
+- scorer/evaluation-script version;
 - run-selection rule.
 
 Push this freeze to a public remote and establish an independent server-side
@@ -477,7 +605,7 @@ Create a versioned evidence-observable atomic fact rubric. Each scored fact
 must be:
 
 - atomic and deduplicated;
-- observable from the supplied DC01 memory and/or disk pair;
+- observable from the selected DC01 memory-only route that C4 will freeze;
 - associated with a required artifact type;
 - labeled stable, approximate, ambiguous, or unobservable;
 - frozen before the model run;
@@ -498,7 +626,8 @@ Every rate must publish its numerator and denominator.
 | Metric | Definition |
 |---|---|
 | Investigator proposal support rate | receipt-supported investigator proposals / all investigator proposals |
-| Final-confirmed precision | receipt-supported final `CONFIRMED` findings / all final `CONFIRMED` findings |
+| Final-confirmed factual precision | factually `CORRECT` in-rubric final `CONFIRMED` findings / all factually adjudicable in-rubric final `CONFIRMED` findings |
+| Final-confirmed receipt-support rate | receipt-`SUPPORTED` final `CONFIRMED` findings / all final `CONFIRMED` findings |
 | Discovered-fact recall | scored reference facts correctly surfaced at any status / all scored observable facts |
 | Confirmed-fact recall | scored reference facts correctly surfaced and finally `CONFIRMED` / all scored observable facts |
 | Reviewer catch rate | receipt-unsupported proposals downgraded / all receipt-unsupported proposals |
@@ -538,7 +667,8 @@ Product-quality success requires:
 - matching final custody;
 - every citation resolving to a retained real receipt;
 - no receipt-unsupported finding remaining `CONFIRMED`;
-- honest recall, precision, reviewer escape, and reviewer over-downgrade rates;
+- honest recall, final-confirmed factual precision, final-confirmed
+  receipt-support, reviewer escape, and reviewer over-downgrade rates;
 - anonymous no-rebuild inspection.
 
 A complete run may still expose missed facts, unsupported proposals, reviewer
@@ -569,21 +699,41 @@ invites judges to question the experiment.
 Primary source:
 [DFIR Madness Case 001](https://dfirmadness.com/the-stolen-szechuan-sauce/).
 
-Current server-reported compressed archive facts:
+Current server-reported compressed archive facts are retained for benchmark
+context. Only the memory archive is in the Build Week primary:
 
 | Archive | Bytes | Source-published MD5 |
 |---|---:|---|
 | `DC01-E01.zip` | 4,836,649,413 | `E57FC636E833C5F1AB58DFACE873BBDE` |
 | `DC01-memory.zip` | 561,424,278 | `64A4E2CB47138084A5C2878066B2D7B1` |
 
-The combined compressed download is 5,398,073,691 bytes, approximately 5.398
-decimal GB or 5.027 GiB. The original plan's 4.8 GB plus 0.6 GB is acceptable
-only when labeled rounded compressed download size.
+The two published archives total 5,398,073,691 compressed bytes, approximately
+5.398 decimal GB or 5.027 GiB. That combined size is context only, not the
+primary-run download requirement. The selected primary will use the
+561,424,278-byte memory archive after C4 freezes the route.
 
-After download:
+Current acquisition state at 22:22 ET:
 
-1. Verify the source-published MD5 values.
-2. Compute SHA-256 for both archives.
+- `DC01-memory.zip` was acquired from the official case page outside the
+  repository;
+- its exact size is 561,424,278 bytes;
+- its MD5 matches the source-published
+  `64A4E2CB47138084A5C2878066B2D7B1`;
+- its locally computed SHA-256 is
+  `86658D85D8254E8D30DCCC4F50D9C2A8B550A101D2E78A6D932316849E37AD80`;
+- extracted `citadeldc01.mem` is 2,147,483,648 bytes with SHA-256
+  `8079A7459B1739CAF7D4FBF6DDE5EB0AE7A9D24DBDE657DEBF4D5202C8DC6B62`;
+- both archive and evidence image remain outside Git and outside public proof
+  bundles.
+
+The DC01 E01 archive is not claimed acquired or proven by this checkpoint and
+is explicitly outside the Build Week primary. The demonstrated and selected
+route is Windows memory-only.
+
+For the selected memory archive:
+
+1. Verify the source-published MD5 value.
+2. Compute the archive SHA-256.
 3. Extract safely outside the repository.
 4. Compute SHA-256 for every evidence file used.
 5. Record source URL, retrieval time, byte sizes, archive hashes, extracted
@@ -622,7 +772,13 @@ establish broad redistribution rights.
 
 ## 9. Authentic proof bundle
 
-The judge-visible proof bundle should have this minimum structure:
+The C2 bundle machinery is implemented and offline-tested. The only retained
+CLI bundle at this checkpoint is the empty-input terminal `INVALID` bundle. Its
+successful ordinary verification proves bundle consistency on that failure
+path only. It is not the authentic bundle described in this section.
+
+The future judge-visible authentic proof bundle should have this minimum
+structure:
 
 ```text
 examples/public-run/
@@ -637,6 +793,7 @@ examples/public-run/
   prompts/
   tool-outputs/
   verifier-output.txt
+  manifest.sha256
 ```
 
 `manifest.json` must bind:
@@ -649,6 +806,11 @@ examples/public-run/
 - evidence pre/post hashes;
 - prompt, catalog, dependency, rubric, and price-table digests;
 - cap configuration;
+- exact 16,000,000-byte worker-response ceiling;
+- recursive case-insensitive slash-variant public-path sanitization contract
+  across success and failure surfaces;
+- exact 65,536 UTF-8-byte investigator-model-view ceiling, native-order prefix
+  selection, and explicit completeness receipt;
 - audit final hash;
 - relative artifact paths, byte sizes, and SHA-256 values;
 - cleanup and custody result.
@@ -661,7 +823,10 @@ Each tool output must be stored content-addressably with:
 - relative artifact path;
 - byte count, encoding, and media type;
 - SHA-256;
-- explicit truncation or transport-limit status.
+- explicit truncation or transport-limit status;
+- when the investigator received a bounded view, that view's exact byte count,
+  completeness flag, native-order prefix rule, and binding to the complete
+  accepted-output byte count and SHA-256.
 
 `audit.jsonl` is the authoritative ordered event history. It is not the single
 source for every fact and it is not externally immutable. The final manifest,
@@ -719,7 +884,8 @@ The first screen should show:
 
 1. one-sentence problem and product outcome;
 2. authentic-run status, model, date, runtime, cost, calls, and custody;
-3. known-fact recall and atomic-claim precision with numerators;
+3. confirmed-fact recall, final-confirmed factual precision, and
+   final-confirmed receipt-support rate with numerators and denominators;
 4. investigator versus reviewer status changes;
 5. a clear replay banner.
 
@@ -740,16 +906,23 @@ dashboard.
 
 ### `verify-run`
 
-The no-key verifier must fail closed on:
+The standard-library, no-network verifier now fails closed on:
 
 - audit sequence, previous-hash, or entry-hash mismatch;
 - missing artifact;
 - byte-size or SHA-256 mismatch;
 - unresolved finding citation;
 - quoted span not present in the cited output;
-- manifest and summary disagreement;
+- modified manifest-listed summary bytes;
 - failed final custody;
 - missing provider proof required by the public claim.
+
+It also rejects unsafe relative paths, symlinks, duplicate receipt identities,
+unreferenced tool-output blobs, invalid terminal ordering, judge upgrades, and
+fake/replay markers under strict live verification. A successful check proves
+internal bundle integrity, receipt resolution, and recorded custody fields. It
+does not prove semantic entailment and, without the source evidence, does not
+rehash original evidence bytes.
 
 ## 11. Video plan
 
@@ -774,7 +947,7 @@ Genuine GPT-5.6 run, time-compressed. Full audit and timestamps linked.
 | 1:22-1:42 | Adaptive behavior | Concise observable decision summary and course correction |
 | 1:42-2:04 | Signature result | Investigator proposal, reviewer verdict, frozen reference-adjudication result |
 | 2:04-2:28 | Receipt drill-down | Typed args, exact stored output, hash, audit verification, custody |
-| 2:28-2:42 | Scoreboard | Recall, precision, reviewer catch/escape, runtime, calls, cost, custody |
+| 2:28-2:42 | Scoreboard | Recall, factual precision, receipt-support, reviewer catch/escape, runtime, calls, cost, custody |
 | 2:42-2:48 | Close | Repo, viewer, MIT project code, attribution, Codex plus GPT-5.6 |
 
 Do not show hidden chain-of-thought. Show concise model-authored decision
@@ -791,11 +964,18 @@ flagship result.
 
 - [ ] Request Codex credits if not already done and save confirmation.
 - [ ] Verify current-event registration and private eligibility.
-- [ ] Check disk capacity and start both DC01 downloads.
-- [x] Initialize honest local Git history; public remote still pending.
+- [x] Acquire and hash the official DC01 memory archive and extracted image
+      outside the repository; the E01 archive remains unproven.
+- [x] Initialize honest local Git history and retain commits `5309e5c` and
+      `7b05d6a`; public remote still pending.
 - [x] Create `BUILD_PROVENANCE.md`.
-- [ ] Freeze Windows paired target with memory-only fallback.
+- [x] Prove the Windows memory-only native route locally.
+- [x] Cut the scored primary route to Windows memory-only; paired E01 is future
+      work and not a gate.
+- [ ] Bind the Windows memory-only route into the public C4 freeze.
 - [x] Complete and verify the three reproduced correctness fixes.
+- [x] Complete C2 proof artifacts, bounded audited retries, verifier, and exact
+      Python 3.11 dependency state.
 
 Do not begin Linux/macOS breadth, Plaso, Qwen reruns, viewer polish, or video.
 
@@ -806,19 +986,35 @@ Pass only when:
 - [x] sanitizer bypass is fixed and rendered adversarial tests pass;
 - [x] exact filesystem offset is propagated and tested;
 - [x] text-log/memory classification is fixed and tested;
-- [ ] full outputs are durable or every claim is narrowed;
-- [ ] provider-returned model metadata design is implemented;
-- [ ] dependencies are locked;
-- [x] honest local Git/provenance exists; public remote remains required;
-- [ ] clean Python 3.11 install, `pip check`, tests, Ruff, and wheel pass;
-- [ ] real catalog imports;
-- [ ] one native memory tool and the required disk-path probes succeed.
+- [x] full accepted outputs are durable and content-addressed;
+- [x] provider-returned model and request/response metadata are implemented and
+      fixture-verified;
+- [x] exact constraints and `pylock` are committed;
+- [x] official CPython 3.11.9, both clean environments, `pip check`, 128 tests,
+      Ruff and format, wheel plus sdist build, installed smoke, and diff check
+      pass;
+- [x] Volatility help and the exact pinned catalog import succeed with 25
+      direct plus 5 dynamic entries;
+- [x] reviewed Gate A hardening is committed as `6e696a0` on top of `7b05d6a`
+      without rewriting history;
+- [ ] public remote and independent server timestamp exist;
+- [x] authoritative sanitized `vol_pstree` and `vol_psscan` outputs plus the
+      post-fix large `vol_netscan` output are retained outside Git and custody
+      matches; success and failure surfaces have path-scrubbing regressions.
 
-If Gate A fails because of disk mounting, cut paired disk from the flagship and
-use an honest Windows memory-only route. Remove multi-OS, Docker, and disk-demo
-claims. Do not add features.
+**Current Gate A result at 22:22 ET: LOCAL NATIVE LEG GREEN, OVERALL BLOCKED.**
+C1, C2, Python, lock, build, catalog, acquisition, profile, symbols, sealed
+native execution, large-output handling, and custody are green. The remaining
+Gate A provenance leg is to publish the full unchanged history and establish
+an independent server timestamp. The verified
+empty-input `INVALID` bundle remains separate and does not contribute native or
+model proof.
 
-### Gate B1: before the first GPT-5.6 DC01 call
+The selected and proven route is Windows memory-only. Freeze and score exactly
+that route. Remove multi-OS, Docker, and disk-demo claims rather than delaying
+the primary.
+
+### Gate B: before the first GPT-5.6 DC01 call
 
 Pass only when:
 
@@ -826,14 +1022,17 @@ Pass only when:
 - [ ] metric numerators, denominators, zero-denominator behavior, success gates,
       infrastructure-fault criteria, and run-selection rule are frozen;
 - [ ] code, prompts, catalog, dependencies, caps, retries, price table, evidence
-      hashes, rubric, and scorer are bound by digest;
+      hashes, rubric, scorer, the exact 16,000,000-byte worker ceiling,
+      success/failure public-path sanitization contract, and exact 65,536-byte
+      UTF-8 model-view ceiling with prefix/completeness rules are bound by
+      digest;
 - [ ] the exact freeze commit and tag are public;
 - [ ] server-timestamped CI or an equivalent independent service recomputes and
       publishes the freeze digests;
 - [ ] no GPT-5.6 DC01 investigation has occurred, or every earlier run is
       disclosed and the untouched-preregistration claim is removed.
 
-### Gate B2: July 17 at 18:00 ET
+### Gate C: July 17 at 18:00 ET
 
 Pass only when:
 
@@ -849,7 +1048,7 @@ Pass only when:
 If the evaluation is performed by the project author, label it
 project-authored rather than independent.
 
-If Gate B2 fails, stop presentation work and fix only the live path. A fake
+If Gate C fails, stop presentation work and fix only the live path. A fake
 replay cannot substitute for proof. Convene an explicit go/no-go review.
 
 ### July 18
@@ -897,9 +1096,11 @@ the inaccurate “exactly four pieces of deterministic code” story.
 
 ### Completed Codex build prompt: P0 correctness
 
-This prompt completed on July 14 with 80 passing tests. Retain it for audit
-history; do not paste it again unless a regression reopens one of the three
-defects.
+This prompt completed on July 14 at the historical 80-test C1 checkpoint. C2
+later reached 123 tests at `7b05d6a`; the current Gate A-hardened working tree
+has 128. Retain all three checkpoints accurately, do not quote 80 or 123 as the
+current suite, and do not paste the prompt again unless a regression reopens one
+of the three defects.
 
 ```text
 Continue the existing sentinel-unchained repository. Do not rebuild or replace
@@ -930,7 +1131,13 @@ outcomes, ledger states, gate state, risks, change log, and the single next
 action. Update DECISIONS.md only if a durable architecture decision changes.
 ```
 
-### Next Codex build prompt: proof artifacts
+### Completed Codex build prompt: C2 proof artifacts
+
+Commits `5309e5c` and `7b05d6a` completed this block with 123 passing tests,
+clean Ruff and build gates, the exact Python 3.11 lock path, and a verified
+terminal `INVALID` empty-input bundle. Retain the prompt for build history. Do
+not paste it as the next task, and do not describe its invalid fixture as an
+authentic or complete run.
 
 ```text
 Continue the verified P0-fixed sentinel-unchained repository. Read the master
@@ -965,13 +1172,16 @@ The authoritative paste-ready C3 through C7 prompts are in
 [WINNER_ROADMAP.md](WINNER_ROADMAP.md#16-paste-ready-codex-sequence). Their
 order is mandatory:
 
-1. clean Python 3.11 and deterministic native-tool proof without GPT-5.6 on
-   DC01;
-2. public protocol, rubric, scorer, prompt, tool, cap, retry, and run-selection
-   freeze;
-3. first GPT-5.6 DC01 investigation as the primary result;
-4. frozen two-axis evaluation and no-rebuild judge product;
-5. final docs, video, feedback, tag, and submission.
+1. retain the completed local deterministic native-tool proof without GPT-5.6
+   on DC01;
+2. push the retained history through Gate A commit `6e696a0` without rewriting
+   it, and establish an independent server timestamp;
+3. public protocol, rubric, scorer, prompt, tool, cap, retry,
+   16,000,000-byte worker-response, success/failure path-sanitization,
+   65,536-byte UTF-8 model-view prefix/completeness, and run-selection freeze;
+4. first GPT-5.6 DC01 investigation as the primary result;
+5. frozen two-axis evaluation and no-rebuild judge product;
+6. final docs, video, feedback, tag, and submission.
 
 Do not use the runtime investigator contract below against DC01 before the
 public experiment freeze. Authentic Responses API transport may be rehearsed
@@ -1129,19 +1339,23 @@ evaluation design, not merely GPT-5.6 calling forensic tools.
 
 ## 17. Final go/no-go rule
 
-Continue Sentinel Unchained while the project can still meet Gate B2 by Friday,
+Continue Sentinel Unchained while the project can still meet Gate C by Friday,
 July 17 at 18:00 ET.
 
-If Gate B2 passes, finish the viewer, video, and submission. If Gate B2 fails,
+If Gate C passes, finish the viewer, video, and submission. If Gate C fails,
 stop all cosmetic and breadth work, diagnose only the live route, and make an
-explicit go/no-go decision. A memory-only authentic route is acceptable if it
-is honestly scoped. A fake replay is never acceptable as proof.
+explicit go/no-go decision. The authentic primary must use the frozen
+memory-only scope. A fake replay is never acceptable as proof.
 
-The single highest-leverage next action remains:
+The single highest-leverage next action is now:
 
-> Implement durable content-addressed tool outputs, provider-returned model
-> proof, manifest, summary, verifier, bounded audited retries, and locked Python
-> 3.11 dependencies before native smoke and the public experiment freeze.
+> Commit the reviewed Gate A routing, launcher, sanitization, large-output, and
+> bounded-model-view hardening. Publish the full history without rewriting it
+> and establish a server timestamp. Then freeze the protocol, rubric, code,
+> prompts, catalog, caps, retries, scorer, the exact 16,000,000-byte worker
+> ceiling, success/failure public-path sanitization contract, exact 65,536-byte
+> UTF-8 model-view prefix/completeness rules, and first-valid-run selection rule.
+> Do not run GPT-5.6 on DC01 before that public freeze.
 
 ## 18. Change control
 
