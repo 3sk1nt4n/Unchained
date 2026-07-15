@@ -332,6 +332,7 @@ not described as immutable or unimpeachable.
 | 2026-07-14 | Provider, retry, exact-output, and reviewer proof hardened | `5309e5c279521aaa7d65c0857120e1c8ddd77344` | Local content binding; no independent timestamp yet |
 | 2026-07-14 | Proof bundle, verifier, lock, and CPython 3.11 path shipped | `7b05d6a241a530c37b6f31fedbad8b4dbe7d294c` | Local content binding; no independent timestamp yet |
 | 2026-07-14 | Real Windows-memory Gate A hardening committed | `6e696a08a9aaeaa345638239e5182ec24826724d` | Native routing, 16,000,000-byte transport, bounded delivery, case-insensitive success/error path privacy, and regressions; local content binding only |
+| 2026-07-14 | Winner strategy, handover, provenance, and judge-facing architecture synchronized | `207a039836cdaf3045e92a2b74e541a7dd2be77f` | Local content binding for the current reviewed documentation; no independent timestamp yet |
 | 2026-07-14 | Primary and lock-check CPython 3.11.9 environments verified | Local command evidence | `pip check` clean; C2 snapshot has 123 tests; Ruff, build, `vol -h`, and 25/5 catalog pass |
 | 2026-07-14 | Empty-evidence lifecycle bundle verified | Local `verify-run` output | Status is `INVALID`; strict complete/live verification fails as intended |
 | 2026-07-14 | Initial DC01 native Windows-memory smoke passed | Local archive/image hashes, diagnostic output, and custody recheck | Exposed two adapter defects; pre-sanitizer output retained outside repo, not current public-safe proof |

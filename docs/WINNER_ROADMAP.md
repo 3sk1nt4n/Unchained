@@ -32,7 +32,7 @@ Proceed with Sentinel Unchained. Do not pivot and do not re-scaffold.
 
 | Stage | State | Evidence and remaining boundary |
 |---|---|---|
-| C0 provenance | **PARTIAL** | Honest local history exists through Gate A commit `6e696a0`; no public remote or independent server timestamp exists |
+| C0 provenance | **PARTIAL** | Honest local history includes Gate A commit `6e696a0` and synchronized strategy/handover commit `207a039`; no public remote or independent server timestamp exists |
 | C1 correctness | **GREEN** | The three reproduced defects and Windows prompt consistency are fixed and regression-tested |
 | C2 proof and reliability | **GREEN OFFLINE** | Content-addressed outputs, provider-returned identity fields, response/request IDs, validated usage, bounded audited retries, manifest, summary, environment record, offline verifier, exact constraints, and `pylock` are implemented |
 | Build evidence | **GREEN LOCALLY** | 14 source modules, 8,779 total text lines, 7,889 nonblank lines, 128 tests, Ruff and format, wheel plus sdist build, pip check, and diff check pass |

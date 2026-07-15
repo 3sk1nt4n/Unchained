@@ -32,7 +32,7 @@ an explicitly historical baseline and must not be quoted as the present build.
 
 | Area | Evidence-backed state | Public claim boundary |
 |---|---|---|
-| Local provenance | Commits `5309e5c`, `7b05d6a`, and `6e696a0` retain the provider/reviewer, C2 proof/lock, and real Windows-memory Gate A hardening | Publish without rewriting history; no public remote or independent server timestamp exists yet |
+| Local provenance | Commits `5309e5c`, `7b05d6a`, `6e696a0`, and `207a039` retain the provider/reviewer, C2 proof/lock, real Windows-memory Gate A hardening, and synchronized winner documentation | Publish without rewriting history; no public remote or independent server timestamp exists yet |
 | Implementation | 14 Python source modules, 8,779 total text lines and 7,889 nonblank lines, 128 passing tests, Ruff and format clean, wheel plus sdist build passing, and diff check clean | Strong local implementation evidence, not an authentic GPT-5.6 investigation |
 | Python environment | Official CPython 3.11.9; clean primary and lockcheck virtual environments; `pip check` clean in both; exact Windows CPython 3.11 constraints and `pylock` committed | Reproducible tested Windows Python environment, not universal host portability |
 | Native-tool readiness | **GREEN LOCALLY:** verified DC01 memory-only profile, resolved Windows symbols, 14 sealed Windows-memory tools, real `vol_pstree`, `vol_psscan`, and post-fix `vol_netscan` results, and matching custody | Deterministic pre-freeze engineering proof only; no GPT-5.6 or scored run occurred |

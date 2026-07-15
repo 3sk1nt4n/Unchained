@@ -23,7 +23,7 @@ has been demonstrated to a judge, and what is still missing.
 | Field | Current value |
 |---|---|
 | Last live-rule verification | 2026-07-14 22:04 ET, direct current 2026 Official Rules plus official GPT-5.6, pricing, and Responses API references |
-| Last repository verification | 2026-07-14 22:22 ET |
+| Last repository verification | 2026-07-14 22:24 ET |
 | Current event day | Submission Day 2, not Day 8 |
 | Hard deadline | 2026-07-21 17:00 PT / 20:00 ET |
 | Time remaining at 2026-07-14 22:22 ET | Approximately 165.6 hours |
@@ -448,7 +448,7 @@ Verified on July 14, 2026 unless otherwise stated.
 | Static judge viewer | NOT STARTED | Strategy document exists; no viewer implementation or hosted path | Generate from real run |
 | Offline `verify-run` | IMPLEMENTED + VERIFIED on invalid bundle | Standard-library verifier passes integrity checks while reporting terminal `INVALID`; it rechecks recorded custody, not absent original evidence bytes | Verify a complete authentic bundle and publish the command |
 | No-key replay/viewer | PARTIAL | Verifier exists; no static viewer or hosted path | Build only over the authentic completed bundle |
-| Git provenance | VERIFIED LOCALLY, NOT PUBLICLY ANCHORED | Local history includes `5309e5c`, `7b05d6a`, and Gate A commit `6e696a0`; no remote or server timestamp | Publish without rewriting history |
+| Git provenance | VERIFIED LOCALLY, NOT PUBLICLY ANCHORED | Local history includes `5309e5c`, `7b05d6a`, Gate A commit `6e696a0`, and synchronized strategy/handover commit `207a039`; no remote or server timestamp | Publish without rewriting history |
 | Build provenance document | IMPLEMENTED | `BUILD_PROVENANCE.md` records prior/new/Codex boundaries and local-timestamp limitation | Record baseline hash and public/freeze URLs when they exist |
 | Public experiment preregistration | NOT STARTED | Protocol/rubric/scorer digest is not frozen or remotely timestamped | Complete after deterministic native smoke and before any GPT-5.6 DC01 call |
 | Judge quickstart | NOT STARTED | No `JUDGE-QUICKSTART.md` | Write after replay path exists |
@@ -486,7 +486,7 @@ integration coverage rather than chasing an arbitrary percentage.
 | Real native plugin proof | VERIFIED LOCALLY: `windows.info` resolves symbols; authoritative `gate-a-final-20260715T015251Z` returns pstree 40 and psscan 72 records; repaired `gate-a-netscan-20260715T014947Z` returns 19,685 records and 3,961,843 accepted-output bytes |
 | Public evidence archive outside repo | 561,424,278 bytes; official MD5 match `64A4E2CB47138084A5C2878066B2D7B1`; archive SHA-256 `86658D85D8254E8D30DCCC4F50D9C2A8B550A101D2E78A6D932316849E37AD80` |
 | Extracted DC01 memory outside repo | 2,147,483,648 bytes; SHA-256 `8079A7459B1739CAF7D4FBF6DDE5EB0AE7A9D24DBDE657DEBF4D5202C8DC6B62`; never commit or redistribute |
-| Git repository | Local `main`; Gate A code/test commit `6e696a0` follows `7b05d6a` and `5309e5c`; no remote or server timestamp |
+| Git repository | Local `main`; synchronized documentation commit `207a039` follows Gate A code/test commit `6e696a0`, `7b05d6a`, and `5309e5c`; no remote or server timestamp |
 | Proof-bundle smoke | Integrity PASS for invalid empty-case bundle `20260715T012818Z-0c60c234`; 4 artifacts, 8 audit entries, terminal `INVALID`, exit 2 |
 
 Tests alone did not prove the native route. The separate real-evidence smoke
@@ -1223,7 +1223,7 @@ Prompt 3 becomes documentation-ready only after all three rows are marked
 
 | Pass | What is verified | Result | Evidence | Timestamp ET |
 |---|---|---|---|---|
-| 1 - Repository truth | Current commits, dirty-tree scope, module/line counts, tests, lint, format, and build | **PASS** | Gate A implementation commit `6e696a0` follows `7b05d6a` and `5309e5c`; only synchronized docs remain for the next commit; 14 modules; 8,779 total/7,889 nonblank source lines; both CPython 3.11.9 environments pass 128 tests and `pip check`; Ruff, format, wheel, sdist, and diff check pass | 2026-07-14 22:22 |
+| 1 - Repository truth | Current commits, dirty-tree scope, module/line counts, tests, lint, format, and build | **PASS** | Gate A implementation commit `6e696a0` and synchronized strategy/handover commit `207a039` follow `7b05d6a` and `5309e5c`; 14 modules; 8,779 total/7,889 nonblank source lines; both CPython 3.11.9 environments pass 128 tests and `pip check`; Ruff, format, wheel, sdist, and diff check pass | 2026-07-14 22:24 |
 | 2 - Environment and local Gate A proof | Supported Python, lock integrity, installed dependencies, tool discovery, invalid-bundle behavior, verified evidence, native rows, bounded delivery, privacy, and custody | **PASS FOR CLAIMED LOCAL SCOPE** | Clean CPython 3.11.9/locks/catalog; official hashes; Windows profile/symbols; 14 tools; authoritative `gate-a-final-20260715T015251Z`: pstree 40/15,277 bytes, psscan 72/16,526 bytes, both `E001` and path-free; repaired netscan 19,685/3,961,843 bytes with explicit incomplete 65,536-byte candidate view; case-insensitive success/error path scrub; custody match; no model/API call | 2026-07-14 22:22 |
 | 3 - ZeroFake handover truth | All authentic/public red gates, freeze boundary, quote/transport semantics, diagnostic history, screenshot/evidence locality, and next sequence remain explicit | **PASS** | Live rules and API/pricing rechecked; pre-fix netscan failure retained; Windows memory-only primary selected; factual precision separated from receipt support; evaluator authorship disclosed; deterministic local proof is not called authentic/scored; no claim of public timestamp, semantic truth, viewer, video, or submission | 2026-07-14 22:22 |
 
@@ -1287,13 +1287,13 @@ At the end of every substantial future session:
 | 2026-07-14 21:51 | Preserved and corrected the real large-output netscan failure | Initial parallel psscan succeeded while netscan honestly exceeded the old 2,000,000-byte transport; fix adds 16,000,000-byte hard transport, recursive local-path sanitization, full accepted retention, and explicit 65,536-byte model view; rerun `gate-a-netscan-20260715T014947Z` returned 19,685 records/3,961,843 bytes with retained SHA-256, `E001`, no private path, and custody match | Keep failure diagnostic and corrected rerun together in freeze evidence |
 | 2026-07-14 21:51 | Completed the authoritative post-sanitizer process batch and full checkpoint verification | `gate-a-final-20260715T015251Z`, 5,968 ms: pstree 40 records/15,277 bytes/SHA-256 `e2e70d5164939f5a735c450ecc0f2c268e48f22ae4a4dab76a92fa67f04ecac6`; psscan 72 records/16,526 bytes/SHA-256 `836951c95fdcc131064b52cfc229bb3753e389567fcb534174ac3f40d14a7fe4`; both `E001`, no private path, custody match; 127 tests plus Ruff/format/pip/build/diff green | Commit fixes/docs, publish remote, then publish full freeze |
 | 2026-07-14 22:06 | Closed the final private-worker error-path leak and fixed the Build Week primary scope | Case-insensitive recursive path scrub now covers success values and exception strings; subprocess regression raises current suite to 128 tests; current source count is 14 modules/8,779 total/7,889 nonblank lines; Windows memory-only is the final primary and paired disk is future work | Run the final verification, commit this checkpoint, publish remote, then publish the full freeze |
-| 2026-07-14 22:19 | Bound the real Gate A hardening in Git and completed the final strategy/doc verification | Commit `6e696a08a9aaeaa345638239e5182ec24826724d`; 128 tests, Ruff, format, both-environment `pip check`, wheel, sdist, Volatility help, 25/5 catalog, diff, links, fences, heading spacing, privacy, evidence, and no-em-dash scans green; exact C4 byte limits, two-axis metrics, evaluator authorship, gate names, and memory-only scope reconciled | Commit synchronized docs, then publish unchanged history and complete C4 |
-| 2026-07-14 22:22 | Refreshed the independent lock-check environment against Gate A commit `6e696a0` | The stale installed project correctly failed the two new worker-privacy regressions; reinstalling the current constrained editable package restored 128 passing tests, clean `pip check`, Ruff, and format. No source fix was required | Preserve this as evidence that the second environment detects stale installs; commit synchronized docs |
+| 2026-07-14 22:19 | Bound the real Gate A hardening in Git and completed the final strategy/doc verification | Commit `6e696a08a9aaeaa345638239e5182ec24826724d`; 128 tests, Ruff, format, both-environment `pip check`, wheel, sdist, Volatility help, 25/5 catalog, diff, links, fences, heading spacing, privacy, evidence, and no-em-dash scans green; exact C4 byte limits, two-axis metrics, evaluator authorship, gate names, and memory-only scope reconciled | Publish unchanged history and complete C4 |
+| 2026-07-14 22:22 | Refreshed the independent lock-check environment against Gate A commit `6e696a0` | The stale installed project correctly failed the two new worker-privacy regressions; reinstalling the current constrained editable package restored 128 passing tests, clean `pip check`, Ruff, and format. No source fix was required | Preserve this as evidence that the second environment detects stale installs; publish unchanged history |
+| 2026-07-14 22:24 | Committed the synchronized winner strategy, handover, provenance, README, and environment record | Commit `207a039836cdaf3045e92a2b74e541a7dd2be77f`; public rules/API references, exact Gate A receipts, Windows memory-only scope, two-axis scoring, evaluator authorship, and all remaining red gates are aligned | Create and anonymously verify the public remote, then complete and publish C4 |
 
 ## Single next action
 
-Commit this synchronized documentation checkpoint, then create and verify the
-public remote without rewriting history. Finish and publish the
+Create and verify the public remote without rewriting history. Finish and publish the
 preregistration/freeze with server-timestamped digests. Only after that public
 freeze may DC01 be exposed to GPT-5.6 for the first valid post-freeze primary
 run. No viewer, video, or prose polish outranks this sequence.

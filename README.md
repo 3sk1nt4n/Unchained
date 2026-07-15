@@ -102,10 +102,11 @@ semantics, model protocol, report safety, and offline tests. Codex also performe
 live-rules verification, official API-contract review, adversarial code review,
 experiment-method review, judge-experience review, and the C1 security and
 partition-routing hardening. The successful thread ID is retained below and in
-the provenance record. Local commits `5309e5c`, `7b05d6a`, and `6e696a0` bind
-the provider/reviewer hardening, self-verifying proof-bundle plus Python 3.11
-work, and real Windows-memory Gate A hardening. They are local content
-bindings, not independent public timestamps.
+the provenance record. Local commits `5309e5c`, `7b05d6a`, `6e696a0`, and
+`207a039` bind the provider/reviewer hardening, self-verifying proof-bundle plus
+Python 3.11 work, real Windows-memory Gate A hardening, and synchronized winner
+documentation. They are local content bindings, not independent public
+timestamps.
 
 The human owner chose the product thesis, Developer Tools track, DFIR testbed,
 benchmark, safety boundary, scope cuts, evaluation claims, and final submission
