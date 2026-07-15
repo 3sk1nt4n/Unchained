@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+import sys
 import threading
 import time
 from pathlib import Path
@@ -331,6 +333,9 @@ def test_private_worker_does_not_inherit_host_credentials(
     assert result["AWS_SECRET_ACCESS_KEY"] is None
     assert result["HTTPS_PROXY"] is None
     assert result["PATH"]
+    assert os.path.normcase(result["PATH"].split(os.pathsep)[0]) == os.path.normcase(
+        os.path.dirname(os.path.abspath(sys.executable))
+    )
     assert result["SIFT_EVENT_LOG_FORCE_BUDGET"] == "1"
     assert result["SIFT_EVENT_LOG_MAX_RETURN_BYTES"] == str(_EVENT_LOG_MAX_RETURN_BYTES)
 

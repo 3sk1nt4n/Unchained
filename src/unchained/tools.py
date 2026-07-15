@@ -751,6 +751,11 @@ def _worker_environment() -> dict[str, str]:
     """Remove unrelated host credentials from the trusted parser subprocess."""
 
     environment = os.environ.copy()
+    runtime_scripts = os.path.dirname(os.path.abspath(sys.executable))
+    inherited_path = environment.get("PATH", "")
+    environment["PATH"] = os.pathsep.join(
+        value for value in (runtime_scripts, inherited_path) if value
+    )
     exact_sensitive = {
         "ALL_PROXY",
         "HTTP_PROXY",

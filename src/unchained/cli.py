@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
+import os
 import sys
 import uuid
 from collections.abc import Sequence
@@ -13,6 +13,16 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from .agent import AgentRun, UnchainedAgent, defang_untrusted_inline
+from .artifacts import (
+    ArtifactError,
+    ArtifactRef,
+    ArtifactStore,
+    artifact_ref_from_existing,
+    build_manifest,
+    build_summary,
+    capture_environment,
+    write_manifest_pair,
+)
 from .audit import AuditLog
 from .caps import CapConfig, CapExceeded, RunBudget
 from .evidence import CustodyError, EvidenceDiscoveryError, EvidenceError, EvidenceSession
@@ -43,6 +53,20 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def build_verify_parser() -> argparse.ArgumentParser:
+    """Create the dependency-free completed-bundle verification command."""
+
+    parser = argparse.ArgumentParser(
+        prog="python -m unchained verify-run",
+        description="Verify a retained Sentinel Unchained proof bundle without rebuilding it.",
+    )
+    parser.add_argument("run_directory", type=Path, help="completed proof-bundle directory")
+    parser.add_argument("--json", action="store_true", dest="json_output")
+    parser.add_argument("--require-complete", action="store_true")
+    parser.add_argument("--require-live-gpt56", action="store_true")
+    return parser
+
+
 def _run_directory(evidence: Path) -> tuple[str, Path]:
     run_id = f"{datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')}-{uuid.uuid4().hex[:8]}"
     base = Path.cwd().resolve()
@@ -54,19 +78,6 @@ def _run_directory(evidence: Path) -> tuple[str, Path]:
     directory.mkdir(parents=True, exist_ok=False)
     directory.chmod(0o700)
     return run_id, directory
-
-
-def _write_json(path: Path, value: object) -> None:
-    path.write_text(
-        json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
-
-
-def _write_report(path: Path, report: str) -> str:
-    normalized = report.rstrip() + "\n"
-    path.write_text(normalized, encoding="utf-8", newline="\n")
-    return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
 
 
 def _fatal_report(reason: str, profile: EvidenceProfile | None = None) -> str:
@@ -123,29 +134,75 @@ def _terminal_exit(run: AgentRun) -> int:
     return EXIT_COMPLETE if run.status is RunStatus.COMPLETE else EXIT_PARTIAL
 
 
+def _tool_output_artifacts(
+    run_directory: Path,
+    entries: list[dict[str, object]],
+) -> list[ArtifactRef]:
+    """Collect only blobs explicitly referenced by audited tool completions."""
+
+    by_path: dict[str, ArtifactRef] = {}
+    for entry in entries:
+        if entry.get("event_type") != "tool.completed":
+            continue
+        payload = entry.get("payload")
+        if not isinstance(payload, dict):
+            raise ArtifactError("tool.completed payload is not an object")
+        receipt = payload.get("output_artifact")
+        if not isinstance(receipt, dict):
+            raise ArtifactError("tool.completed omitted output_artifact")
+        path = str(receipt.get("path") or "")
+        media_type = str(receipt.get("media_type") or "application/octet-stream")
+        encoding = receipt.get("encoding")
+        if encoding is not None and not isinstance(encoding, str):
+            raise ArtifactError("tool-output encoding is not a string or null")
+        actual = artifact_ref_from_existing(
+            run_directory,
+            path,
+            role="tool-output",
+            media_type=media_type,
+            encoding=encoding,
+        )
+        claimed_hash = receipt.get("sha256") or payload.get("output_sha256")
+        claimed_bytes = receipt.get("bytes") or payload.get("output_bytes")
+        if actual.sha256 != claimed_hash or actual.bytes != claimed_bytes:
+            raise ArtifactError(f"audited tool artifact does not match retained bytes: {path}")
+        existing = by_path.get(path)
+        if existing is not None and existing != actual:
+            raise ArtifactError(f"conflicting duplicate tool artifact receipt: {path}")
+        by_path[path] = actual
+    return [by_path[path] for path in sorted(by_path)]
+
+
 def run_cli(evidence_path: Path, caps_profile: str) -> int:
-    """Execute one run, always attempting final custody verification after profiling."""
+    """Execute, close, manifest, and immediately verify one isolated run."""
 
     run_id, run_directory = _run_directory(evidence_path)
     audit_path = run_directory / "audit.jsonl"
-    report_path = run_directory / "report.md"
+    store = ArtifactStore(run_directory)
     session: EvidenceSession | None = None
     profile: EvidenceProfile | None = None
     investigation: AgentRun | None = None
+    registry: ToolRegistry | None = None
+    cap_config: CapConfig | None = None
+    model: OpenAIResponsesModel | None = None
     terminal_status = RunStatus.FATAL
     exit_code = EXIT_FATAL
     report = _fatal_report("run did not start")
+    terminal_reason: str | None = "run did not start"
     custody_required = False
     mount_released = True
     budget: RunBudget | None = None
+    root_artifacts: list[ArtifactRef] = []
 
     with AuditLog(audit_path, run_id) as audit:
         audit.append(
             "run.created",
             {
-                "run_directory": str(run_directory),
-                "evidence_input": str(evidence_path.expanduser().resolve(strict=False)),
+                "run_directory": ".",
+                "evidence_input_label": "CASE-A",
+                "evidence_input_kind": "directory" if evidence_path.is_dir() else "file",
                 "caps_profile": caps_profile,
+                "absolute_paths_recorded": False,
             },
         )
         try:
@@ -165,7 +222,6 @@ def run_cli(evidence_path: Path, caps_profile: str) -> int:
                 },
             )
             audit.append("profile.completed", profile.public_dict())
-            _write_json(run_directory / "profile.json", profile.public_dict())
 
             if profile.shape == "unknown":
                 raise EvidenceDiscoveryError(
@@ -185,10 +241,12 @@ def run_cli(evidence_path: Path, caps_profile: str) -> int:
             terminal_status = investigation.status
             exit_code = _terminal_exit(investigation)
             report = investigation.report_markdown
+            terminal_reason = investigation.partial_reason
         except CapExceeded as exc:
             terminal_status = RunStatus.PARTIAL
             exit_code = EXIT_PARTIAL
             report = _cap_report(exc, profile)
+            terminal_reason = str(exc)
             audit.append(
                 "cap.fired",
                 {
@@ -201,6 +259,7 @@ def run_cli(evidence_path: Path, caps_profile: str) -> int:
             terminal_status = RunStatus.FATAL
             exit_code = EXIT_FATAL
             report = _fatal_report(str(exc), profile)
+            terminal_reason = str(exc)
             audit.append(
                 "custody.mismatch",
                 {"match": False, "error": str(exc), "status": RunStatus.FATAL.value},
@@ -209,36 +268,37 @@ def run_cli(evidence_path: Path, caps_profile: str) -> int:
             terminal_status = RunStatus.INVALID
             exit_code = EXIT_INVALID
             report = _invalid_report(str(exc))
+            terminal_reason = f"{type(exc).__name__}: {exc}"
             audit.append(
                 "run.preflight_failed",
-                {"status": terminal_status.value, "error": f"{type(exc).__name__}: {exc}"},
+                {"status": terminal_status.value, "error": terminal_reason},
             )
         except EvidenceError as exc:
             terminal_status = RunStatus.FATAL
             exit_code = EXIT_FATAL
             report = _fatal_report(str(exc), profile)
+            terminal_reason = f"{type(exc).__name__}: {exc}"
             audit.append(
                 "run.failed",
-                {"status": terminal_status.value, "error": f"{type(exc).__name__}: {exc}"},
+                {"status": terminal_status.value, "error": terminal_reason},
             )
         except KeyboardInterrupt:
             terminal_status = RunStatus.FATAL
             exit_code = EXIT_FATAL
-            report = _fatal_report("KeyboardInterrupt: run interrupted by operator", profile)
+            terminal_reason = "KeyboardInterrupt: run interrupted by operator"
+            report = _fatal_report(terminal_reason, profile)
             audit.append(
                 "run.interrupted",
-                {
-                    "status": terminal_status.value,
-                    "error": "KeyboardInterrupt: run interrupted by operator",
-                },
+                {"status": terminal_status.value, "error": terminal_reason},
             )
-        except Exception as exc:  # noqa: BLE001 - CLI must preserve an auditable artifact
+        except Exception as exc:  # noqa: BLE001 - preserve an auditable failed run
             terminal_status = RunStatus.FATAL
             exit_code = EXIT_FATAL
-            report = _fatal_report(f"{type(exc).__name__}: {exc}", profile)
+            terminal_reason = f"{type(exc).__name__}: {exc}"
+            report = _fatal_report(terminal_reason, profile)
             audit.append(
                 "run.failed",
-                {"status": terminal_status.value, "error": f"{type(exc).__name__}: {exc}"},
+                {"status": terminal_status.value, "error": terminal_reason},
             )
         finally:
             if session is not None:
@@ -247,7 +307,8 @@ def run_cli(evidence_path: Path, caps_profile: str) -> int:
         if not mount_released:
             terminal_status = RunStatus.FATAL
             exit_code = EXIT_FATAL
-            report = _fatal_report("read-only evidence mount could not be released", profile)
+            terminal_reason = "read-only evidence mount could not be released"
+            report = _fatal_report(terminal_reason, profile)
             audit.append(
                 "mount.release_failed",
                 {"status": RunStatus.FATAL.value, "mount_released": False},
@@ -268,47 +329,152 @@ def run_cli(evidence_path: Path, caps_profile: str) -> int:
             except CustodyError as exc:
                 terminal_status = RunStatus.FATAL
                 exit_code = EXIT_FATAL
-                report = _fatal_report(str(exc), profile)
+                terminal_reason = str(exc)
+                report = _fatal_report(terminal_reason, profile)
                 audit.append(
                     "custody.mismatch",
                     {"match": False, "error": str(exc), "status": RunStatus.FATAL.value},
                 )
 
-        report_sha256 = _write_report(report_path, report)
-        audit.append(
-            "artifact.written",
-            {
-                "name": "report.md",
-                "sha256": report_sha256,
-                "status": terminal_status.value,
-            },
+        cap_name = (
+            investigation.cap.kind.value
+            if investigation is not None and investigation.cap is not None
+            else None
         )
-        audit.append(
-            "run.completed",
-            {
-                "status": terminal_status.value,
-                "exit_code": exit_code,
-                "report": str(report_path),
-                "audit": str(audit_path),
-                "cap": (
-                    investigation.cap.kind.value
-                    if investigation is not None and investigation.cap is not None
-                    else None
+        try:
+            report_ref = store.write_text(
+                "report.md",
+                report.rstrip() + "\n",
+                role="report",
+                media_type="text/markdown",
+            )
+            root_artifacts.append(report_ref)
+            if profile is not None:
+                root_artifacts.append(
+                    store.write_json(
+                        "profile.json",
+                        profile.public_dict(),
+                        role="evidence-profile",
+                    )
+                )
+            caps_payload = asdict(cap_config) if cap_config is not None else {}
+            environment = capture_environment(
+                run_id=run_id,
+                project_directory=Path(__file__).resolve().parents[2],
+                requested_model=(
+                    model.model_id if model is not None else os.getenv("UNCHAINED_MODEL")
                 ),
-            },
-        )
-        AuditLog.verify(audit_path)
+                caps_profile=caps_profile,
+                caps=caps_payload,
+                tool_schemas=registry.schemas() if registry is not None else (),
+            )
+            root_artifacts.append(
+                store.write_json("environment.json", environment, role="environment")
+            )
+            preterminal_entries = AuditLog.verify(audit_path)
+            summary = build_summary(
+                run_id=run_id,
+                entries=preterminal_entries,
+                status=terminal_status.value,
+                exit_code=exit_code,
+                profile=profile,
+                cap=cap_name,
+                reason=terminal_reason,
+                mount_released=mount_released,
+            )
+            root_artifacts.append(store.write_json("summary.json", summary, role="summary"))
+            for artifact in root_artifacts:
+                audit.append("artifact.written", artifact.public_dict())
+            audit.append(
+                "run.completed",
+                {
+                    "status": terminal_status.value,
+                    "exit_code": exit_code,
+                    "report": "report.md",
+                    "audit": "audit.jsonl",
+                    "profile": "profile.json" if profile is not None else None,
+                    "environment": "environment.json",
+                    "summary": "summary.json",
+                    "cap": cap_name,
+                    "reason": terminal_reason,
+                    "custody_baseline_established": custody_required,
+                    "custody_final_check_performed": custody_required,
+                    "mount_released": mount_released,
+                },
+            )
+            AuditLog.verify(audit_path)
+        except Exception as exc:
+            audit.append(
+                "bundle.finalization_failed",
+                {"error_type": type(exc).__name__, "error": str(exc)[:2_000]},
+            )
+            raise
+
+    entries = AuditLog.verify(audit_path)
+    audit_ref = artifact_ref_from_existing(
+        run_directory,
+        "audit.jsonl",
+        role="audit",
+        media_type="application/x-ndjson",
+    )
+    tool_artifacts = _tool_output_artifacts(run_directory, entries)
+    manifest = build_manifest(
+        run_id=run_id,
+        status=terminal_status.value,
+        exit_code=exit_code,
+        audit_ref=audit_ref,
+        audit_entries=entries,
+        artifacts=[*root_artifacts, *tool_artifacts],
+    )
+    write_manifest_pair(store, manifest)
+
+    from .verify import verify_run
+
+    verification = verify_run(
+        run_directory,
+        require_complete=terminal_status is RunStatus.COMPLETE,
+        require_live_gpt56=terminal_status is RunStatus.COMPLETE,
+    )
+    if not verification.passed:
+        print("Proof-bundle verification failed:", file=sys.stderr)
+        for error in verification.errors:
+            print(f"- {error}", file=sys.stderr)
+        return EXIT_FATAL
 
     print(f"Run status: {terminal_status.value}")
-    print(f"Report: {report_path}")
-    print(f"Audit: {audit_path}")
+    print(f"Proof bundle: {run_directory}")
+    print("Bundle verification: PASS")
     return exit_code
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     """Parse arguments and return a stable process exit code."""
 
-    arguments = build_parser().parse_args(argv)
+    raw_arguments = list(sys.argv[1:] if argv is None else argv)
+    if raw_arguments[:1] == ["verify-run"]:
+        arguments = build_verify_parser().parse_args(raw_arguments[1:])
+        from .verify import verify_run
+
+        result = verify_run(
+            arguments.run_directory,
+            require_complete=arguments.require_complete,
+            require_live_gpt56=arguments.require_live_gpt56,
+        )
+        if arguments.json_output:
+            print(json.dumps(result.public_dict(), indent=2, sort_keys=True))
+        else:
+            print("VALID" if result.passed else "INVALID")
+            print(f"Run: {result.run_id or 'unknown'}")
+            print(f"Status: {result.terminal_status or 'unknown'}")
+            print(f"Artifacts verified: {result.verified_artifacts}")
+            print(f"Audit entries verified: {result.verified_audit_entries}")
+            for warning in result.warnings:
+                print(f"Warning: {warning}")
+            for error in result.errors:
+                print(f"Error: {error}", file=sys.stderr)
+        return EXIT_COMPLETE if result.passed else EXIT_FATAL
+
+    arguments = build_parser().parse_args(raw_arguments)
     try:
         return run_cli(arguments.evidence, arguments.caps)
     except KeyboardInterrupt:
