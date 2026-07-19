@@ -81,7 +81,8 @@ if ($secureKey.Length -gt 0) {
     [Environment]::SetEnvironmentVariable("UNCHAINED_MODEL", "gpt-5.6", "User")
     $env:OPENAI_API_KEY_FILE = $keyFile
     $env:UNCHAINED_MODEL = "gpt-5.6"
-    Write-Host "      Saved to $keyFile (owner-only ACL); OPENAI_API_KEY_FILE set." -ForegroundColor Green
+    Write-Host "      Saved to $keyFile (owner-only ACL)." -ForegroundColor Green
+    Write-Host "      Every sentinel command now finds it automatically - nothing else to set." -ForegroundColor Green
     Write-Host "      Model pinned to gpt-5.6 (Sol investigator). The cheap Luna canary" -ForegroundColor Gray
     Write-Host "      is available any time via: sentinel smoke-openai" -ForegroundColor Gray
 }

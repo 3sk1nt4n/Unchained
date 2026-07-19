@@ -75,7 +75,8 @@ if [ -n "$KEY" ]; then
   chmod 600 "$KEY_FILE"
   KEY=""
   printf '      %sSaved to %s (chmod 600).%s\n' "$GREEN" "$KEY_FILE" "$RESET"
-  note "Run the cheap live canary any time with:"
+  note "Native sentinel commands find this file automatically - nothing else to set."
+  note "The isolated container cannot read host files, so the live canary mounts it:"
   note "  OPENAI_API_KEY_FILE=$KEY_FILE docker compose --profile live run --rm live-smoke"
 else
   printf '      %sSkipped. Everything below stays local and free.%s\n' "$GREEN" "$RESET"

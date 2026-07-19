@@ -8,6 +8,7 @@ import os
 import time
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, replace
+from pathlib import Path
 from typing import Any, Literal, Protocol
 
 from .audit import AuditLog, canonical_json, first_2kb, sha256_text
@@ -60,8 +61,38 @@ def is_gpt56_luna_model(value: str) -> bool:
     return value == "gpt-5.6-luna" or value.startswith("gpt-5.6-luna-")
 
 
+def default_api_key_file() -> Path:
+    """Return the canonical per-user key file written by ``sentinel key``.
+
+    This is the same location the guided installers use, so one hidden paste
+    serves every later command without environment variables. Environment
+    configuration always takes precedence over this file.
+    """
+
+    if os.name == "nt":
+        base = os.getenv("LOCALAPPDATA") or str(Path.home())
+        return Path(base) / "sentinel-unchained" / "openai_api_key"
+    base = os.getenv("XDG_CONFIG_HOME") or str(Path.home() / ".config")
+    return Path(base) / "sentinel-unchained" / "openai_api_key"
+
+
+def _read_bounded_secret_file(secret_path: str, label: str) -> str:
+    try:
+        with open(secret_path, encoding="utf-8") as secret_file:  # noqa: PTH123
+            raw_key = secret_file.read(_MAX_API_KEY_BYTES + 1)
+    except (OSError, UnicodeError) as exc:
+        raise ValueError(f"{label} is not a readable UTF-8 secret") from exc
+    if len(raw_key.encode("utf-8")) > _MAX_API_KEY_BYTES:
+        raise ValueError(f"{label} exceeds the bounded secret size")
+    key = raw_key.strip()
+    if not key or "\n" in key or "\r" in key:
+        raise ValueError(f"{label} must contain exactly one nonempty credential")
+    return key
+
+
 def _load_openai_api_key(explicit_key: str | None = None) -> tuple[str | None, str | None]:
-    """Load one credential from an explicit value, environment, or bounded secret file."""
+    """Load one credential from an explicit value, environment, secret file, or
+    the canonical ``sentinel key`` file — in that fixed precedence order."""
 
     if explicit_key:
         return explicit_key, "explicit"
@@ -69,19 +100,15 @@ def _load_openai_api_key(explicit_key: str | None = None) -> tuple[str | None, s
     if environment_key:
         return environment_key, "environment"
     secret_path = os.getenv("OPENAI_API_KEY_FILE")
-    if not secret_path:
+    if secret_path:
+        return _read_bounded_secret_file(secret_path, "OPENAI_API_KEY_FILE"), "file"
+    default_path = default_api_key_file()
+    if not default_path.is_file():
         return None, None
-    try:
-        with open(secret_path, encoding="utf-8") as secret_file:  # noqa: PTH123
-            raw_key = secret_file.read(_MAX_API_KEY_BYTES + 1)
-    except (OSError, UnicodeError) as exc:
-        raise ValueError("OPENAI_API_KEY_FILE is not a readable UTF-8 secret") from exc
-    if len(raw_key.encode("utf-8")) > _MAX_API_KEY_BYTES:
-        raise ValueError("OPENAI_API_KEY_FILE exceeds the bounded secret size")
-    key = raw_key.strip()
-    if not key or "\n" in key or "\r" in key:
-        raise ValueError("OPENAI_API_KEY_FILE must contain exactly one nonempty credential")
-    return key, "file"
+    return (
+        _read_bounded_secret_file(str(default_path), "the sentinel key file"),
+        "default-key-file",
+    )
 
 
 def openai_api_key_status() -> tuple[bool, str | None]:
@@ -140,7 +167,10 @@ class OpenAIResponsesModel:
             raise ValueError("UNCHAINED_MODEL must identify GPT-5.6 Sol")
         configured_key, _key_source = _load_openai_api_key(api_key)
         if not configured_key:
-            raise ValueError("OPENAI_API_KEY is required (or mount OPENAI_API_KEY_FILE)")
+            raise ValueError(
+                "OPENAI_API_KEY is required (run 'sentinel key' once, set "
+                "OPENAI_API_KEY, or mount OPENAI_API_KEY_FILE)"
+            )
 
         # Import only for a live run. Tests and evidence profiling need no SDK import.
         from openai import OpenAI

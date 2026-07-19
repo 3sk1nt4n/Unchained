@@ -216,30 +216,25 @@ Create a funded project key at:
 
 <https://platform.openai.com/api-keys>
 
-Store it only in the Windows user environment or a secure secret manager. Do
-not paste it into chat, Git, a screenshot, or a command saved in history.
-
-After closing old terminals and opening a new PowerShell window, check presence
-only:
+**The one-step path — paste once with hidden input, done forever:**
 
 ```powershell
-if ($env:OPENAI_API_KEY) {
-    "OPENAI_API_KEY is present"
-} else {
-    "OPENAI_API_KEY is absent"
-}
+& "$venv\Scripts\sentinel.exe" key
 ```
 
-For a temporary process-scoped key without using the Windows environment GUI,
-run the repository helper locally:
+Input is masked; the key is written to a private per-user file
+(`%LOCALAPPDATA%\sentinel-unchained\openai_api_key`, owner-only) and **every
+later sentinel command finds it automatically** — no environment variables,
+no terminal restarts. Check or remove any time:
 
 ```powershell
-.\scripts\set-openai-key.ps1
+& "$venv\Scripts\sentinel.exe" key --status
+& "$venv\Scripts\sentinel.exe" key --remove
 ```
 
-PowerShell masks the input. The helper prints only a presence confirmation and
-does not write the key to the repository. The value remains available to this
-PowerShell process and programs launched from it until the terminal closes.
+Never paste the key into chat, Git, a screenshot, or a command saved in
+history. For automation, `OPENAI_API_KEY` or `OPENAI_API_KEY_FILE` still work
+and always take precedence over the saved file.
 
 Set the requested model and hard caps:
 

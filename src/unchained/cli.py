@@ -91,8 +91,29 @@ def build_root_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "command",
         nargs="?",
-        choices=("onboard", "doctor", "profile", "smoke-openai", "run", "verify", "view"),
+        choices=("onboard", "key", "doctor", "profile", "smoke-openai", "run", "verify", "view"),
         help="lifecycle command; run 'sentinel <command> --help' for details",
+    )
+    return parser
+
+
+def build_key_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="sentinel key",
+        description=(
+            "One-time hidden OpenAI key setup: paste once with masked input; every "
+            "later command finds it automatically. The key is never echoed or printed."
+        ),
+    )
+    parser.add_argument(
+        "--status",
+        action="store_true",
+        help="report whether a key is configured and from which source; never the key",
+    )
+    parser.add_argument(
+        "--remove",
+        action="store_true",
+        help="delete the saved sentinel key file",
     )
     return parser
 
@@ -205,6 +226,100 @@ def build_view_parser() -> argparse.ArgumentParser:
     return parser
 
 
+_KEY_SOURCE_LABELS = {
+    "environment": "OPENAI_API_KEY environment variable",
+    "file": "OPENAI_API_KEY_FILE secret file",
+    "default-key-file": "saved sentinel key file (one-time 'sentinel key' setup)",
+}
+
+
+def _key_command(*, status: bool, remove: bool) -> int:
+    """Manage the canonical hidden-input key file; never print the credential."""
+
+    from .model import default_api_key_file, openai_api_key_status
+
+    console = Console(sys.stdout)
+    key_path = default_api_key_file()
+
+    if status:
+        present, source = openai_api_key_status()
+        if present:
+            label = _KEY_SOURCE_LABELS.get(source or "", source or "unknown source")
+            message = f"Key configured via the {label}."
+            console.ok(message) if console.enabled else print(message)
+        else:
+            message = "No key configured. Run 'sentinel key' for one-time hidden setup."
+            console.warn(message) if console.enabled else print(message)
+        print(f"Saved-key location: {key_path}")
+        print("Secrets printed: never.")
+        return EXIT_COMPLETE
+
+    if remove:
+        if key_path.is_file():
+            key_path.unlink()
+            print(f"Removed the saved key file: {key_path}")
+        else:
+            print("No saved key file to remove.")
+        return EXIT_COMPLETE
+
+    if not _interactive_terminal():
+        print(
+            "sentinel key needs an interactive terminal for hidden input; "
+            "set OPENAI_API_KEY or OPENAI_API_KEY_FILE for automation.",
+            file=sys.stderr,
+        )
+        return EXIT_INVALID
+
+    if console.enabled:
+        console.phase("ONE-TIME KEY SETUP")
+        console.detail("Paste once with hidden input. Saved to a private per-user file.")
+        console.detail("Every sentinel command then finds it automatically - no")
+        console.detail("environment variables needed. Env configuration still overrides.")
+    import getpass
+
+    entered = getpass.getpass("Paste your OpenAI API key (input stays hidden): ").strip()
+    if not entered:
+        print("Cancelled; nothing was saved.")
+        return EXIT_INVALID
+    if "\n" in entered or "\r" in entered or len(entered.encode("utf-8")) > 512:
+        print("That does not look like one single-line API key; nothing was saved.")
+        return EXIT_INVALID
+
+    key_path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor = os.open(key_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    try:
+        os.write(descriptor, (entered + "\n").encode("utf-8"))
+    finally:
+        os.close(descriptor)
+    entered = ""
+    if os.name == "nt":
+        import subprocess
+
+        with contextlib.suppress(Exception):
+            subprocess.run(
+                [
+                    "icacls",
+                    str(key_path),
+                    "/inheritance:r",
+                    "/grant:r",
+                    f"{os.environ.get('USERNAME', 'SYSTEM')}:(R,W)",
+                ],
+                capture_output=True,
+                check=False,
+                timeout=15,
+            )
+
+    success = "Key saved. Every sentinel command now finds it automatically."
+    if console.enabled:
+        console.ok(success)
+    else:
+        print(success)
+    print(f"Location: {key_path} (owner-only access)")
+    print("Check any time: sentinel key --status · remove: sentinel key --remove")
+    print("Tip: if UNCHAINED_MODEL is unset, set it to gpt-5.6 before a paid run.")
+    return EXIT_COMPLETE
+
+
 def _doctor(*, json_output: bool) -> int:
     configured_model = os.getenv("UNCHAINED_MODEL")
     key_present, key_source = openai_api_key_status()
@@ -233,8 +348,9 @@ def _doctor(*, json_output: bool) -> int:
             print(f"{'PASS' if passed else 'FAIL':<4}  {name}")
         if not ready:
             print(
-                "Next: set UNCHAINED_MODEL=gpt-5.6 and OPENAI_API_KEY "
-                "(or OPENAI_API_KEY_FILE), then rerun doctor."
+                "Next: run 'sentinel key' for one-time hidden key setup, set "
+                "UNCHAINED_MODEL=gpt-5.6, then rerun doctor. (Automation can set "
+                "OPENAI_API_KEY or OPENAI_API_KEY_FILE instead.)"
             )
     return EXIT_COMPLETE if ready else EXIT_INVALID
 
@@ -1248,6 +1364,10 @@ def main(argv: Sequence[str] | None = None) -> int:
                 file=sys.stderr,
             )
             return EXIT_INVALID
+
+    if raw_arguments[:1] == ["key"]:
+        arguments = build_key_parser().parse_args(raw_arguments[1:])
+        return _key_command(status=arguments.status, remove=arguments.remove)
 
     if raw_arguments[:1] == ["doctor"]:
         arguments = build_doctor_parser().parse_args(raw_arguments[1:])

@@ -476,6 +476,10 @@ def render_welcome(
                 "Optional paid Luna connectivity canary (no evidence; not proof): "
                 "sentinel smoke-openai"
             ),
+            (
+                "One-time key setup for paid runs — hidden input, saved privately, "
+                "found automatically by every later command: sentinel key"
+            ),
         ],
         stream=stream,
         color=color,

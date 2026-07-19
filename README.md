@@ -36,15 +36,19 @@
 
 **The whole idea in one breath:**
 
-- 🧠 **GPT-5.6 runs the investigation** — it chooses which typed forensic
-  tools to fire (up to six in parallel), reads the results, and proposes
-  findings.
-- 🔒 **Deterministic code owns the evidence** — read-only access, SHA-256
-  custody, hard caps, all-or-none validation. The model is never allowed to
-  *be* the evidence.
-- 🧾 **Every case seals into a proof bundle** — exact byte-level citations, a
-  hash-chained audit log, and an offline verifier that rebuilds the report and
-  viewer byte-for-byte. If one byte changes, verification fails.
+- 🔍 **Deterministic code goes first** — before any model call, the evidence is
+  enumerated, content-probed, routed, and SHA-256-hashed into custody, locally
+  and read-only. Zero OpenAI calls until this front door is green.
+- 🧠 **Then GPT-5.6 runs the investigation** — it opens with up to six typed
+  forensic tools fired in parallel, reads the retained results, chooses the
+  next tool one audited action at a time, and finally proposes structured
+  findings that a fresh-context reviewer may only preserve or downgrade.
+- 🔒 **Code owns the evidence the whole way** — read-only access, hard caps,
+  all-or-none validation, exact byte-span citations. The model is never
+  allowed to *be* the evidence.
+- 🧾 **Every case seals into a proof bundle** — a hash-chained audit log and an
+  offline verifier that rebuilds the report and viewer byte-for-byte. If one
+  byte changes, verification fails.
 
 **This is the real first screen** — `sentinel onboard`, no key, no evidence,
 zero OpenAI calls:
@@ -317,7 +321,7 @@ py -3.11 -m venv C:\venvs\sentinel-unchained
 python -m pip install .
 
 $env:UNCHAINED_MODEL = "gpt-5.6"
-$env:OPENAI_API_KEY = "<set locally; never paste or commit it>"
+sentinel key    # one-time hidden paste — saved privately, found automatically
 
 sentinel doctor
 sentinel onboard C:\Evidence\CASE-A
@@ -568,6 +572,7 @@ WSL2 ext4 storage. A cloud-synced bind can dominate runtime.
 ```text
 sentinel onboard [<evidence>] [--mount] [--json]
 sentinel onboard <evidence> --launch --caps strict
+sentinel key [--status | --remove]
 sentinel doctor
 sentinel profile <evidence> --json
 sentinel smoke-openai --json
