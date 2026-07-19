@@ -1,4 +1,4 @@
-# Sentinel Unchained repository instructions
+# Unchained repository instructions
 
 `docs/WINNER_ROADMAP.md` controls Build Week priority, sequence, positioning,
 and go/no-go gates. `docs/HACKATHON_MASTER_PLAN.md` owns the detailed

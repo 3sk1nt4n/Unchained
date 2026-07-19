@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "receipt_kind": "independent-reviewer-attested-sanitized-projection",
+  "qualification": "NONQUALIFYING_CONNECTIVITY_SMOKE",
+  "observed_at_utc_date": "2026-07-19",
+  "repository_commit_reported": "51662cfb809212af3b58a680c0d9265d91692302",
+  "result": {
+    "ok": true,
+    "provider_model_reported": "gpt-5.6-luna",
+    "provider_requests_reported": 1,
+    "typed_tool_call_valid_reported": true,
+    "forensic_evidence_read_reported": false,
+    "proof_bundle_created_reported": false,
+    "secrets_printed_reported": false,
+    "usage_reported": {
+      "input_tokens": 186,
+      "output_tokens": 27,
+      "total_tokens": 213
+    },
+    "estimated_cost_usd_reported_approximate": 0.0002,
+    "request_id_prefix_reported": "req_76a45ad9",
+    "response_id_prefix_reported": "resp_0a673866"
+  },
+  "attestation_source": {
+    "file": "REPORT-LIVE-RUN.md",
+    "bytes": 4434,
+    "sha256": "7ebdf230de88b18af3cd8a38acecebc2b1b48ca0d6c0740e596dd0bb0df53c9c",
+    "reviewer_description": "independent verification on the owner's Windows 11 machine with a CPython 3.11 virtual environment",
+    "claim_label_in_source": "TESTED"
+  },
+  "retention_and_proof_scope": {
+    "raw_api_receipt_available_to_this_projection": false,
+    "bundle_derived": false,
+    "cryptographically_bound_to_a_raw_provider_response": false,
+    "provider_request_id_disclosed_in_full": false,
+    "provider_response_id_disclosed_in_full": false,
+    "statement": "This file is a sanitized projection of an independent reviewer's live-run report. The underlying raw Luna JSON receipt was not retained with the supplied artifacts, so these fields are attestations from the hashed source report, not a bundle-derived cryptographic proof. The canary proves no forensic claim and cannot qualify as a Sol investigation."
+  },
+  "sanitization": {
+    "contains_api_key": false,
+    "contains_local_paths": false,
+    "contains_evidence_bytes": false,
+    "contains_raw_forensic_output": false
+  }
+}

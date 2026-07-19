@@ -7,6 +7,13 @@ This review compares the focused `sentinel-unchained` controller with its
 implemented in this working tree. It is an engineering review, not a claim that
 an authentic end-to-end evidence run has completed.
 
+> **2026-07-19 protocol amendment:** unscored live audits showed completed
+> no-call responses containing substantial ledger prose, not empty output.
+> Runtime v2 therefore replaces the brittle raw-text terminator with one closed
+> required action, `finish_investigation({"status":"DONE"})`. Arbitrary text is
+> never normalized into completion; historical literal-DONE-v1 remains
+> verifier-readable only.
+
 ## Repositories reviewed
 
 - `sentinel-unchained`: upstream `main` at
@@ -44,10 +51,11 @@ parallel typed execution [deterministic authority]
       |
       v
 PLAN -> ACT -> OBSERVE -> UPDATE [GPT-5.6]
-  stateless ledger packet; exactly one typed tool per adaptive turn
+  stateless ledger packet; exactly one required typed action per adaptive turn
       |
       v
-raw text exactly DONE -> forced structured serialization [deterministic protocol]
+finish_investigation({"status":"DONE"}) -> forced structured serialization
+  [deterministic typed-DONE-v2 protocol]
       |
       v
 exact evidence-span resolution [deterministic]
@@ -132,7 +140,7 @@ The focused successor already had the correct safety skeleton:
 - atomic reservation and all-or-none validation of the opening batch before
   launch;
 - exact content-addressed retention before `tool.completed` is accepted;
-- one adaptive tool per turn and raw response text exactly equal to `DONE`;
+- one required adaptive typed action per turn and closed typed-DONE termination;
 - forced structured finalization with forensic tools removed;
 - a fresh judge that cannot upgrade a status;
 - explicit `COMPLETE`, `PARTIAL`, `INVALID`, and `FATAL` states;
@@ -232,9 +240,11 @@ compact case ledger, a receipt index without arbitrary excerpts, the remaining
 budget, and only the latest paired observation. Every nonterminal tool call must
 also carry a visible, valid-UTF-8 ledger update no larger than 8,192 bytes; code
 records it before execution and strict verification rebinds it to the model
-response. The finalizer receives retained observations once, after the raw
-assistant response is exactly `DONE`; leading/trailing whitespace or commentary
-does not terminate the loop.
+response. The finalizer receives retained observations once, after the model
+calls the closed `finish_investigation({"status":"DONE"})` protocol action.
+Empty text, prose, whitespace, punctuation, and Markdown do not terminate the
+loop. The verifier retains read compatibility with historical literal-DONE-v1
+bundles.
 
 ### P1: free-form Markdown was a protocol choke point
 

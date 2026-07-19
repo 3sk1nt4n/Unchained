@@ -1,4 +1,4 @@
-# Sentinel Unchained Build Provenance
+# Unchained Build Provenance
 
 > **Created:** 2026-07-14 during the OpenAI Build Week submission period
 > **Purpose:** distinguish prior work, new Build Week work, Codex work, and
@@ -83,7 +83,7 @@ Prior work not claimed as new Unchained implementation:
 
 ## 4. New Build Week work
 
-The following project-owned areas were built for Sentinel Unchained during this
+The following project-owned areas were built for Unchained during this
 Build Week effort and are the work intended for evaluation:
 
 - `src/unchained/evidence.py`: bounded discovery, content classification,

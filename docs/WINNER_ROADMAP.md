@@ -1,4 +1,4 @@
-# Sentinel Unchained: Winner Roadmap
+# Unchained: Winner Roadmap
 
 > **Role:** priority, sequencing, positioning, and go/no-go overlay
 > **Status:** OpenAI-native vNext green offline; authentic runtime, sandbox, and attestation red
@@ -26,7 +26,7 @@ If these files conflict, apply this precedence:
 
 ## 1. Winner verdict
 
-Proceed with Sentinel Unchained. Do not pivot and do not re-scaffold.
+Proceed with Unchained. Do not pivot and do not re-scaffold.
 
 ### Current execution snapshot: 2026-07-18
 
@@ -103,7 +103,7 @@ demonstrated on a forensic benchmark.
 
 Use this public one-line framing:
 
-> Sentinel Unchained is a trust-measurement harness that quantifies
+> Unchained is a trust-measurement harness that quantifies
 > receipt-grounded reliability for a GPT-5.6-directed investigator on a frozen
 > forensic benchmark, then publishes a proof bundle every judge can inspect.
 

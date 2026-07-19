@@ -1,0 +1,256 @@
+{
+  "schema_version": 1,
+  "comparison_id": "sentinel-dc01-memory-qwen-openai-v1",
+  "status": "PENDING",
+  "qualification": "CONTROLLED_COMPARATIVE_CASE_STUDY_NOT_CAUSAL_ABLATION",
+  "freeze": {
+    "freeze_id": "sentinel-dc01-sol-v1",
+    "tag": "experiment-freeze-v1",
+    "tag_policy": "ANNOTATED_TAG_MUST_RESOLVE_TO_CURRENT_CLEAN_HEAD",
+    "aggregation_head_policy": "CLEAN_TAG_DESCENDANT_CHANGING_ONLY_COMPARISON_RESULTS_V1",
+    "candidate_time_floor": "ANNOTATED_TAGGER_TIMESTAMP",
+    "external_server_timestamp_utc": null,
+    "lock_path": "docs/BENCHMARK-FREEZE.lock.json",
+    "lock_sha256": null,
+    "reference_fact_set_path": "experiment/reference-facts-v1.json",
+    "reference_fact_set_sha256": null,
+    "shared_scoring_version": "dc01-scoring-v1"
+  },
+  "evidence": {
+    "case_id": "CASE-A",
+    "public_evidence_id": "E001",
+    "route": "windows-memory-only",
+    "size_bytes": 2147483648,
+    "sha256": "8079a7459b1739caf7d4fbf6dde5eb0ae7a9d24dbde657debf4d5202c8dc6b62"
+  },
+  "repositories": {
+    "openai": {
+      "commit_policy": "RESOLVED_ANNOTATED_FREEZE_TAG_COMMIT",
+      "required_ancestor": "51662cfb809212af3b58a680c0d9265d91692302",
+      "public_repository": "https://github.com/3sk1nt4n/sentinel-unchained"
+    },
+    "qwen": {
+      "required_commit": "7118c6ef02b19f4d016723470bfaa5f8a94dbfe5",
+      "required_ancestor": "9f309c6134e857f7b86f3e6b9c6709ce954944a5",
+      "public_repository": "https://github.com/3sk1nt4n/Sentinel-Ensemble-Qwen"
+    }
+  },
+  "systems": {
+    "openai": {
+      "display_name": "OpenAI-native Unchained",
+      "runner_argv": [
+        "{python}",
+        "-I",
+        "-m",
+        "unchained",
+        "run",
+        "{evidence_dir}",
+        "--caps",
+        "default"
+      ],
+      "required_environment_any_of": [
+        "OPENAI_API_KEY_FILE"
+      ],
+      "required_environment_values": {
+        "UNCHAINED_MODEL": "gpt-5.6"
+      },
+      "required_requested_models": [
+        "gpt-5.6"
+      ],
+      "accepted_provider_model_patterns": [
+        "^gpt-5\\.6-sol(?:-.+)?$"
+      ],
+      "terminal_complete_value": "COMPLETE",
+      "tool_policy": "openai-windows-memory-14-typed-adaptive-v1",
+      "model_policy": "requested gpt-5.6; provider identity must be gpt-5.6-sol or gpt-5.6-sol-*",
+      "runtime_contract": {
+        "policy_id": "TAGGED_CPYTHON311_PACKAGE_LOCK_AND_PROVIDER_RECEIPTS_V1",
+        "python_implementation": "CPython",
+        "python_version": "3.11.9",
+        "dependency_lock_path": "requirements/pylock.windows-amd64-cp311.toml",
+        "dependency_lock_sha256": "2ab5957a30eba0ebaa24775b8e78d381800ef003be201e6acf932aba724dfef7"
+      },
+      "cap_contract": {
+        "profile": "default",
+        "max_tool_calls": 60,
+        "max_total_tokens": 400000,
+        "max_wall_seconds": 1800.0,
+        "max_cost_usd": 10.0
+      },
+      "workload_ownership_policy": "CONTROLLER_OWNED_LOCAL_PROCESS_TREE_V1",
+      "cost_basis": "code-owned frozen GPT-5.6 Sol price table; local estimate, not provider billing",
+      "price_contract_path": "docs/BENCHMARK-FREEZE.lock.json",
+      "price_contract_sha256": null,
+      "native_verifier": "sentinel verify --require-complete --require-live-gpt56"
+    },
+    "qwen": {
+      "display_name": "Sentinel Ensemble Qwen",
+      "runner_argv": [
+        "docker",
+        "run",
+        "--rm",
+        "--name",
+        "{container_name}",
+        "--cidfile",
+        "{cidfile}",
+        "--mount",
+        "type=bind,src={evidence_dir},dst=/evidence,readonly",
+        "--env",
+        "DASHSCOPE_API_KEY",
+        "--env",
+        "QWEN_API_KEY",
+        "{qwen_image_digest}",
+        "/evidence"
+      ],
+      "required_environment_any_of": [
+        "DASHSCOPE_API_KEY",
+        "QWEN_API_KEY"
+      ],
+      "required_environment_values": {
+        "SIFT_LLM_PROVIDER": "qwen",
+        "SIFT_DEFAULT_MODEL": "qwen3.7-max",
+        "SIFT_MODEL_ANALYSIS": "qwen3.7-max",
+        "SIFT_MODEL_INV3A": "qwen3.7-max",
+        "SIFT_INV2_ENSEMBLE_FORCE_MODEL": "qwen-plus",
+        "SIFT_INV2_ENSEMBLE": "1",
+        "SIFT_ENSEMBLE_MODELS": "qwen-plus,qwen-plus,qwen-plus,qwen-plus",
+        "SIFT_MODEL_REACT": "qwen-plus",
+        "SIFT_MODEL_INV1_PRIMARY": "qwen-plus",
+        "SIFT_MODEL_REPORT": "qwen-plus",
+        "SIFT_MODEL_SELF_CORRECTION": "qwen-plus",
+        "SIFT_INV3A_FINALIZE": "1",
+        "SIFT_INV3A_REVIEW_ALL": "1",
+        "SIFT_ALLOW_YARA": "1",
+        "SIFT_NO_OPEN": "1",
+        "SIFT_HTTP_TIMEOUT": "600"
+      },
+      "required_requested_models": [
+        "qwen-plus",
+        "qwen3.7-max"
+      ],
+      "accepted_provider_model_patterns": [
+        "^qwen-plus(?:-.+)?$",
+        "^qwen3\\.7-max(?:-.+)?$"
+      ],
+      "terminal_complete_value": "completed",
+      "tool_policy": "qwen-memory-only-source-filtered-pipeline-at-pinned-commit",
+      "model_policy": "Qwen model and ensemble roster must be frozen before READY and retained per response",
+      "runtime_contract": {
+        "policy_id": "PINNED_DOCKERFILE_IMAGE_BUILD_AND_PROVIDER_RECEIPTS_V1",
+        "execution_surface": "Prebuilt immutable Docker image by digest; build excluded from run timing",
+        "dependency_authority": "Dockerfile and dependency files at repository_commit",
+        "immutable_image_digest": null,
+        "build_provenance_path": "docs/runs/qwen-build-provenance-v1.json",
+        "build_provenance_sha256": null,
+        "sbom_path": "docs/runs/qwen-sbom-v1.json",
+        "sbom_sha256": null
+      },
+      "cap_contract": {
+        "policy_id": "NO_EQUIVALENT_GLOBAL_TOKEN_OR_COST_CAP_V1",
+        "global_token_cap": null,
+        "global_cost_cap_usd": null,
+        "http_timeout_seconds": 600
+      },
+      "workload_ownership_policy": "DOCKER_DAEMON_CONTAINER_OWNERSHIP_UNAVAILABLE_FAIL_CLOSED",
+      "cost_basis": "provider usage under a separately frozen Qwen price table; NOT AVAILABLE until bound",
+      "price_contract_path": "docs/runs/qwen-price-contract-v1.json",
+      "price_contract_sha256": null,
+      "native_verifier": "Qwen post-run report and custody gates at the pinned commit; not equivalent to Sentinel strict verification"
+    }
+  },
+  "execution": {
+    "default_mode": "DRY_RUN_NO_PROVIDER_NO_EVIDENCE_READ",
+    "provider_execution_switch": "--execute",
+    "order": [
+      "openai",
+      "qwen"
+    ],
+    "external_child_timeout_seconds": 1800,
+    "child_environment_policy": "MINIMAL_NONSECRET_ALLOWLIST_PLUS_SELECTED_PROVIDER_CREDENTIALS_V1",
+    "process_tree_policy": "WINDOWS_JOB_OBJECT_KILL_ON_CLOSE_OR_POSIX_NEW_SESSION_PROCESS_GROUP_V1",
+    "measurement_regime": {
+      "candidate_order": "PAIRED_OPENAI_THEN_QWEN_BY_SEQUENCE_V1",
+      "timing_scope": "PREBUILT_RUNTIME_INVESTIGATION_ONLY_EXCLUDES_BUILD_AND_INSTALL_V1",
+      "cache_policy": "WARM_DEPENDENCY_CACHE_COLD_CASE_OUTPUT_NO_PROVIDER_RESPONSE_REUSE_V1",
+      "runtime_build_metrics": "SEPARATE_DISCLOSED_NOT_IN_INVESTIGATION_WALL_TIME_V1",
+      "host_resource_receipt_path": "docs/runs/comparison-host-resources-v1.json",
+      "host_resource_receipt_sha256": null
+    },
+    "target_valid_runs_per_system": 3,
+    "selection_rule": "retain every post-freeze candidate; first valid complete run is primary; aggregate every valid run",
+    "ledger_rule": "each system ledger must enumerate every post-freeze candidate JSON by contiguous sequence and SHA-256",
+    "private_launch_receipts": "external launch receipts remain outside both repositories and never qualify as scored records",
+    "infrastructure_fault_codes": [
+      "PROVIDER_UNAVAILABLE_BEFORE_USABLE_RESPONSE",
+      "FROZEN_EVIDENCE_READ_FAILURE",
+      "REQUIRED_SYMBOL_RESOLUTION_UNAVAILABLE_BEFORE_OPENING",
+      "HOST_PROCESS_OR_STORAGE_FAILURE",
+      "VERIFIER_DEFECT_INVALIDATES_EQUIVALENT_BUNDLES"
+    ],
+    "not_infrastructure_faults": [
+      "weak or empty findings",
+      "missed reference facts",
+      "unsupported findings or reviewer escapes",
+      "unattractive latency or cost within frozen caps",
+      "model-selected tools",
+      "a frozen cap firing",
+      "low precision, recall, or F1"
+    ]
+  },
+  "metrics": [
+    "wall_time_seconds",
+    "time_to_first_observation_seconds",
+    "model_request_count",
+    "tool_call_count",
+    "input_tokens",
+    "output_tokens",
+    "total_tokens",
+    "estimated_cost_usd",
+    "final_confirmed_factual_precision",
+    "discovered_fact_recall",
+    "confirmed_fact_recall",
+    "unsupported_finding_rate",
+    "exact_citation_resolution_rate",
+    "confirmed_f1",
+    "custody_pass",
+    "native_verifier_pass"
+  ],
+  "run_record_contract": {
+    "location": "docs/runs/comparison-inputs/<system>/candidate-NNN.json",
+    "ledger": "docs/runs/comparison-inputs/<system>/ledger.json",
+    "rates": "store status, numerator, denominator, and exact value; denominator zero is NOT_APPLICABLE",
+    "sidecars": "every valid candidate requires ledger-hashed candidate-NNN.extraction.json and candidate-NNN.adjudication.json sidecars; metrics are recomputed from them",
+    "runtime_and_caps": "copy the exact closed structured runtime_contract and cap_contract objects into every candidate record; aggregation rejects any drift",
+    "classification": [
+      "VALID",
+      "INFRASTRUCTURE_FAULT",
+      "PARTIAL_CAP",
+      "PROTOCOL_INVALID"
+    ]
+  },
+  "disclosed_differences": [
+    "The providers and model families differ: OpenAI GPT-5.6 Sol versus a frozen Qwen/DashScope roster.",
+    "The prompts, context policies, and orchestration differ: adaptive opening/one-tool turns versus the Qwen ensemble pipeline.",
+    "The eligible tool catalogs and tool-selection policies differ even though both receive only the same memory image.",
+    "The cap, retry, timeout, and concurrency contracts differ and must be retained rather than described as identical.",
+    "The semantic validators, reviewer behavior, report schemas, and native verifier guarantees are not equivalent.",
+    "Provider token, cache, and price accounting can differ; unavailable cost fields remain NOT AVAILABLE rather than estimated from another provider.",
+    "The shared external fact scorer is the only source for precision, recall, F1, unsupported-finding, and citation-resolution comparisons.",
+    "One public case can have training contamination and cannot establish general forensic accuracy or universal performance."
+  ],
+  "claim_policy": {
+    "current_claim": "PENDING_NO_SAME_EVIDENCE_RESULT",
+    "same_evidence_requires": [
+      "case_id",
+      "public_evidence_id",
+      "route",
+      "size_bytes",
+      "sha256",
+      "reference_fact_set_sha256",
+      "repository_commits",
+      "complete_candidate_ledgers"
+    ],
+    "superiority_requires": "a COMPLETE generated table backed by all valid ledgers; report dimensions honestly even when Qwen wins",
+    "historical_qwen_metrics": "EXCLUDED: committed DC01 Qwen metrics used memory plus disk and are not the same memory-only experiment"
+  }
+}

@@ -1,4 +1,4 @@
-# Sentinel Unchained: quick install and run
+# Unchained: quick install and run
 
 This is the shortest reliable path for a fresh Windows 10 or Windows 11 AMD64
 machine. The Build Week flagship is Windows memory evidence. Native Windows E01
@@ -11,6 +11,42 @@ There are two separate judge paths:
    a funded OpenAI project key.
 
 Never present a fake-model test or replay as an authentic GPT-5.6 run.
+
+## Judge's first screen
+
+After installation, start here—not with a funded run:
+
+```powershell
+$sentinel = "$env:LOCALAPPDATA\venvs\sentinel-unchained-py311\Scripts\sentinel.exe"
+& $sentinel onboard
+```
+
+The welcome needs no evidence and no key, reads nothing, and makes zero OpenAI
+calls. To produce the first deterministic case card:
+
+```powershell
+& $sentinel onboard "C:\Evidence\sentinel\dc01"
+```
+
+That default profiles content and rechecks SHA-256 custody locally. Archives
+are not unpacked; unsupported documents are hashed/listed and set aside. The
+router accepts at most one ready memory image and one ready disk image per case.
+Same-class multiples fail closed.
+
+The paid path uses the same GPT-5.6 Sol model with one of two stop-ceiling
+profiles:
+
+| Choice | Option | Default hard ceilings |
+|---|---|---|
+| **CAUTIOUS** | `--caps strict` | 20 tools · 100,000 tokens · 10 min · $2.50 estimated cost |
+| **FLAGSHIP** | `--caps default` | 60 tools · 400,000 tokens · 30 min · $10 estimated cost |
+
+These are hard ceilings, not price quotes, reasoning-depth modes, or promises
+of finding quality. The effective values appear in the onboarding card. A paid
+run requires `--launch` in an interactive terminal and the exact phrase
+`LAUNCH GPT-5.6 SOL`; JSON and noninteractive onboarding cannot launch.
+
+The full junior-analyst walkthrough is [Start Here](docs/START-HERE.md).
 
 ## 1. Install prerequisites
 
@@ -71,6 +107,13 @@ Expected final line:
 
 ```text
 No broken requirements found.
+```
+
+Open the guided, zero-key welcome:
+
+```powershell
+$sentinel = "$env:LOCALAPPDATA\venvs\sentinel-unchained-py311\Scripts\sentinel.exe"
+& $sentinel onboard
 ```
 
 ## 3. Run the no-key quality gate
@@ -197,21 +240,22 @@ separate directory, for example:
 C:\Evidence\sentinel\dc01\
 ```
 
-The directory should contain the extracted Windows memory image. The program
-profiles content rather than trusting a filename extension and prints a case
-card containing OS, shape, readiness, sizes, hashes, and available tools.
+The directory should contain the extracted Windows memory image. Unchained
+profiles content rather than trusting a filename extension and prints a
+path-free case card containing OS, shape, readiness, sizes, hashes, available
+tools, cloud boundary, and effective caps. It does not unpack an archive; any
+permitted extraction happens before onboarding.
 
 Profile and route it before spending an API call:
 
 ```powershell
-& "$venv\Scripts\sentinel.exe" profile C:\Evidence\sentinel\dc01
+& "$venv\Scripts\sentinel.exe" onboard C:\Evidence\sentinel\dc01
 ```
 
 ## 7. Run the bounded investigator
 
-The simplest live run is one command. It performs the environment check,
-prompts for the API key invisibly, sets the hard caps, and launches the
-investigator:
+The recommended live path re-runs the local profile, prints the selected cloud
+and hard-cap boundary, and then stops at the explicit confirmation gate:
 
 > Prototype boundary: use an externally read-only or immutable evidence copy
 > and a restricted nonsynchronized case workspace. The current router accepts
@@ -222,13 +266,27 @@ investigator:
 > policy before sending sensitive derived content.
 
 ```powershell
+& "$venv\Scripts\sentinel.exe" onboard C:\Evidence\sentinel\dc01 `
+    --launch --caps default
+```
+
+Type exactly `LAUNCH GPT-5.6 SOL` only after checking the case and cap cards.
+Anything else cancels with no investigation request. Add `--mount` only when an
+attempted contained read-only disk mount is needed; otherwise the onboarding
+path keeps disk handling raw-only.
+
+The explicit PowerShell wrapper remains available for an operator who wants it
+to set the selected cap variables and prompt for the key invisibly:
+
+```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\run.ps1 `
-    -EvidencePath C:\Evidence\sentinel\dc01 -Live
+    -EvidencePath C:\Evidence\sentinel\dc01 -Live -Caps default
 ```
 
 The hidden key prompt appears only in the local PowerShell window. The key is
-not printed or written to the repository. Use `-SkipSetup` only after the setup
-command has already passed in the same checkout.
+not printed or written to the repository. Use `-SkipSetup` only after setup has
+already passed in the same checkout. Direct `sentinel run` remains the advanced
+noninteractive entry point when paid-run authorization is enforced externally.
 
 ```powershell
 Set-Location "$env:USERPROFILE\src\sentinel-unchained"
@@ -244,8 +302,12 @@ self-contained `viewer.html`.
 The GPT-5.6 opening is intentionally all-or-none: it must choose one to six
 distinct route-valid typed calls. An unknown, duplicate, malformed, or seventh
 call rejects the whole opening rather than running a valid-looking subset. In
-the adaptive loop, only raw assistant text exactly equal to `DONE` terminates;
-whitespace or commentary around that token is a protocol failure.
+the adaptive loop, every response must contain exactly one typed action. A
+forensic action continues the loop; only the closed
+`finish_investigation({"status":"DONE"})` action terminates it. Empty output,
+free-form prose, case variants, extra fields, and Markdown have no terminal
+authority. The verifier can still inspect historical literal-`DONE` v1 bundles,
+but the current runtime emits typed-DONE-v2.
 
 Exit meanings:
 
@@ -279,8 +341,8 @@ The verifier reconstructs the exact opening, adaptive, finalizer, judge, and
 report inputs—including every adaptive ledger, receipt index, budget snapshot,
 latest observation, and full finalizer observation sequence—and binds accepted
 output usage to the paired request ceiling. It binds strict tool schemas/phase
-options, model function calls, tool receipts, visible case-ledger updates, raw
-literal `DONE`, forced
+options, model function calls, tool receipts, visible case-ledger updates,
+typed-DONE-v2 (or historical literal-DONE-v1), forced
 investigation/judge/report serializers, full artifact descriptors, mandatory
 judge quotes, recomputed byte spans/occurrence counts, custody, cleanup, and the
 complete terminal state. A claimed `COMPLETE` run may contain no `capped` or
@@ -388,11 +450,14 @@ Build and run the offline fixture with no network and no key:
 ```powershell
 docker build --target test -t sentinel-unchained:test .
 docker compose build
-docker compose run --rm offline --help
+docker compose run --rm offline
 docker compose run --rm offline profile /evidence --json
 ```
 
-Expected profile facts include `logs-only`, evidence ID `E001`,
+The first run uses the service's `onboard --json` default and exits `0` without
+a key, evidence read, or network. `doctor --json` remains an explicit
+live-readiness check and correctly reports not ready in this offline/no-secret
+service. Expected fixture-profile facts include `logs-only`, evidence ID `E001`,
 `openai_called=false`, and matching custody.
 
 For the one-request GPT-5.6 Luna typed-tool canary, store the key in a readable

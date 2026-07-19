@@ -1,4 +1,4 @@
-# Sentinel Unchained: Build Week Winner Master Plan
+# Unchained: Build Week Winner Master Plan
 
 > **Status:** CONDITIONAL GO, OpenAI-native vNext is green offline, authentic runtime remains red
 > **Last deep review:** 2026-07-18
@@ -6,7 +6,7 @@
 > **Internal submission deadline:** 2026-07-20
 > **Hard deadline:** 2026-07-21 17:00 PT / 20:00 ET
 
-This document is the strategic master plan for Sentinel Unchained. It replaces
+This document is the strategic master plan for Unchained. It replaces
 the stale July 13 kickoff plan and its disproven claims. It defines the product
 story, scientific method, scope, proof contract, judge experience, delivery
 gates, prompts, and submission requirements.
@@ -22,7 +22,7 @@ Official Rules control.
 
 ## 1. Executive verdict
 
-Sentinel Unchained has a winning core idea and a substantial offline-tested
+Unchained has a winning core idea and a substantial offline-tested
 controller. It is not submission-ready today.
 
 ### Current proof snapshot: 2026-07-18
@@ -77,7 +77,7 @@ turn the submission into a winner-grade GPT-5.6 project.
 
 ### One-line thesis
 
-> Sentinel Unchained is a trust-measurement harness for model-directed
+> Unchained is a trust-measurement harness for model-directed
 > investigators, demonstrated on a forensic benchmark. GPT-5.6 adaptively uses
 > a pinned subset of typed forensic tools while deterministic code constrains
 > authority, protects custody, and preserves receipts that a frozen evaluation
@@ -85,7 +85,7 @@ turn the submission into a winner-grade GPT-5.6 project.
 
 ### Twenty-second judge story
 
-> Autonomous forensic agents can sound certain without proof. Sentinel
+> Autonomous forensic agents can sound certain without proof. Unchained
 > Unchained lets GPT-5.6 choose and interpret typed forensic tools, but it cannot
 > choose a shell, binary, or evidence path. On a known-answer Windows case, we
 > measure which observable facts it finds, which claims exceed its receipts,
@@ -95,7 +95,7 @@ turn the submission into a winner-grade GPT-5.6 project.
 ### Product relationship
 
 Sentinel Ensemble is the production-oriented deterministic trust architecture.
-Sentinel Unchained is a complementary controlled-autonomy experiment. It asks
+Unchained is a complementary controlled-autonomy experiment. It asks
 how much semantic agency a frontier model can exercise when code retains
 evidence custody, typed authority, protocol enforcement, audit receipts, and
 resource limits.
@@ -106,7 +106,7 @@ systems answer different questions:
 | System | Primary question |
 |---|---|
 | Sentinel Ensemble | How can deterministic code prevent unsupported claims from entering a report? |
-| Sentinel Unchained | What can an adaptive model discover, overclaim, and self-correct inside a constrained, inspectable runtime? |
+| Unchained | What can an adaptive model discover, overclaim, and self-correct inside a constrained, inspectable runtime? |
 
 ### Developer Tools audience
 
@@ -119,7 +119,7 @@ The target users are:
 
 The demonstrated impact claim is intentionally specific:
 
-> Sentinel Unchained helps security-agent developers measure whether an
+> Unchained helps security-agent developers measure whether an
 > autonomous investigator discovers supported incident facts, how often it
 > overclaims, whether a fresh reviewer catches those overclaims, and whether
 > every result remains traceable to preserved evidence.
@@ -204,8 +204,8 @@ New Build Week work that must be evaluated:
 - evidence profiling and capability routing;
 - constrained GPT-5.6 Responses API adapter;
 - model-selected parallel opening book;
-- adaptive one-tool investigation loop;
-- literal-DONE and forced structured finalization protocol;
+- adaptive one-action investigation loop;
+- typed-DONE-v2 and forced structured finalization protocol;
 - fresh-context, downgrade-only reviewer;
 - caps, audit, custody integration, tool isolation, and report safety;
 - full proof artifacts, frozen reference evaluation, viewer, and judge path;
@@ -232,7 +232,7 @@ model.” The accurate statement is:
 | Deterministic tool domain | Reviewed typed schemas, tool eligibility, fixed binary/callable mapping, path sealing, concurrency, timeouts, containment |
 | Deterministic audit domain | Ordered hash-linked events, requests, responses, calls, arguments, output artifacts, usage, costs, timestamps, terminal state |
 | Deterministic caps domain | Tool, token, wall-clock, and dollar limits with graceful partial termination |
-| Supporting controller protocol | All-or-none one-to-six opening calls with distinct IDs/tools and zero rejected calls in `COMPLETE`, one tool per later turn, literal DONE, forced serialization, monotonic judge validation, citation validation, sanitization, cleanup |
+| Supporting controller protocol | All-or-none one-to-six opening calls with distinct IDs/tools and zero rejected calls in `COMPLETE`; one required typed action per later turn; closed `finish_investigation({"status":"DONE"})`; phase-output floors; forced serialization; monotonic judge validation; citation validation; sanitization; cleanup |
 | GPT-5.6 investigator | Opening strategy, next-tool choice, concise decision summaries, hypotheses, interpretation, provisional atomic findings, stopping decision |
 | Fresh GPT-5.6 reviewer | Finding-scoped receipt review, preservation or downgrade only, rationale and cited spans |
 | GPT-5.6 reporter | Narrative and tables from already reviewed findings, without new evidence or new findings |
@@ -258,7 +258,7 @@ CODE: validate, reserve caps, execute concurrently, retain receipts
 GPT-5.6 LOOP: concise decision summary -> one typed call -> observe -> update
         |
         v
-LITERAL DONE
+STRICT TYPED DONE
         |
         v
 FORCED STRUCTURED INVESTIGATION FINALIZATION
@@ -1286,14 +1286,17 @@ Opening: choose 1 to 6 distinct eligible functions that provide the highest
 information value for this exact profile. Choose only functions actually
 supplied. The controller will execute them concurrently.
 
-After the opening, each turn may request exactly one function. Emit only a
-concise decision summary, not hidden chain-of-thought. Track support,
+After the opening, each turn must request exactly one supplied function: an
+eligible forensic function when another result can matter, or the closed
+`finish_investigation({"status":"DONE"})` action when the investigation is
+finished. Emit only a concise decision summary, not hidden chain-of-thought. Track support,
 uncertainty, contradiction, coverage gaps, and tool failure. A zero-record result
 is not proof of absence unless coverage is established. Change course when
 evidence contradicts a hypothesis.
 
-When further calls are unlikely to change the conclusions, return no function
-call and output exactly DONE. In final structured output, use stable atomic
+When further calls are unlikely to change the conclusions, call the strict
+finish function with status exactly DONE. Blank or free-form text has no
+terminal authority. In final structured output, use stable atomic
 finding IDs, cite exact receipt IDs, separate dead ends from findings, and do
 not label a plausible or familiar scenario as confirmed without affirmative
 receipt support.
@@ -1328,7 +1331,7 @@ finding-scoped citations, and exact quoted spans.
 ### Video voiceover anchor
 
 ```text
-Forensic agents can sound certain without proof. Sentinel Unchained lets
+Forensic agents can sound certain without proof. Unchained lets
 GPT-5.6 choose and interpret a constrained set of typed forensic tools while
 code protects evidence custody, authority, receipts, and cost. This is a genuine
 GPT-5.6 run, shown time-compressed; every timestamp and output is retained. A
@@ -1421,7 +1424,7 @@ evaluation design, not merely GPT-5.6 calling forensic tools.
 
 ## 17. Final go/no-go rule
 
-Continue Sentinel Unchained while the project can still meet Gate C by Friday,
+Continue Unchained while the project can still meet Gate C by Friday,
 July 17 at 18:00 ET.
 
 If Gate C passes, finish the viewer, video, and submission. If Gate C fails,

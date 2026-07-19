@@ -1,4 +1,4 @@
-# Sentinel Unchained - Design Decisions
+# Unchained - Design Decisions
 
 This is the design contract for the Python 3.11 prototype. It records the
 choices made without interrupting the kickoff for questions.
@@ -7,7 +7,7 @@ Status date: 2026-07-18.
 
 ## D-001 - Product boundary
 
-Sentinel Unchained investigates captured evidence and produces an auditable
+Unchained investigates captured evidence and produces an auditable
 report. GPT-5.6 plans, acts, interprets, judges, and reports. The product does
 not remediate systems, delete artifacts, isolate hosts, disable accounts, or
 turn model conclusions into destructive authority.
@@ -67,7 +67,7 @@ interfaces that accept model-supplied commands, binaries, paths, plugins, or
 raw argument vectors.
 
 The authoritative investigator instructions in `src/unchained/prompts.py` are
-owned by Sentinel Unchained. They are neither copied nor imported from Qwen.
+owned by Unchained. They are neither copied nor imported from Qwen.
 Phase-specific protocol text may wrap them, but the prior project's prompt
 layer never enters the model request.
 
@@ -698,7 +698,7 @@ OpenAI Build Week `/feedback` Codex Session ID:
 ```
 
 The upload confirmation identified this value as the thread ID. This is the
-project thread where the majority of Sentinel Unchained's core functionality
+project thread where the majority of Unchained's core functionality
 was implemented, so the same exact value is the one recorded for the Devpost
 submission field. Re-evaluate this fact after material later core work and run
 `/feedback` near submission; the qualifying majority-core thread controls, not

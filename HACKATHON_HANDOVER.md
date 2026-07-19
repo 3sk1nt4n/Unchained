@@ -1,4 +1,4 @@
-# Sentinel Unchained - OpenAI Build Week Living Handover
+# Unchained - OpenAI Build Week Living Handover
 
 This file is the execution-status source of truth for the OpenAI Build Week
 submission. It records verified rules, current proof state, delivery gates,
@@ -69,7 +69,7 @@ does not prove that GPT-5.6 produced the original run.
 
 ## Executive decision
 
-Proceed conditionally with Sentinel Unchained for Build Week. Do not pivot to a
+Proceed conditionally with Unchained for Build Week. Do not pivot to a
 new dynamic model-registry project now. Unchained is no longer a from-scratch
 concept: it is a substantial controller prototype with 17 source modules, an
 independently verified proof protocol, 274 passing tests after the Docker/Luna
@@ -180,7 +180,7 @@ The four current tracks are:
 4. Education.
 
 Developer Tools explicitly includes testing, DevOps, agentic workflows, and
-security. Sentinel Unchained fits that track. The live rules list a $15,000
+security. Unchained fits that track. The live rules list a $15,000
 first-place and $10,000 second-place prize for Developer Tools.
 
 Do not select a track from an old gpt-oss page. Verify the selected track again
@@ -254,7 +254,7 @@ The rules allow one entrant to submit multiple projects only when each is unique
 and substantially different, as determined by OpenAI and Devpost. Each project
 enters one track and can win at most one prize.
 
-The current strategy remains one polished Build Week Sentinel entry. That is a
+The current strategy remains one polished Build Week Unchained entry. That is a
 delivery decision, not a false claim that multiple submissions are prohibited.
 
 ## Product positioning
@@ -271,7 +271,7 @@ delivery decision, not a false claim that multiple submissions are prohibited.
 ### Relationship to Sentinel Ensemble
 
 Sentinel Ensemble is the production-oriented deterministic trust architecture.
-Sentinel Unchained is a controlled GPT-5.6 autonomy experiment built on a pinned,
+Unchained is a controlled GPT-5.6 autonomy experiment built on a pinned,
 pre-existing forensic foundation. It asks how much adaptive semantic agency can
 be admitted safely when deterministic code retains custody, typed authority,
 protocol enforcement, audit receipts, and resource limits.
@@ -314,7 +314,8 @@ Build Week additions to prove with dated Codex logs and commits:
 - GPT-5.6 investigator prompt and adaptive loop.
 - Responses API state behavior.
 - Opening-book concurrency and one-tool investigation protocol.
-- Literal `DONE` plus forced structured serialization.
+- Required typed `finish_investigation({"status":"DONE"})` plus forced
+  structured serialization; historical literal-DONE-v1 remains verifier-readable.
 - Fresh, downgrade-only judge.
 - Audit chain and receipt handling.
 - Tool/token/time/cost caps.
@@ -401,7 +402,7 @@ CLI / budget
     -> evidence inventory, classification, routing, and pre-run hashes
     -> typed tool registry and bounded private workers
     -> GPT-5.6 opening selection (all-or-none, at most six) and adaptive investigator loop
-    -> literal DONE and forced investigation serialization
+    -> strict typed DONE and forced investigation serialization
     -> deterministic exact evidence-span resolution
     -> fresh downgrade-only judge over those spans
     -> strict report draft and deterministic rendering
@@ -436,7 +437,7 @@ Verified on July 14, 2026 unless otherwise stated.
 | Python package | IMPLEMENTED + VERIFIED | CPython 3.11.9 primary and independent lockcheck environments; `pip check` clean; wheel build passes | Retain transcript with final submission commit |
 | CLI/controller | IMPLEMENTED + VERIFIED offline | 267 tests pass; `sentinel doctor/profile/run/verify/view` CLI tests | Genuine run artifact |
 | Opening parallel tools | IMPLEMENTED + VERIFIED offline | The opening is accepted all-or-none; a `COMPLETE` lifecycle has 1–6 distinct valid calls and zero rejected calls | Authentic audit trace |
-| Literal `DONE` protocol | IMPLEMENTED + VERIFIED offline | Controller tests | Authentic trace |
+| Typed `DONE` v2 protocol | IMPLEMENTED + VERIFIED offline | Required-action/schema/controller/verifier tests | Authentic COMPLETE trace |
 | Typed/no-shell authority | IMPLEMENTED + VERIFIED offline | Schema and worker tests | Native forensic demo |
 | Evidence inventory/custody | IMPLEMENTED + VERIFIED locally on real evidence | DC01 profile is Windows memory-only, ready, symbols ready; final custody matches | Publish only the non-evidence proof receipts after freeze |
 | Hard caps | IMPLEMENTED + VERIFIED offline | Cap tests | Recorded `PARTIAL` demo |
@@ -722,7 +723,7 @@ The flagship is accepted only when every applicable item below is evidenced.
 - [ ] Typed tools run without model-selected shell/path/binary authority.
 - [ ] Model/tool events and provider request IDs are retained safely.
 - [ ] Usage, cost, runtime, and tool status are measured.
-- [ ] The investigator terminates through the literal `DONE` protocol.
+- [ ] The investigator terminates through the strict typed-DONE-v2 protocol.
 - [ ] Structured findings are produced.
 - [ ] The fresh judge completes with monotonic verdicts.
 - [ ] Final report completes.
@@ -1315,6 +1316,7 @@ At the end of every substantial future session:
 | 2026-07-14 22:24 | Committed the synchronized winner strategy, handover, provenance, README, and environment record | Commit `207a039836cdaf3045e92a2b74e541a7dd2be77f`; public rules/API references, exact Gate A receipts, Windows memory-only scope, two-axis scoring, evaluator authorship, and all remaining red gates are aligned | Push and verify public provenance, then complete and publish C4 |
 | 2026-07-14 22:32 | Verified public provenance after user push | `origin/main` exactly matches `3506d29003262f22fee2144f12352749fc6cd06f`; GitHub metadata reports `visibility=public`; browser fetch returned a stale 404 and is retained as a non-authoritative discrepancy; API key is not present in this Codex process | Freeze the protocol and rubric before any GPT-5.6 DC01 call |
 | 2026-07-18 | Published OpenAI-native vNext foundation and completed the bounded Docker/UX follow-up | Foundation `ed4d3f5` fast-forwarded to public `main`; 274 tests plus Ruff/format/`pip check` in Linux/AMD64 test image; non-root runtime; no-network synthetic profile `E001`; custody match; secret scan pass; Luna canary implemented but no authorized key/live receipt | Push the synchronized follow-up, publish the experiment freeze, retain the Luna canary, then run one harmless complete Sol lifecycle before DC01 |
+| 2026-07-19 | Independently reviewed the first live Luna canary and retained Sol run | Luna reported as one nonqualifying typed request; Sol bundle-derived receipt records two `gpt-5.6-sol` responses, six successful opening tools on real Windows memory, an enforced six-call cap, matching recorded custody, and offline `VALID` / terminal `PARTIAL` | Publish sanitized receipts, freeze the complete experiment, then run the missing serializer/reviewer/report lifecycle to `COMPLETE` |
 
 ## Historical next action before the vNext publication
 
@@ -1550,16 +1552,16 @@ DC01 memory path.
 `NONQUALIFYING_CONNECTIVITY_SMOKE` and cannot satisfy the Sol-specific strict
 proof gate.
 
-This machine had no authorized API key. The canary implementation and mocked
-container contract are verified, but no authentic provider receipt is claimed.
-The exact next live command is:
+At this 2026-07-18 Docker checkpoint, the machine had no authorized API key.
+The canary implementation and mocked container contract were verified, but no
+authentic provider receipt was claimed at that time. The next command was:
 
 ```powershell
 $env:OPENAI_API_KEY_FILE = "C:\Secure\openai_api_key"
 docker compose --profile live run --rm live-smoke
 ```
 
-### Current next action
+### Historical next action before the first live receipts
 
 1. Push this synchronized Docker/README/handoff follow-up to public `main`.
 2. Publish the experiment freeze binding code, prompts, Sol alias/snapshot,
@@ -1575,6 +1577,132 @@ docker compose --profile live run --rm live-smoke
 
 The current winning line is:
 
-> Sentinel is not an LLM pretending to be evidence. It is GPT-5.6 directing a
+> Unchained is not an LLM pretending to be evidence. It is GPT-5.6 directing a
 > bounded investigation whose actions, citations, custody, and final report can
 > be checked independently.
+
+## First live GPT-5.6 receipt checkpoint (2026-07-19)
+
+This checkpoint supersedes older forward-looking statements that no Luna or Sol
+live request had been demonstrated. It does not rewrite those dated historical
+records, and it does not mark the flagship complete-case gate green.
+
+### Independent review provenance
+
+The supplied independent review report identifies Windows 11, CPython 3.11,
+repository commit `51662cfb809212af3b58a680c0d9265d91692302`, and labels its
+executed claims `TESTED`. The supplied `REPORT-LIVE-RUN.md` is 4,434 bytes with
+SHA-256
+`7ebdf230de88b18af3cd8a38acecebc2b1b48ca0d6c0740e596dd0bb0df53c9c`.
+
+The repository stores two deliberately sanitized projections:
+
+- [Luna canary receipt](docs/runs/luna-canary-receipt.json)
+- [Sol capped DC01 opening receipt](docs/runs/sol-capped-dc01-opening.json)
+
+The Luna file is an independent-reviewer-attested projection. The raw Luna JSON
+response was not supplied or retained with a proof bundle, so it is neither
+bundle-derived nor cryptographic provider proof. It reports one
+`gpt-5.6-luna` request, a valid strict typed call, no evidence read, 186 input
+tokens, 27 output tokens, and the permanent qualification label
+`NONQUALIFYING_CONNECTIVITY_SMOKE`.
+
+The Sol projection is derived from the retained bundle's own files. Its binding
+commitments are:
+
+| Retained artifact | Bytes | SHA-256 |
+|---|---:|---|
+| `audit.jsonl` | 100,445 | `57b3413e5d2c63ce18a3ffc83b70af4f22889b5ea2cdf37fbb5d0984c4774b84` |
+| `manifest.json` | 4,872 | `be6ff8b13099cffcd1ca0e2b69c53f106c7b7b3f64b5ad7f628522fb0f59bb3d` |
+| `profile.json` | 819 | `15dc2ee77de1cb10a5569ed66a0f81048f23782d045eaeaccd6fe88ff7d28d46` |
+| `summary.json` | 1,351 | `89b069bb4fdfe2af0a4f98df775492a6a2eb8a7e7bbe8364c91015aead8f9846` |
+
+### Exact Sol result
+
+Bundle-derived values control over rounded review prose:
+
+| Fact | Exact retained value |
+|---|---|
+| Run ID | `20260719T020118Z-ede6c445` |
+| Evidence | `E001`, ready Windows memory, 2,147,483,648 bytes |
+| Provider identity recorded by audit | `gpt-5.6-sol` on both model responses |
+| Model responses | 2 |
+| Opening | 6 selected, 6 executed, 0 rejected |
+| Successful tools | `vol_pstree`, `vol_psscan`, `vol_netscan`, `vol_malfind`, `vol_cmdline`, `vol_svcscan` |
+| Adaptive request | `vol_dlllist`, cap-blocked before forensic execution |
+| Tool receipt counts | 6 `success`, 1 `capped` |
+| Usage | 58,508 input; 746 output; 59,254 provider-total tokens |
+| Local cost estimate | `$0.38789875`; not a provider invoice |
+| End-to-end wall | 43,702 ms |
+| Terminal | `PARTIAL`, exit `3`, `MAX_TOOL_CALLS` |
+| Custody | Baseline/final recorded; matching SHA-256; mount released |
+| Offline verify | `VALID`; 13 artifacts; 38 chained audit entries |
+
+The verifier warning is material: original evidence was not included and was
+not rehashed during later offline verification. The verifier establishes the
+consistency of recorded custody receipts, the audit chain, artifacts, caps,
+usage, and terminal state. It does not cryptographically authenticate OpenAI,
+establish provider billing, or prove semantic forensic correctness.
+
+### Current live-proof scorecard
+
+| Gate | Current state |
+|---|---|
+| Luna connectivity and strict typed call | **DEMONSTRATED — independently attested projection** |
+| Luna raw/bundle-derived receipt | **NOT RETAINED** |
+| Sol provider-model metadata | **RECORDED twice as `gpt-5.6-sol`** |
+| Six-way Sol opening | **DEMONSTRATED on real memory** |
+| Six typed Volatility executions | **SUCCESS** |
+| Deterministic tool cap | **FIRED correctly before seventh forensic execution** |
+| Recorded pre/post custody | **MATCH** |
+| Retained capped bundle | **OFFLINE `VALID`, terminal `PARTIAL`** |
+| Typed `DONE` v2 and forced findings serialization live | **PENDING** |
+| Fresh downgrade-only reviewer live | **PENDING** |
+| Authentic `COMPLETE` Sol bundle | **PENDING** |
+| Same-evidence Qwen benchmark and semantic score | **PENDING** |
+| Human/cross-browser authentic viewer QA | **PENDING** |
+
+### Terminal-protocol correction and v2 hardening
+
+The supplied independent report described four later no-call turns as empty.
+Direct read-only inspection of their retained `model.response` audit payloads
+does not support that diagnosis: every response had provider status
+`completed`, no function call, and visible message lengths of 1,750, 1,124,
+1,112, and 395 characters. The v1 controller therefore rejected substantial
+nonterminal ledger prose, not blank output. Accepting empty text, case variants,
+punctuation, or Markdown as completion would both miss the observed failure and
+weaken the proof contract.
+
+The integrated v2 remedy is a closed, non-forensic
+`finish_investigation({"status":"DONE"})` function appended to the immutable
+adaptive catalog. Every adaptive request uses `tool_choice=required` and a
+one-call ceiling; code accepts exactly one eligible forensic action or the
+canonical finish action. The verifier binds the catalog, required choice,
+closed arguments, terminal response, and `typed-DONE-v2` event while retaining
+read compatibility for historical literal-DONE-v1 bundles. Investigate,
+serializer, and reviewer requests also require a 4,096-token allocation; if the
+remaining token or estimated-cost budget cannot preserve it, the run stops by
+cap before dispatch instead of degrading into a protocol error. This remedy is
+offline-verified; its authentic COMPLETE trace is still pending.
+
+### Current next action
+
+1. Revoke every credential that has appeared in chat, logs, screenshots, or a
+   recording. Create a fresh project-scoped key with an explicit spend limit;
+   keep it outside Git and do not paste it into an agent thread.
+2. Publish these sanitized receipts without publishing evidence bytes, raw
+   forensic output, local paths, credentials, or full provider identifiers.
+3. Freeze the complete-run code, prompts, models, schemas, tools, caps, price
+   table, evidence digest, scoring facts, and run-selection rule.
+4. Run a harmless Sol case through typed `DONE`, findings serialization,
+   fresh review, deterministic report/viewer, custody, and strict verification.
+5. Run and retain the authentic frozen `COMPLETE` case.
+6. Run the same-evidence Qwen comparison and frozen semantic scorer.
+7. Complete viewer QA, video, hosted artifact, and submission packaging.
+
+The winning claim is now stronger but remains bounded:
+
+> A retained live GPT-5.6 Sol bundle proves the opening, typed tool, cap,
+> content-addressed artifact, and recorded-custody path on real memory. It is
+> deliberately `PARTIAL`; the complete findings, fresh-review, and report proof
+> remains the next gate.

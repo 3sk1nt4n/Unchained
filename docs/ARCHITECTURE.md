@@ -1,6 +1,6 @@
-# Sentinel Unchained architecture
+# Unchained architecture
 
-Sentinel Unchained is a trust-measurement harness for model-directed digital
+Unchained is a trust-measurement harness for model-directed digital
 forensics. The forensic case is the testbed; the product is the auditable,
 deterministic boundary around an autonomous GPT-5.6 investigator.
 
@@ -26,8 +26,8 @@ CASE LEDGER + LATEST OBSERVATION [deterministic packet]
       |
       v
 PLAN -> ACT -> OBSERVE -> UPDATE [GPT-5.6]
-  visible <=8,192-byte ledger update + at most one typed forensic tool per turn;
-  raw response text exactly equal to DONE is the only terminator
+  exactly one typed action per turn: an eligible forensic tool with a visible
+  <=8,192-byte ledger update, or finish_investigation({"status":"DONE"})
       |
       v
 FORCED INVESTIGATION SERIALIZATION [strict schema, no forensic tools]
@@ -68,7 +68,7 @@ artifacts are sealed afterward so the manifest records that result.
 |---|---|---|---|
 | Evidence | Complete inventory, public evidence IDs, pre/post hashes, capability route | Interpret the public profile | Hashes detect end-state changes; they do not defeat privileged pathname swaps |
 | Tools | Registry, evidence paths, schemas, process ownership, caps, evidence/hash bindings | Choose route-valid tool and typed arguments | Registered third-party adapters are not yet network/filesystem sandboxed by the OS |
-| State | Case ledger facts, completed calls, receipts, budgets, latest observation | Notes, hypotheses, course corrections, `DONE` | No prior provider transcript or encrypted reasoning replay |
+| State | Case ledger facts, completed calls, receipts, budgets, latest observation, closed typed-DONE action | Notes, hypotheses, course corrections, decision to finish | No prior provider transcript or encrypted reasoning replay |
 | Findings | IDs, citations, exact quote resolution, status lattice | Propose findings and supporting quotes | Structural provenance is not a semantic truth validator |
 | Judge | Fresh packet, known IDs/spans, downgrade-only enforcement | Preserve or downgrade with rationale and span quote | Same model family can share investigator failure modes |
 | Report | Authoritative rows, transitions, citations, limitations, escaping | Narrative draft and commentary | Prose remains analyst-facing and requires human review |
@@ -78,8 +78,12 @@ The model cannot access a shell, choose an arbitrary path or binary, change the
 evidence, write the audit, modify a cap, add a judge finding, promote a verdict,
 or control authoritative report rows. An opening response containing an unknown,
 duplicate, malformed, or seventh tool call rejects the whole opening batch; no
-valid subset is executed. Adaptive termination is equally literal: whitespace,
-punctuation, or commentary around `DONE` is a protocol error, not completion.
+valid subset is executed. Adaptive termination is equally strict: empty text,
+whitespace, punctuation, Markdown, and narrative prose have no terminal
+authority. Only the closed non-forensic
+`finish_investigation({"status":"DONE"})` action completes the loop. The
+verifier can still read historical literal-DONE-v1 bundles, but the v2 runtime
+does not emit them.
 
 ## Context and speed policy
 
@@ -93,12 +97,17 @@ full transcript or the old 2,048-byte audit prefixes.
 | Phase | Reasoning effort | Text verbosity | Max output tokens | Max calls exposed |
 |---|---|---|---:|---:|
 | Opening | low | low | 2,048 | 6 typed forensic calls |
-| Adaptive turn | medium | low | 4,096 | 1 typed forensic call |
-| Finalization | medium | low | 12,288 | 1 strict schema call |
-| Judge | high | low | 12,288 | 1 strict schema call |
+| Adaptive turn | medium | low | 4,096 (also the request-allocation minimum) | 1 typed action: forensic or finish |
+| Finalization | medium | low | 12,288 (4,096 minimum allocation) | 1 strict schema call |
+| Judge | high | low | 12,288 (4,096 minimum allocation) | 1 strict schema call |
 | Report | low | medium | 8,192 | 1 strict schema call |
 
 Case-wide tool, token, wall-time, and estimated-cost caps remain code-enforced.
+If the remaining token or cost budget cannot preserve a phase's minimum output
+allocation, code fires the corresponding cap before dispatch instead of
+sending a predictably starved reasoning request. `max_output_tokens` includes
+reasoning and visible output; the minimum is a request-allocation guard, not a
+promise of a particular number of visible tokens.
 Opening calls reserve their entire batch before concurrent execution. The
 current scheduler is bounded but not yet resource-aware; running several heavy
 full-image scans on one slow disk remains a production optimization target.
