@@ -37,7 +37,7 @@ FOUNDATION_COMMIT = "51662cfb809212af3b58a680c0d9265d91692302"
 LOCK_SCHEMA_VERSION = 1
 HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 HEX_GIT_SHA = re.compile(r"^[0-9a-f]{40}$")
-CANONICAL_ORIGIN_URL = "https://github.com/3sk1nt4n/sentinel-unchained.git"
+CANONICAL_ORIGIN_URL = "https://github.com/3sk1nt4n/Unchained.git"
 REMOTE_VISIBILITY_CLAIM = (
     "public remote tag visibility is chronology evidence only; it does not authenticate "
     "server time, provide a signed timestamp, or establish cryptographic provenance"

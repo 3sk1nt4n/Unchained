@@ -52,7 +52,7 @@ $ExpectedEvidenceSha256 = "8079a7459b1739caf7d4fbf6dde5eb0ae7a9d24dbde657debf4d5
 $ExpectedDependencyLockPath = "requirements/pylock.windows-amd64-cp311.toml"
 $ExpectedDependencyLockSha256 = "2ab5957a30eba0ebaa24775b8e78d381800ef003be201e6acf932aba724dfef7"
 $ExpectedDependencyLockTarget = "windows-amd64-cp311"
-$ExpectedCanonicalOriginUrl = "https://github.com/3sk1nt4n/sentinel-unchained.git"
+$ExpectedCanonicalOriginUrl = "https://github.com/3sk1nt4n/Unchained.git"
 $RemoteVisibilityClaim = (
     "public remote tag visibility is chronology evidence only; it does not authenticate " +
     "server time, provide a signed timestamp, or establish cryptographic provenance"

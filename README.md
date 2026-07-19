@@ -124,7 +124,7 @@ offline-verifiable proof bundle.
 key with hidden input, and land in the guided onboarding:
 
 ```powershell
-irm https://raw.githubusercontent.com/3sk1nt4n/sentinel-unchained/main/get.ps1 | iex
+irm https://raw.githubusercontent.com/3sk1nt4n/Unchained/main/get.ps1 | iex
 ```
 
 Prefer to see every step? The manual path is identical:
@@ -132,8 +132,8 @@ Prefer to see every step? The manual path is identical:
 **Step 1 — install (reads no evidence, asks for no key, makes no OpenAI call):**
 
 ```powershell
-git clone https://github.com/3sk1nt4n/sentinel-unchained.git
-cd sentinel-unchained
+git clone https://github.com/3sk1nt4n/Unchained.git
+cd Unchained
 powershell -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1
 ```
 
@@ -191,14 +191,14 @@ Requirements: Git, Docker Engine + Compose (or Docker Desktop).
 with hidden input for the live canary, and open the onboarding:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/3sk1nt4n/sentinel-unchained/main/get.sh | bash
+curl -fsSL https://raw.githubusercontent.com/3sk1nt4n/Unchained/main/get.sh | bash
 ```
 
 Or step by step:
 
 ```bash
-git clone https://github.com/3sk1nt4n/sentinel-unchained.git
-cd sentinel-unchained
+git clone https://github.com/3sk1nt4n/Unchained.git
+cd Unchained
 docker compose build
 docker compose run --rm offline
 docker compose run --rm offline profile /evidence --json
@@ -227,8 +227,8 @@ The identical Compose commands above run under Docker Desktop for Mac. On
 Apple Silicon, Docker executes the `linux/amd64` image through emulation.
 
 ```bash
-git clone https://github.com/3sk1nt4n/sentinel-unchained.git
-cd sentinel-unchained
+git clone https://github.com/3sk1nt4n/Unchained.git
+cd Unchained
 docker compose build
 docker compose run --rm offline profile /evidence --json
 ```

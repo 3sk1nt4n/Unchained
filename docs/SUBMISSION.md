@@ -11,7 +11,7 @@
 |---|---|
 | Project | Unchained |
 | Track | Developer Tools |
-| Repository | <https://github.com/3sk1nt4n/sentinel-unchained> |
+| Repository | <https://github.com/3sk1nt4n/Unchained> |
 | License | MIT |
 | Submission commit/tag | `PENDING_FINAL_FREEZE` |
 | Public video under three minutes | `PENDING` |
@@ -181,8 +181,8 @@ substrate and new Build Week work is in `BUILD_PROVENANCE.md`.
 No key and no spend:
 
 ```powershell
-git clone https://github.com/3sk1nt4n/sentinel-unchained.git
-cd sentinel-unchained
+git clone https://github.com/3sk1nt4n/Unchained.git
+cd Unchained
 docker compose build
 docker compose run --rm offline
 docker compose run --rm offline profile /evidence --json

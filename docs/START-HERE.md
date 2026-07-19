@@ -30,8 +30,8 @@ Use Windows 10/11 AMD64, Git, PowerShell, and official CPython **3.11.9
 AMD64** for the primary Windows-memory path.
 
 ```powershell
-git clone https://github.com/3sk1nt4n/sentinel-unchained.git
-Set-Location .\sentinel-unchained
+git clone https://github.com/3sk1nt4n/Unchained.git
+Set-Location .\Unchained
 powershell -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1
 ```
 

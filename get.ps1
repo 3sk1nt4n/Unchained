@@ -1,5 +1,5 @@
 # Unchained one-line bootstrap for Windows.
-#   irm https://raw.githubusercontent.com/3sk1nt4n/sentinel-unchained/main/get.ps1 | iex
+#   irm https://raw.githubusercontent.com/3sk1nt4n/Unchained/main/get.ps1 | iex
 # Clones the repo, runs the pinned installer, optionally captures your OpenAI
 # key with hidden input, and hands off to the guided onboarding.
 # It never echoes, logs, or uploads the key, and never reads evidence.
@@ -40,9 +40,9 @@ if (Test-Path (Join-Path (Get-Location) "setup.ps1")) {
     Write-Host "      Using the current checkout: $repo" -ForegroundColor Gray
 }
 else {
-    $repo = Join-Path $env:USERPROFILE "sentinel-unchained"
+    $repo = Join-Path $env:USERPROFILE "Unchained"
     if (-not (Test-Path (Join-Path $repo "setup.ps1"))) {
-        git clone https://github.com/3sk1nt4n/sentinel-unchained.git $repo
+        git clone https://github.com/3sk1nt4n/Unchained.git $repo
         if ($LASTEXITCODE -ne 0) { throw "git clone failed with exit code $LASTEXITCODE." }
     }
     else {

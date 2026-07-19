@@ -11,7 +11,7 @@ living [hackathon handover](../HACKATHON_HANDOVER.md).
 
 | Field | Value |
 |---|---|
-| Repository | `https://github.com/3sk1nt4n/sentinel-unchained` |
+| Repository | `https://github.com/3sk1nt4n/Unchained` |
 | Reviewed base | `2b256a7bfd170388d2a8497dd3289af248abae18` |
 | Foundation commit | `ed4d3f540a27171c04a7321f4f85efea23d905de` |
 | Commit message | `Build OpenAI-native Unchained vNext` |
@@ -23,7 +23,7 @@ living [hackathon handover](../HACKATHON_HANDOVER.md).
 | Current Docker/README follow-up thread | `019f76f3-a19f-71d1-81b2-eed6305857f6` — not a successful `/feedback` receipt unless submitted from this thread |
 
 The exact foundation commit is visible at
-[`ed4d3f5`](https://github.com/3sk1nt4n/sentinel-unchained/commit/ed4d3f540a27171c04a7321f4f85efea23d905de).
+[`ed4d3f5`](https://github.com/3sk1nt4n/Unchained/commit/ed4d3f540a27171c04a7321f4f85efea23d905de).
 The default repository page now follows `main`; release-facing follow-ups must
 land there so judges do not have to discover a side branch.
 

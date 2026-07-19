@@ -1147,7 +1147,7 @@ Not safe yet:
 Start in:
 
 ```powershell
-cd <path-to-clone>\sentinel-unchained
+cd <path-to-clone>\Unchained
 ```
 
 Read first:
@@ -1511,7 +1511,7 @@ other independently controlled attestation before making that claim.
 
 | Field | Verified state |
 |---|---|
-| Public repository | `https://github.com/3sk1nt4n/sentinel-unchained` |
+| Public repository | `https://github.com/3sk1nt4n/Unchained` |
 | vNext foundation | `ed4d3f540a27171c04a7321f4f85efea23d905de` |
 | Working branch | `agent/openai-native-vnext`, remote equal at publication |
 | Default branch | `main`, safely fast-forwarded from `2b256a7` to `ed4d3f5` |

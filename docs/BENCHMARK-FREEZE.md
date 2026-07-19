@@ -277,7 +277,7 @@ be retained in chronological order.
 7. Review and commit `docs/BENCHMARK-FREEZE.lock.json`.
 8. Create the annotated public tag `experiment-freeze-v1` at the lock commit.
 9. Push the commit and tag to the exact canonical origin
-   `https://github.com/3sk1nt4n/sentinel-unchained.git` without rewriting history.
+   `https://github.com/3sk1nt4n/Unchained.git` without rewriting history.
 10. Immediately before execution, run
     `python scripts/benchmark_freeze_gate.py --require-tag --require-remote-tag --json`
     and retain its JSON artifact. This performs one noninteractive remote lookup;
@@ -621,7 +621,7 @@ by hand.
   },
   "public_anchor": {
     "tag": "experiment-freeze-v1",
-    "canonical_origin_url": "https://github.com/3sk1nt4n/sentinel-unchained.git",
+    "canonical_origin_url": "https://github.com/3sk1nt4n/Unchained.git",
     "remote_annotated_tag_required_for_scored_run": true,
     "remote_visibility_claim": "public remote tag visibility is chronology evidence only; it does not authenticate server time, provide a signed timestamp, or establish cryptographic provenance",
     "history_rewrite_allowed": false

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Unchained one-line bootstrap for Linux and macOS (Docker lane).
-#   curl -fsSL https://raw.githubusercontent.com/3sk1nt4n/sentinel-unchained/main/get.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/3sk1nt4n/Unchained/main/get.sh | bash
 # Clones the repo, builds the hardened offline container, optionally stores
 # your OpenAI key with hidden input for the live Luna canary, and opens the
 # guided onboarding. It never echoes, logs, or uploads the key, and never
@@ -42,9 +42,9 @@ if [ -f "./compose.yaml" ] && [ -f "./setup.ps1" ]; then
   REPO="$(pwd)"
   note "Using the current checkout: $REPO"
 else
-  REPO="$HOME/sentinel-unchained"
+  REPO="$HOME/Unchained"
   if [ ! -f "$REPO/compose.yaml" ]; then
-    git clone https://github.com/3sk1nt4n/sentinel-unchained.git "$REPO"
+    git clone https://github.com/3sk1nt4n/Unchained.git "$REPO"
   else
     note "Reusing the existing checkout: $REPO"
   fi

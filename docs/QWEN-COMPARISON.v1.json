@@ -27,7 +27,7 @@
     "openai": {
       "commit_policy": "RESOLVED_ANNOTATED_FREEZE_TAG_COMMIT",
       "required_ancestor": "51662cfb809212af3b58a680c0d9265d91692302",
-      "public_repository": "https://github.com/3sk1nt4n/sentinel-unchained"
+      "public_repository": "https://github.com/3sk1nt4n/Unchained"
     },
     "qwen": {
       "required_commit": "7118c6ef02b19f4d016723470bfaa5f8a94dbfe5",

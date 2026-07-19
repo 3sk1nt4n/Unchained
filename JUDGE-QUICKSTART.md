@@ -5,7 +5,7 @@
 Any machine with Docker; no Python, no API key, no evidence image required:
 
 ```powershell
-git clone https://github.com/3sk1nt4n/sentinel-unchained.git; cd sentinel-unchained
+git clone https://github.com/3sk1nt4n/Unchained.git; cd Unchained
 docker compose build
 docker compose run --rm offline profile /evidence --json
 ```
@@ -100,8 +100,8 @@ Run each block from a new PowerShell window:
 ```powershell
 New-Item -ItemType Directory -Force "$env:USERPROFILE\src" | Out-Null
 Set-Location "$env:USERPROFILE\src"
-git clone https://github.com/3sk1nt4n/sentinel-unchained.git
-Set-Location .\sentinel-unchained
+git clone https://github.com/3sk1nt4n/Unchained.git
+Set-Location .\Unchained
 git status --short
 ```
 
@@ -304,7 +304,7 @@ already passed in the same checkout. Direct `sentinel run` remains the advanced
 noninteractive entry point when paid-run authorization is enforced externally.
 
 ```powershell
-Set-Location "$env:USERPROFILE\src\sentinel-unchained"
+Set-Location "$env:USERPROFILE\src\Unchained"
 $python = "$env:LOCALAPPDATA\venvs\sentinel-unchained-py311\Scripts\python.exe"
 & "$venv\Scripts\sentinel.exe" run C:\Evidence\sentinel\dc01 --caps default
 ```
