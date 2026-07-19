@@ -29,6 +29,7 @@ Write-Host "+===================================================================
 Write-Host ""
 Write-Host "This bootstrap never reads evidence and never sends anything to OpenAI." -ForegroundColor Yellow
 Write-Host "A paid run always requires the exact interactive phrase LAUNCH GPT-5.6 SOL." -ForegroundColor Yellow
+Write-Host "Native Windows lane: only Python 3.11 is needed - no Docker required." -ForegroundColor Gray
 Write-Host "Every step is safe to re-run - finished work is detected and skipped." -ForegroundColor Gray
 Write-Host ""
 
@@ -92,10 +93,14 @@ else {
     }
 }
 
-# 4/6 - built-in synthetic sample
-Write-Step "4/6" "Ready-made synthetic sample (no download, no key, no spend)"
-$trySample = Read-Host "      Profile the built-in sample now? (Y/n)"
-if ($trySample -notmatch '^[nN]') {
+# 4/6 - the guided walk-in (shows the welcome + a real case card exactly once)
+Write-Step "4/6" "Your guided walk-in (zero key, zero spend)"
+Write-Host "      Profile the built-in synthetic sample now, or just see the welcome." -ForegroundColor Gray
+$trySample = Read-Host "      Profile the built-in sample? (Y = yes / n = welcome only)"
+if ($trySample -match '^[nN]') {
+    & $sentinelExe onboard
+}
+else {
     & $sentinelExe onboard (Join-Path $repo "docker\fixtures")
 }
 
@@ -120,7 +125,11 @@ $openCase = Read-Host "      Open the official download page in your browser now
 if ($openCase -match '^[yY]') {
     Start-Process "https://dfirmadness.com/the-stolen-szechuan-sauce/"
 }
-$zipPath = Read-Host "      Path to a downloaded DC01 .zip to verify+extract (Enter to skip)"
+$zipPath = ""
+$haveZip = Read-Host "      Already downloaded a DC01 .zip and want to verify+onboard it now? (y/N)"
+if ($haveZip -match '^[yY]') {
+    $zipPath = (Read-Host "      Paste the full path to the .zip (e.g. C:\Users\You\Downloads\DC01-memory.zip)").Trim('"').Trim()
+}
 if ($zipPath -and (Test-Path $zipPath)) {
     $name = Split-Path $zipPath -Leaf
     Write-Host "      Computing MD5 (large file - please wait)..." -ForegroundColor Gray
@@ -148,13 +157,16 @@ elseif ($zipPath) {
     Write-Host "      Path not found: $zipPath (skipping)." -ForegroundColor Yellow
 }
 
-# 6/6 - guided onboarding
-Write-Step "6/6" "Opening the guided onboarding (zero-key, zero-spend welcome)"
-& $sentinelExe onboard
+# 6/6 - you're ready
+Write-Step "6/6" "You're ready - here's your one-word cheat sheet"
 Write-Host ""
-Write-Host "Next moves (one word from any terminal):" -ForegroundColor Cyan
-Write-Host "  sentinel onboard <one-case-evidence-folder>          local case card, `$0" -ForegroundColor White
-Write-Host "  sentinel onboard $evidenceDir       the public practice case" -ForegroundColor White
-Write-Host "  sentinel key --status                                confirm the saved key" -ForegroundColor White
-Write-Host "  sentinel onboard <evidence> --launch --caps strict   LIGHT - CAUTIOUS ceilings" -ForegroundColor White
-Write-Host "  sentinel onboard <evidence> --launch --caps default  HEAVY - FLAGSHIP ceilings" -ForegroundColor White
+Write-Host "  sentinel onboard <case-folder>       profile one case locally, `$0" -ForegroundColor White
+Write-Host "  sentinel onboard $evidenceDir      the public practice case, `$0" -ForegroundColor White
+Write-Host "  sentinel key --status                confirm the saved key" -ForegroundColor White
+Write-Host ""
+Write-Host "  Ready for a real investigation? Pick a depth and launch:" -ForegroundColor Cyan
+Write-Host "    LIGHT  " -ForegroundColor Green -NoNewline
+Write-Host "sentinel onboard <case> --launch --caps strict   (20 tools / `$2.50 ceiling)" -ForegroundColor White
+Write-Host "    HEAVY  " -ForegroundColor Magenta -NoNewline
+Write-Host "sentinel onboard <case> --launch --caps default  (60 tools / `$10 ceiling)" -ForegroundColor White
+Write-Host "    Both run GPT-5.6 Sol; you then type LAUNCH GPT-5.6 SOL to confirm." -ForegroundColor Gray

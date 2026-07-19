@@ -31,12 +31,29 @@ printf '%s+=====================================================================
 printf '%sThis bootstrap never reads evidence and never sends anything to OpenAI.%s\n' "$AMBER" "$RESET"
 printf '%sThe offline lane has no network at all; the paid Sol lane is Windows-native.%s\n\n' "$AMBER" "$RESET"
 
-for tool in git docker; do
-  if ! command -v "$tool" >/dev/null 2>&1; then
-    printf 'Required tool %s was not found. Install Git and Docker (with Compose), then rerun.\n' "$tool" >&2
-    exit 1
-  fi
-done
+if ! command -v git >/dev/null 2>&1; then
+  printf '%sGit was not found.%s Install it, then re-run this one-liner.\n' "$AMBER" "$RESET" >&2
+  printf '  Debian/Ubuntu: sudo apt install git   macOS: xcode-select --install\n' >&2
+  exit 1
+fi
+if ! command -v docker >/dev/null 2>&1; then
+  printf '\n%sDocker is required for the Linux/macOS lane, and it is not installed yet.%s\n' "$AMBER" "$RESET" >&2
+  printf '%sInstall it once, then re-run this exact one-liner (it resumes where it left off):%s\n' "$GRAY" "$RESET" >&2
+  case "$(uname -s)" in
+    Darwin) printf '  macOS: install Docker Desktop -> https://www.docker.com/products/docker-desktop/\n' >&2 ;;
+    *)      printf '  Ubuntu/Debian: sudo apt update && sudo apt install -y docker.io docker-compose-plugin\n' >&2
+            printf '  Any Linux:     https://docs.docker.com/engine/install/\n' >&2
+            printf '  Then:          sudo usermod -aG docker $USER  (log out/in so docker runs without sudo)\n' >&2 ;;
+  esac
+  printf '\n%sPrefer no Docker? On Windows the native lane needs only Python 3.11 - see the README.%s\n' "$GRAY" "$RESET" >&2
+  exit 1
+fi
+if ! docker info >/dev/null 2>&1; then
+  printf '\n%sDocker is installed but not running (or needs sudo).%s\n' "$AMBER" "$RESET" >&2
+  printf '  Start Docker Desktop, or on Linux: sudo systemctl start docker\n' >&2
+  printf '  Then re-run this one-liner.\n' >&2
+  exit 1
+fi
 
 step "1/6" "Getting the repository"
 if [ -f "./compose.yaml" ] && [ -f "./setup.ps1" ]; then
