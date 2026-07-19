@@ -79,6 +79,7 @@ EXPECTED_BOUND_FILES = frozenset(
         "src/unchained/audit.py",
         "src/unchained/caps.py",
         "src/unchained/cli.py",
+        "src/unchained/console.py",
         "src/unchained/evidence.py",
         "src/unchained/model.py",
         "src/unchained/models.py",

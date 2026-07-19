@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import importlib.util
 import json
 import os
 import sys
+import time
 import uuid
 from collections.abc import Sequence
 from dataclasses import asdict
@@ -26,6 +28,7 @@ from .artifacts import (
 )
 from .audit import AuditLog
 from .caps import CapConfig, CapExceeded, RunBudget
+from .console import Console
 from .evidence import CustodyError, EvidenceDiscoveryError, EvidenceError, EvidenceSession
 from .model import (
     ModelProviderError,
@@ -493,8 +496,128 @@ def _onboard(
     )
 
 
+_RUN_CLOCK: list[float] = []
+
+
+def _elapsed() -> str | None:
+    if not _RUN_CLOCK:
+        return None
+    seconds = time.monotonic() - _RUN_CLOCK[0]
+    return f"{int(seconds // 60):02d}:{seconds % 60:04.1f}"
+
+
 def _progress(message: str) -> None:
-    print(f"[sentinel] {message}", file=sys.stderr, flush=True)
+    console = Console(sys.stderr)
+    if console.enabled:
+        console.step(message, elapsed=_elapsed())
+    else:
+        print(f"[sentinel] {message}", file=sys.stderr, flush=True)
+
+
+class _AuditNarrator:
+    """Display-only proxy over :class:`AuditLog` for an interactive terminal.
+
+    Every call is forwarded to the wrapped audit log unchanged before any
+    narration happens, so the appended record — not the narration — remains the
+    sole authority. A narration failure can never alter or abort the run.
+    """
+
+    _PHASE_LABELS = {
+        "opening": "GPT-5.6 opening book",
+        "investigation": "Adaptive investigation",
+        "serialization": "Structured findings serialization",
+        "judge": "Fresh downgrade-only review",
+        "report": "Deterministic report draft",
+    }
+
+    def __init__(self, audit: AuditLog, console: Console) -> None:
+        self._audit = audit
+        self._console = console
+        self._phase_seen: str | None = None
+
+    def __getattr__(self, name: str) -> object:
+        return getattr(self._audit, name)
+
+    def _narrate(self, render: object) -> None:
+        if not self._console.enabled:
+            return
+        with contextlib.suppress(Exception):
+            render()  # type: ignore[operator]
+
+    def _phase_header(self, phase: str) -> None:
+        if phase == self._phase_seen:
+            return
+        self._phase_seen = phase
+        label = self._PHASE_LABELS.get(phase, phase.replace("_", " ").title())
+        self._console.phase(label)
+
+    def append(self, event_type: str, payload: object, *, actor: str = "runner") -> object:
+        record = self._audit.append(event_type, payload, actor=actor)
+
+        def render() -> None:
+            if event_type == "custody.initial.completed" and isinstance(payload, dict):
+                count = payload.get("file_count")
+                self._console.ok(f"initial SHA-256 custody sealed over {count} file(s)")
+            elif event_type == "custody.final.completed":
+                self._console.ok("final custody re-hash matched the baseline")
+            elif event_type == "opening.completed" and isinstance(payload, dict):
+                self._console.ok("opening book executed; all typed calls accounted for")
+            elif event_type == "judge.started":
+                self._phase_header("judge")
+            elif event_type == "report.started":
+                self._phase_header("report")
+            elif event_type == "cap.fired" and isinstance(payload, dict):
+                self._console.warn(f"hard cap fired: {payload.get('kind')}")
+            elif event_type.startswith("model.retry"):
+                self._console.warn("transient provider error; bounded audited retry")
+
+        self._narrate(render)
+        return record
+
+    def model_request(self, **kwargs: object) -> None:
+        self._audit.model_request(**kwargs)  # type: ignore[arg-type]
+
+        def render() -> None:
+            phase = str(kwargs.get("phase", ""))
+            self._phase_header(phase)
+            model = kwargs.get("requested_model", "GPT-5.6")
+            self._console.step(f"↑ dispatching bounded {model} request", elapsed=_elapsed())
+
+        self._narrate(render)
+
+    def model_response(self, **kwargs: object) -> None:
+        self._audit.model_response(**kwargs)  # type: ignore[arg-type]
+
+        def render() -> None:
+            response = kwargs.get("response")
+            usage = getattr(response, "usage", None)
+            tokens = getattr(usage, "total_tokens", 0)
+            running = kwargs.get("running_cost_usd", 0.0)
+            self._console.detail(
+                f"↓ response received · {tokens:,} tokens · ${float(running):.4f} est. total"
+            )
+
+        self._narrate(render)
+
+    def tool_started(self, call_id: str, name: str, arguments: object, **kwargs: object) -> None:
+        self._audit.tool_started(call_id, name, arguments, **kwargs)  # type: ignore[arg-type]
+        self._narrate(lambda: self._console.step(f"⚒ {name} executing", elapsed=_elapsed()))
+
+    def tool_completed(self, result: object, **kwargs: object) -> None:
+        self._audit.tool_completed(result, **kwargs)  # type: ignore[arg-type]
+
+        def render() -> None:
+            name = getattr(result, "tool_name", "tool")
+            status = getattr(result, "status", "?")
+            byte_count = len(getattr(result, "output", "").encode("utf-8", "replace"))
+            duration = getattr(result, "duration_ms", 0)
+            line = f"{name} · {status} · {byte_count:,} bytes retained · {duration:,} ms"
+            if status == "success":
+                self._console.ok(line)
+            else:
+                self._console.warn(line)
+
+        self._narrate(render)
 
 
 def _view(run_directory: Path, *, no_open: bool) -> int:
@@ -644,6 +767,12 @@ def run_cli(
 ) -> int:
     """Execute, close, manifest, and immediately verify one isolated run."""
 
+    _RUN_CLOCK.clear()
+    _RUN_CLOCK.append(time.monotonic())
+    stderr_console = Console(sys.stderr)
+    if stderr_console.enabled:
+        stderr_console.banner("U N C H A I N E D", "Unchained reasoning. Chained evidence.")
+        stderr_console.detail("GPT-5.6 chooses where to look; code proves what happened.")
     _progress("checking GPT-5.6 configuration before evidence I/O")
     model = OpenAIResponsesModel()
     run_id, run_directory = _run_directory(evidence_path)
@@ -663,7 +792,8 @@ def run_cli(
     budget: RunBudget | None = None
     root_artifacts: list[ArtifactRef] = []
 
-    with AuditLog(audit_path, run_id) as audit:
+    with AuditLog(audit_path, run_id) as audit_log:
+        audit = _AuditNarrator(audit_log, stderr_console)
         audit.append(
             "run.created",
             {
@@ -943,11 +1073,24 @@ def run_cli(
         return EXIT_FATAL
 
     _progress("content-addressed proof bundle verified")
-    print(f"Run status: {terminal_status.value}")
-    print(f"Proof bundle: {run_directory}")
-    print("Bundle verification: PASS")
-    print(f'Verify again: sentinel verify "{run_directory}" --require-complete')
-    print(f'Open viewer: sentinel view "{run_directory}"')
+    stdout_console = Console(sys.stdout)
+    if stdout_console.enabled:
+        stdout_console.rule()
+        stdout_console.line(
+            f"  {stdout_console.badge(terminal_status.value)}"
+            f"  run {run_id}  ·  wall {_elapsed() or '?'}"
+        )
+        stdout_console.kv("Proof bundle", str(run_directory))
+        stdout_console.kv("Verification", "PASS — report, viewer, custody, and audit chain")
+        stdout_console.kv("Verify again", f'sentinel verify "{run_directory}" --require-complete')
+        stdout_console.kv("Open viewer", f'sentinel view "{run_directory}"')
+        stdout_console.rule()
+    else:
+        print(f"Run status: {terminal_status.value}")
+        print(f"Proof bundle: {run_directory}")
+        print("Bundle verification: PASS")
+        print(f'Verify again: sentinel verify "{run_directory}" --require-complete')
+        print(f'Open viewer: sentinel view "{run_directory}"')
     return exit_code
 
 
@@ -970,13 +1113,26 @@ def main(argv: Sequence[str] | None = None) -> int:
         if arguments.json_output:
             print(json.dumps(result.public_dict(), indent=2, sort_keys=True))
         else:
-            print("VALID" if result.passed else "INVALID")
-            print(f"Run: {result.run_id or 'unknown'}")
-            print(f"Status: {result.terminal_status or 'unknown'}")
-            print(f"Artifacts verified: {result.verified_artifacts}")
-            print(f"Audit entries verified: {result.verified_audit_entries}")
-            for warning in result.warnings:
-                print(f"Warning: {warning}")
+            console = Console(sys.stdout)
+            if console.enabled:
+                console.rule()
+                verdict = "VALID" if result.passed else "INVALID"
+                console.line(f"  {console.badge(verdict)}  independent offline verification")
+                console.kv("Run", result.run_id or "unknown")
+                console.kv("Terminal status", result.terminal_status or "unknown")
+                console.kv("Artifacts", f"{result.verified_artifacts} verified")
+                console.kv("Audit chain", f"{result.verified_audit_entries} entries verified")
+                console.rule()
+                for warning in result.warnings:
+                    console.warn(warning)
+            else:
+                print("VALID" if result.passed else "INVALID")
+                print(f"Run: {result.run_id or 'unknown'}")
+                print(f"Status: {result.terminal_status or 'unknown'}")
+                print(f"Artifacts verified: {result.verified_artifacts}")
+                print(f"Audit entries verified: {result.verified_audit_entries}")
+                for warning in result.warnings:
+                    print(f"Warning: {warning}")
             for error in result.errors:
                 print(f"Error: {error}", file=sys.stderr)
         return EXIT_COMPLETE if result.passed else EXIT_FATAL

@@ -1589,6 +1589,27 @@ def _terminal_text(value: object) -> str:
 def print_case_card(profile: EvidenceProfile, stream: TextIO = sys.stdout) -> None:
     """Print the human-readable deterministic profile and full custody hashes."""
 
+    from .console import Console
+
+    console = Console(stream)
+    if console.enabled:
+        console.phase("UNCHAINED - CASE CARD")
+        console.kv("OS", profile.os)
+        console.kv("Shape", profile.shape)
+        console.kv("Filesystems", ", ".join(profile.filesystems) or "none resolved")
+        console.kv("Capability", profile.capability_label)
+        console.kv("Read-only mount", str(profile.mount_path or "unavailable / not required"))
+        for item in profile.items:
+            console.ok(
+                f"{item.evidence_id}  {item.kind:<7} {_human_size(item.size):>11}  "
+                f"health={item.health} symbols={item.symbols}"
+            )
+            console.detail(f"path: {_terminal_text(item.path)}")
+            console.detail(f"SHA-256: {item.sha256}")
+        for warning in profile.warnings:
+            console.warn(_terminal_text(warning))
+        return
+
     print("UNCHAINED - CASE CARD", file=stream)
     print(f"OS: {profile.os}", file=stream)
     print(f"Shape: {profile.shape}", file=stream)

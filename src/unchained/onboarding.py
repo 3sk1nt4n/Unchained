@@ -14,6 +14,13 @@ _CARD_WIDTH = 82
 _RESET = "\x1b[0m"
 _BOLD = "\x1b[1m"
 _CYAN = "\x1b[96m"
+_BLUE = "\x1b[38;5;45m"
+_VIOLET = "\x1b[38;5;141m"
+_GREEN = "\x1b[38;5;78m"
+_AMBER = "\x1b[38;5;214m"
+_RED = "\x1b[38;5;203m"
+_DIM = "\x1b[38;5;245m"
+_WHITE = "\x1b[38;5;255m"
 _ASCII_FALLBACK = str.maketrans(
     {
         "·": "-",
@@ -195,16 +202,24 @@ def _paint(value: str, code: str, enabled: bool) -> str:
     return f"{code}{value}{_RESET}" if enabled else value
 
 
-def _boxed(title: str, lines: list[str], *, stream: TextIO, color: bool) -> None:
+def _boxed(
+    title: str,
+    lines: list[str],
+    *,
+    stream: TextIO,
+    color: bool,
+    accent: str = _CYAN,
+) -> None:
     """Render a fixed-width card with wrapping and no evidence-derived paths."""
 
     inner = _CARD_WIDTH - 2
     normalized_title = f" {title} "
     remaining = max(0, inner - len(normalized_title))
     print(
-        _paint(f"┌{normalized_title}{'─' * remaining}┐", _CYAN, color),
+        _paint(f"┌{normalized_title}{'─' * remaining}┐", accent + _BOLD, color),
         file=stream,
     )
+    edge = _paint("│", accent, color)
     for line in lines:
         wrapped = textwrap.wrap(
             line,
@@ -213,8 +228,8 @@ def _boxed(title: str, lines: list[str], *, stream: TextIO, color: bool) -> None
             drop_whitespace=True,
         ) or [""]
         for part in wrapped:
-            print(f"│ {part:<{inner - 2}} │", file=stream)
-    print(_paint(f"└{'─' * inner}┘", _CYAN, color), file=stream)
+            print(f"{edge} {part:<{inner - 2}} {edge}", file=stream)
+    print(_paint(f"└{'─' * inner}┘", accent, color), file=stream)
 
 
 def _guardrail_lines(caps_profile: str, caps: CapConfig) -> list[str]:
@@ -370,17 +385,20 @@ def render_welcome(
     stream = _encoding_safe_stream(stream)
     color = _supports_color(stream, no_color=no_color)
     width = _CARD_WIDTH
-    print(_paint("╔" + "═" * (width - 2) + "╗", _CYAN, color), file=stream)
-    for line in (
-        "UNCHAINED",
-        "Bounded autonomous DFIR · OpenAI GPT-5.6 Sol",
-        '"Point me at one case. I will profile it before any model call."',
-    ):
+    banner_styles = {
+        "UNCHAINED": _WHITE + _BOLD,
+        "Bounded autonomous DFIR · OpenAI GPT-5.6 Sol": _VIOLET,
+        '"Point me at one case. I will profile it before any model call."': _DIM,
+    }
+    print(_paint("╔" + "═" * (width - 2) + "╗", _BLUE + _BOLD, color), file=stream)
+    for line, style in banner_styles.items():
         print(
-            _paint(f"║{line:^{width - 2}}║", _BOLD if line == "UNCHAINED" else _CYAN, color),
+            _paint("║", _BLUE + _BOLD, color)
+            + _paint(f"{line:^{width - 2}}", style, color)
+            + _paint("║", _BLUE + _BOLD, color),
             file=stream,
         )
-    print(_paint("╚" + "═" * (width - 2) + "╝", _CYAN, color), file=stream)
+    print(_paint("╚" + "═" * (width - 2) + "╝", _BLUE + _BOLD, color), file=stream)
     print(file=stream)
     _boxed(
         "1 · PREPARE ONE CASE",
@@ -432,18 +450,21 @@ def render_welcome(
         ],
         stream=stream,
         color=color,
+        accent=_GREEN,
     )
     _boxed(
         "4 · CHOOSE A RUN BUDGET",
         _budget_choice_lines(caps_profile, caps),
         stream=stream,
         color=color,
+        accent=_VIOLET,
     )
     _boxed(
         "CLOUD + COST BOUNDARY",
         _guardrail_lines(caps_profile, caps),
         stream=stream,
         color=color,
+        accent=_AMBER,
     )
 
 
@@ -464,22 +485,28 @@ def render_profile(
     stream = _encoding_safe_stream(stream)
     color = _supports_color(stream, no_color=no_color)
     print(
-        _paint("◆ PROFILE COMPLETE — deterministic, local, zero OpenAI calls", _BOLD, color),
+        _paint(
+            "◆ PROFILE COMPLETE — deterministic, local, zero OpenAI calls",
+            _GREEN + _BOLD,
+            color,
+        ),
         file=stream,
     )
     print(file=stream)
     for item in profile.items:
         state = _safe_health(item)
-        marker = "✓" if item.kind != "unknown" and item.available else "○"
+        ready = item.kind != "unknown" and item.available
+        marker = _paint("✓", _GREEN + _BOLD, color) if ready else _paint("○", _DIM, color)
         digest = f"{item.sha256[:12]}…{item.sha256[-12:]}"
         print(
             f"  {marker} {item.evidence_id}  {item.kind.upper():<7}  "
-            f"{_human_size(item.size):>10}  {state}  SHA-256 {digest}",
+            f"{_human_size(item.size):>10}  {state}  " + _paint(f"SHA-256 {digest}", _DIM, color),
             file=stream,
         )
     if assessment.set_aside_items:
         print(
-            f"  ○ {assessment.set_aside_items} unsupported item(s) set aside — "
+            _paint("  ○ ", _DIM, color)
+            + f"{assessment.set_aside_items} unsupported item(s) set aside — "
             "hashed, not forensically analyzed",
             file=stream,
         )
@@ -501,25 +528,34 @@ def render_profile(
             + mount_status(profile, requested=mount_requested, released=mount_released)
         ),
     ]
-    _boxed("VERIFIED CASE CARD", case_lines, stream=stream, color=color)
+    _boxed(
+        "VERIFIED CASE CARD",
+        case_lines,
+        stream=stream,
+        color=color,
+        accent=_GREEN if assessment.profile_ready else _AMBER,
+    )
     if assessment.blockers:
         _boxed(
             "FIX BEFORE LAUNCH",
             [f"{index}. {blocker}" for index, blocker in enumerate(assessment.blockers, 1)],
             stream=stream,
             color=color,
+            accent=_RED,
         )
     _boxed(
         "CHOOSE A RUN BUDGET",
         _budget_choice_lines(caps_profile, caps),
         stream=stream,
         color=color,
+        accent=_VIOLET,
     )
     _boxed(
         "CLOUD + COST BOUNDARY",
         _guardrail_lines(caps_profile, caps),
         stream=stream,
         color=color,
+        accent=_AMBER,
     )
     next_lines = [
         "1. Check live dependencies and key presence: sentinel doctor",
@@ -536,7 +572,7 @@ def render_profile(
         next_lines.append(
             "4. Resolve the case-card blockers, then profile again. No paid Sol launch is offered."
         )
-    _boxed("NEXT — NO GUESSWORK", next_lines, stream=stream, color=color)
+    _boxed("NEXT — NO GUESSWORK", next_lines, stream=stream, color=color, accent=_BLUE)
     print(
         "Local profile and custody are complete. Live model readiness is not asserted "
         "until sentinel doctor passes.",
