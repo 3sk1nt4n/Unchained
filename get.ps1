@@ -116,45 +116,65 @@ if (Test-Path $evidenceDir) {
         Where-Object { $_.Length -gt 500MB }
     if ($ready) { Write-Skip "evidence already present in $evidenceDir" }
 }
-Write-Host "      Public Windows memory + disk case. Unchained never fetches it for you;" -ForegroundColor Gray
-Write-Host "      download from the official page, then this verifies the MD5 and onboards." -ForegroundColor Gray
-Write-Host "        https://dfirmadness.com/the-stolen-szechuan-sauce/" -ForegroundColor White
+Write-Host "      Point me at evidence you already have - a downloaded DC01 .zip OR an" -ForegroundColor Gray
+Write-Host "      evidence folder (memory/disk images). A .zip is MD5-verified first;" -ForegroundColor Gray
+Write-Host "      a folder is onboarded directly. Unchained never fetches evidence for you." -ForegroundColor Gray
+Write-Host "        Official page: https://dfirmadness.com/the-stolen-szechuan-sauce/" -ForegroundColor White
 Write-Host "      Publisher MD5s:  DC01-memory.zip = $($knownMd5['DC01-memory.zip'])" -ForegroundColor DarkGray
 Write-Host "                       DC01-E01.zip    = $($knownMd5['DC01-E01.zip'])" -ForegroundColor DarkGray
-$openCase = Read-Host "      Open the official download page in your browser now? (y/N)"
-if ($openCase -match '^[yY]') {
-    Start-Process "https://dfirmadness.com/the-stolen-szechuan-sauce/"
-}
-$zipPath = ""
-$haveZip = Read-Host "      Already downloaded a DC01 .zip and want to verify+onboard it now? (y/N)"
-if ($haveZip -match '^[yY]') {
-    $zipPath = (Read-Host "      Paste the full path to the .zip (e.g. C:\Users\You\Downloads\DC01-memory.zip)").Trim('"').Trim()
-}
-if ($zipPath -and (Test-Path $zipPath)) {
-    $name = Split-Path $zipPath -Leaf
-    Write-Host "      Computing MD5 (large file - please wait)..." -ForegroundColor Gray
-    $actual = (Get-FileHash -Algorithm MD5 -Path $zipPath).Hash.ToUpper()
-    $expected = $knownMd5[$name]
-    if ($expected -and $actual -eq $expected) {
-        Write-Host "      MD5 VERIFIED for $name ($actual)" -ForegroundColor Green
-        New-Item -ItemType Directory -Force $evidenceDir | Out-Null
-        Write-Host "      Extracting into $evidenceDir ..." -ForegroundColor Gray
-        Expand-Archive -Path $zipPath -DestinationPath $evidenceDir -Force
-        Write-Host "      Onboarding the verified case (local, `$0)..." -ForegroundColor Gray
-        & $sentinelExe onboard $evidenceDir
+# This whole step is optional and must never crash the bootstrap.
+try {
+    $openCase = Read-Host "      Open the official download page in your browser now? (y/N)"
+    if ($openCase -match '^[yY]') {
+        Start-Process "https://dfirmadness.com/the-stolen-szechuan-sauce/"
     }
-    elseif ($expected) {
-        Write-Host "      MD5 MISMATCH for $name" -ForegroundColor Red
-        Write-Host "        expected $expected" -ForegroundColor Red
-        Write-Host "        actual   $actual" -ForegroundColor Red
-        Write-Host "      Do not use this download; re-fetch from the official page." -ForegroundColor Red
+    $evPath = ""
+    $haveEv = Read-Host "      Onboard evidence now - a .zip or an evidence folder? (y/N)"
+    if ($haveEv -match '^[yY]') {
+        $evPath = (Read-Host "      Paste the full path (e.g. C:\Users\You\Downloads\DC01-memory.zip or a folder)").Trim().Trim('"').Trim()
+    }
+    if (-not $evPath) {
+        Write-Host "      Skipped - onboard any time with: sentinel onboard <folder>" -ForegroundColor Green
+    }
+    elseif (Test-Path -LiteralPath $evPath -PathType Container) {
+        Write-Host "      Folder detected - onboarding it directly (local, `$0)..." -ForegroundColor Gray
+        & $sentinelExe onboard $evPath
+    }
+    elseif ((Test-Path -LiteralPath $evPath -PathType Leaf) -and ($evPath -match '\.zip$')) {
+        $name = Split-Path $evPath -Leaf
+        Write-Host "      Computing MD5 of $name (large file - please wait)..." -ForegroundColor Gray
+        $actual = $null
+        try { $actual = (Get-FileHash -Algorithm MD5 -LiteralPath $evPath).Hash.ToUpper() }
+        catch { Write-Host "      Could not read that file: $($_.Exception.Message)" -ForegroundColor Yellow }
+        $expected = $knownMd5[$name]
+        if ($actual -and $expected -and $actual -eq $expected) {
+            Write-Host "      MD5 VERIFIED for $name ($actual)" -ForegroundColor Green
+            New-Item -ItemType Directory -Force $evidenceDir | Out-Null
+            Write-Host "      Extracting into $evidenceDir ..." -ForegroundColor Gray
+            Expand-Archive -LiteralPath $evPath -DestinationPath $evidenceDir -Force
+            Write-Host "      Onboarding the verified case (local, `$0)..." -ForegroundColor Gray
+            & $sentinelExe onboard $evidenceDir
+        }
+        elseif ($actual -and $expected) {
+            Write-Host "      MD5 MISMATCH for $name" -ForegroundColor Red
+            Write-Host "        expected $expected" -ForegroundColor Red
+            Write-Host "        actual   $actual" -ForegroundColor Red
+            Write-Host "      Do not use this download; re-fetch from the official page." -ForegroundColor Red
+        }
+        elseif ($actual) {
+            Write-Host "      No known MD5 for '$name'. Extracting and onboarding anyway..." -ForegroundColor Yellow
+            New-Item -ItemType Directory -Force $evidenceDir | Out-Null
+            Expand-Archive -LiteralPath $evPath -DestinationPath $evidenceDir -Force
+            & $sentinelExe onboard $evidenceDir
+        }
     }
     else {
-        Write-Host "      No known MD5 for '$name'. Expected DC01-memory.zip or DC01-E01.zip." -ForegroundColor Yellow
+        Write-Host "      Not a folder or a .zip file: $evPath (skipping)." -ForegroundColor Yellow
     }
 }
-elseif ($zipPath) {
-    Write-Host "      Path not found: $zipPath (skipping)." -ForegroundColor Yellow
+catch {
+    Write-Host "      Practice-case step skipped ($($_.Exception.Message))." -ForegroundColor Yellow
+    Write-Host "      No problem - onboard any time with: sentinel onboard <folder>" -ForegroundColor Green
 }
 
 # 6/6 - you're ready
