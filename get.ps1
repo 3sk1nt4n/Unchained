@@ -19,7 +19,7 @@ Write-Host ""
 Write-Host "+========================================================================+" -ForegroundColor Cyan
 Write-Host "|                               UNCHAINED                                |" -ForegroundColor White
 Write-Host "|            Unchained reasoning. Chained evidence.                      |" -ForegroundColor Magenta
-Write-Host "|   Install -> pick a case -> see the card -> pick depth -> launch.      |" -ForegroundColor Gray
+Write-Host "|        Install -> pick a case -> add your key -> launch live.          |" -ForegroundColor Gray
 Write-Host "+========================================================================+" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Never reads evidence or calls OpenAI on its own. A paid run always needs" -ForegroundColor Yellow
@@ -29,7 +29,7 @@ Write-Host ""
 if ($env:OS -ne "Windows_NT") { throw "get.ps1 is Windows-only. Use get.sh with Docker on Linux/macOS." }
 
 # Prerequisites: Python is required; Docker is only for the optional container lane.
-Write-Step "0/5" "Checking prerequisites"
+Write-Step "0/4" "Checking prerequisites"
 foreach ($tool in @("git", "py")) {
     if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) {
         throw "Required tool '$tool' was not found. Install Git for Windows and CPython 3.11 AMD64, reopen PowerShell, and rerun."
@@ -43,7 +43,7 @@ if (Get-Command docker -ErrorAction SilentlyContinue) {
 }
 
 # 1/5 - repository + pinned toolchain
-Write-Step "1/5" "Installing Unchained (pinned CPython 3.11 toolchain)"
+Write-Step "1/4" "Installing Unchained (pinned CPython 3.11 toolchain)"
 if (Test-Path (Join-Path (Get-Location) "setup.ps1")) {
     $repo = (Get-Location).Path
 } else {
@@ -153,8 +153,13 @@ function Get-CaseFolder {
     Write-Host "        1) DC01 public practice case - guided download + MD5 verify" -ForegroundColor Cyan
     Write-Host "        2) Evidence I already have (a .zip, a folder of zips, or images)" -ForegroundColor Cyan
     Write-Host "        Q) Skip the guided run for now" -ForegroundColor DarkGray
-    $pick = (Read-Host "      Choose 1, 2, or Q").Trim()
+    $pick = (Read-Host "      Choose 1, 2, or Q").Trim().Trim('"')
     if ($pick -match '^[qQ]$') { return "Q" }
+    # If they pasted a path instead of a menu number, just use it.
+    if ($pick -and (Test-Path -LiteralPath $pick)) {
+        $c = Resolve-EvidenceFolder $pick
+        if ($c) { return $c } else { return "" }
+    }
     if ($pick -match '^1$') {
         Write-Info "Public DFIR Madness 001. You download it; I verify the MD5 and prep it."
         Write-Host "        https://dfirmadness.com/the-stolen-szechuan-sauce/" -ForegroundColor White
@@ -177,51 +182,31 @@ function Get-CaseFolder {
     return ""
 }
 
-# 2/5 - pick a case and keep going until one is launch-ready (or you choose Q)
-Write-Step "2/5" "Pick a case"
+# 2/4 - pick a case (loop until we have one, or Q to stop)
+Write-Step "2/4" "Pick a case"
 $chosenCase = $null
 while (-not $chosenCase) {
     $candidate = ""
     try { $candidate = Get-CaseFolder }
     catch { Write-Host "      $($_.Exception.Message)" -ForegroundColor Yellow; $candidate = "" }
     if ($candidate -eq "Q") { break }
-    if (-not $candidate) { Write-Host "      Let's try that again." -ForegroundColor Gray; continue }
-    Write-Host ""
-    & $sentinelExe onboard $candidate            # shows the verified card
-    if ($LASTEXITCODE -eq 0) {
-        $chosenCase = $candidate
-    } else {
-        Write-Host "      That case is not launch-ready (see the card above). Pick another." -ForegroundColor Yellow
-    }
+    if ($candidate) { $chosenCase = $candidate }
+    else { Write-Host "      Let's try that again." -ForegroundColor Gray }
 }
-
 if (-not $chosenCase) {
-    Write-Step "3/5" "Skipped the guided run"
     Write-Host ""
-    Write-Host "  Whenever you're ready (one word, any terminal):" -ForegroundColor Cyan
-    Write-Host "    sentinel onboard <case-folder>                       profile locally, `$0" -ForegroundColor White
-    Write-Host "    sentinel onboard <case> --launch --caps strict       LIGHT run" -ForegroundColor White
-    Write-Host "    sentinel onboard <case> --launch --caps default      HEAVY run" -ForegroundColor White
+    Write-Host "  No case picked. Whenever you're ready (one word, any terminal):" -ForegroundColor Cyan
+    Write-Host "    sentinel onboard <case> --launch --caps strict     LIGHT run" -ForegroundColor White
+    Write-Host "    sentinel onboard <case> --launch --caps default    HEAVY run" -ForegroundColor White
     return
 }
 
-# 3/5 - choose analysis depth
-Write-Step "3/5" "Choose analysis depth (model is GPT-5.6 Sol either way)"
-Write-Host "    1) LIGHT " -ForegroundColor Green -NoNewline
-Write-Host "- CAUTIOUS  20 tools / 100,000 tokens / 10 min / `$2.50 ceiling" -ForegroundColor White
-Write-Host "    2) HEAVY " -ForegroundColor Magenta -NoNewline
-Write-Host "- FLAGSHIP  60 tools / 400,000 tokens / 30 min / `$10 ceiling" -ForegroundColor White
-$capsProfile = "strict"
-if ((Read-Host "      Pick depth (1=LIGHT default, 2=HEAVY)") -match '^2$') { $capsProfile = "default" }
-$depthName = if ($capsProfile -eq "default") { "HEAVY (FLAGSHIP)" } else { "LIGHT (CAUTIOUS)" }
-Write-Host "      Selected: $depthName on GPT-5.6 Sol" -ForegroundColor Cyan
-
-# 4/5 - OpenAI key, right before it could be spent (hidden input)
-Write-Step "4/5" "OpenAI key for the paid run (hidden input, saved privately)"
+# 3/4 - OpenAI key (hidden paste), before anything can be spent
+Write-Step "3/4" "OpenAI key for the paid run (hidden input, saved privately)"
 $keyStatus = & $sentinelExe key --status 2>$null | Out-String
 while (-not ($keyStatus -match "Key configured")) {
     if ((Read-Host "      Paste your OpenAI key now with hidden input? (Y/n)") -match '^[nN]$') {
-        Write-Info "No key, no paid run. Set one any time with: sentinel key"
+        Write-Info "No key, no paid run. Add one any time with: sentinel key"
         break
     }
     & $sentinelExe key
@@ -231,19 +216,16 @@ while (-not ($keyStatus -match "Key configured")) {
 }
 if ($keyStatus -match "Key configured") { Write-Skip "key configured; every command finds it" }
 
-# 5/5 - the live run (the LAUNCH GPT-5.6 SOL phrase is the real consent)
-Write-Step "5/5" "Launch the live investigation"
+# 4/4 - the live run. onboard --launch shows the card, asks LIGHT/HEAVY, takes
+# the exact LAUNCH GPT-5.6 SOL phrase, and runs the pipeline live on screen.
+Write-Step "4/4" "Launch the live investigation"
 if ($keyStatus -match "Key configured") {
-    Write-Host "      $depthName on $chosenCase" -ForegroundColor Gray
-    Write-Host "      You'll type the exact phrase LAUNCH GPT-5.6 SOL to confirm the spend." -ForegroundColor Yellow
-    if ((Read-Host "      Launch now and watch it live? (Y/n)") -notmatch '^[nN]$') {
-        & $sentinelExe onboard $chosenCase --launch --caps $capsProfile
-    } else {
-        Write-Host "      Ready when you are:" -ForegroundColor Cyan
-        Write-Host "        sentinel onboard `"$chosenCase`" --launch --caps $capsProfile" -ForegroundColor White
-    }
+    Write-Host "      Next you'll see the case card, pick LIGHT/HEAVY, and type" -ForegroundColor Gray
+    Write-Host "      the exact phrase LAUNCH GPT-5.6 SOL to confirm the spend." -ForegroundColor Yellow
+    Write-Host ""
+    & $sentinelExe onboard $chosenCase --launch --caps strict
 } else {
     Write-Host "      Ready once you add a key:" -ForegroundColor Cyan
     Write-Host "        sentinel key" -ForegroundColor White
-    Write-Host "        sentinel onboard `"$chosenCase`" --launch --caps $capsProfile" -ForegroundColor White
+    Write-Host "        sentinel onboard `"$chosenCase`" --launch --caps strict" -ForegroundColor White
 }

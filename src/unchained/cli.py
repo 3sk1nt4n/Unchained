@@ -538,7 +538,9 @@ def _confirm_paid_sol_launch(caps_profile: str, caps: CapConfig) -> bool:
         answer = input("Type exactly LAUNCH GPT-5.6 SOL (anything else cancels): ")
     except EOFError:
         return False
-    return answer == "LAUNCH GPT-5.6 SOL"
+    # Tolerate surrounding whitespace (a stray leading/trailing space or newline
+    # from a paste) — the exact phrase, spacing, and case are still required.
+    return answer.strip() == "LAUNCH GPT-5.6 SOL"
 
 
 def _onboard(

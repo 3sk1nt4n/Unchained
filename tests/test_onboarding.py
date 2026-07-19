@@ -310,6 +310,14 @@ def test_paid_sol_confirmation_accepts_only_the_exact_phrase(
     monkeypatch.setattr("builtins.input", lambda _prompt: "LAUNCH GPT-5.6 SOL")
     assert cli_module._confirm_paid_sol_launch("strict", caps) is True
 
+    # A stray leading/trailing space (e.g. from a paste) must still be accepted;
+    # the exact phrase, spacing, and case are still required.
+    monkeypatch.setattr("builtins.input", lambda _prompt: "  LAUNCH GPT-5.6 SOL \n")
+    assert cli_module._confirm_paid_sol_launch("strict", caps) is True
+
+    monkeypatch.setattr("builtins.input", lambda _prompt: "LAUNCH  GPT-5.6  SOL")
+    assert cli_module._confirm_paid_sol_launch("strict", caps) is False
+
 
 def test_launch_requires_interactive_terminal_before_evidence_is_read(
     monkeypatch: pytest.MonkeyPatch,
