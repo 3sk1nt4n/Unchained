@@ -9,7 +9,10 @@
 >
 > This is the one-glance scoreboard. The exhaustive ledger is
 > [`HACKATHON_HANDOVER.md`](HACKATHON_HANDOVER.md); the sequencing rules are
-> [`docs/WINNER_ROADMAP.md`](docs/WINNER_ROADMAP.md).
+> [`docs/WINNER_ROADMAP.md`](docs/WINNER_ROADMAP.md); the adversarial
+> self-review and scored gaps are
+> [`docs/JUDGE-PANEL-REVIEW.md`](docs/JUDGE-PANEL-REVIEW.md); the hour-by-hour
+> path to the deadline is [`docs/FINAL-SPRINT.md`](docs/FINAL-SPRINT.md).
 
 ---
 
