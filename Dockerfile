@@ -63,7 +63,7 @@ ARG VCS_REF=unknown
 ARG BUILD_DATE=unknown
 
 LABEL org.opencontainers.image.title="Unchained" \
-      org.opencontainers.image.description="Bounded GPT-5.6 DFIR investigator with offline-verifiable proof" \
+      org.opencontainers.image.description="Bounded GPT-5.6 Digital Forensics & Incident Response (DFIR) investigator with offline-verifiable proof" \
       org.opencontainers.image.source="https://github.com/3sk1nt4n/Unchained" \
       org.opencontainers.image.revision="${VCS_REF}" \
       org.opencontainers.image.created="${BUILD_DATE}" \

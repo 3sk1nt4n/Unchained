@@ -20,8 +20,9 @@
 </p>
 
 <p align="center">
-  A bounded autonomous DFIR investigator: model judgment where it helps,
-  deterministic authority everywhere evidence can change.
+  A bounded autonomous Digital Forensics &amp; Incident Response (DFIR)
+  investigator: model judgment where it helps, deterministic authority
+  everywhere evidence can change.
 </p>
 
 <p align="center">

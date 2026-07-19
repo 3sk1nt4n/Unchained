@@ -21,7 +21,7 @@ function Write-SetupBanner {
     Write-Host ""
     Write-Host "+========================================================================+" -ForegroundColor Cyan
     Write-Host "|                               UNCHAINED                                |" -ForegroundColor White
-    Write-Host "|       Autonomous DFIR - GPT-5.6 strategy, deterministic proof         |" -ForegroundColor Cyan
+    Write-Host "|       Autonomous Digital Forensics & Incident Response - GPT-5.6       |" -ForegroundColor Cyan
     Write-Host "|                                                                        |" -ForegroundColor Cyan
     Write-Host "|       Point me at one case. I will show you what is safe to run.       |" -ForegroundColor Gray
     Write-Host "+========================================================================+" -ForegroundColor Cyan

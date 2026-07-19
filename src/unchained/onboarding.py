@@ -387,7 +387,7 @@ def render_welcome(
     width = _CARD_WIDTH
     banner_styles = {
         "UNCHAINED": _WHITE + _BOLD,
-        "Bounded autonomous DFIR · OpenAI GPT-5.6 Sol": _VIOLET,
+        "Digital Forensics & Incident Response · OpenAI GPT-5.6 Sol": _VIOLET,
         '"Point me at one case. I will profile it before any model call."': _DIM,
     }
     print(_paint("╔" + "═" * (width - 2) + "╗", _BLUE + _BOLD, color), file=stream)

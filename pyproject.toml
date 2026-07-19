@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "sentinel-unchained"
 version = "0.1.0"
-description = "A controlled, custody-preserving DFIR investigator driven by GPT-5.6."
+description = "A controlled, custody-preserving Digital Forensics & Incident Response (DFIR) investigator driven by GPT-5.6."
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
 license = "MIT"

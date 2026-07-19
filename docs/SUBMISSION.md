@@ -34,8 +34,8 @@ verifies exactly what was executed and cited.
 
 ## Short description
 
-Unchained is a bounded autonomous DFIR investigator built with Codex
-and GPT-5.6. It profiles an evidence folder without a model call, establishes
+Unchained is a bounded autonomous Digital Forensics & Incident Response (DFIR)
+investigator built with Codex and GPT-5.6. It profiles an evidence folder without a model call, establishes
 SHA-256 custody, exposes only route-eligible typed read-only tools, and lets
 GPT-5.6 choose an opening of up to six tools that code validates all-or-none and
 executes concurrently. Later turns carry a compact visible ledger and allow one

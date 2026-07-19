@@ -63,7 +63,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     parser = argparse.ArgumentParser(
         prog="sentinel run",
-        description="Run a bounded GPT-5.6-driven DFIR investigation.",
+        description=(
+            "Run a bounded GPT-5.6-driven Digital Forensics & Incident Response "
+            "(DFIR) investigation."
+        ),
     )
     parser.add_argument("evidence", type=Path, help="file or folder containing captured evidence")
     parser.add_argument(
@@ -80,7 +83,10 @@ def build_root_parser() -> argparse.ArgumentParser:
 
     parser = argparse.ArgumentParser(
         prog="sentinel",
-        description="Profile, investigate, verify, and view a bounded GPT-5.6 DFIR case.",
+        description=(
+            "Profile, investigate, verify, and view a bounded GPT-5.6 "
+            "Digital Forensics & Incident Response (DFIR) case."
+        ),
     )
     parser.add_argument(
         "command",

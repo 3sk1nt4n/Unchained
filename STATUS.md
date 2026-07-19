@@ -1,7 +1,8 @@
 # Unchained — Status Checklist
 
 > **Unchained reasoning. Chained evidence.**
-> A trust-measurement harness for a GPT-5.6-directed DFIR investigator: the model
+> A trust-measurement harness for a GPT-5.6-directed Digital Forensics &
+> Incident Response (DFIR) investigator: the model
 > chooses where to look; deterministic code proves what happened and seals an
 > offline-verifiable proof bundle. Track: **Developer Tools** ·
 > Deadline: **2026-07-21, 17:00 PT**.
