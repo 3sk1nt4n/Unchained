@@ -87,62 +87,92 @@ function Test-Md5 {
     return $true
 }
 
-function Get-Dc01Case {
-    # Turn a downloaded DC01 zip, a folder that holds the zips, or an extracted
-    # folder into a launch-ready MEMORY-ONLY case. DC01's disk ships as a split
-    # EWF (E01+E02) that fails closed as two disks, so the clean path is the
-    # memory image - which is where Volatility works anyway.
-    Write-Info "Public DFIR Madness 001 case. You download it; I verify the MD5 and prep it."
-    Write-Host "        https://dfirmadness.com/the-stolen-szechuan-sauce/" -ForegroundColor White
-    Write-Host "      Publisher MD5s:  DC01-memory.zip = $($knownMd5['DC01-memory.zip'])" -ForegroundColor DarkGray
-    Write-Host "                       DC01-E01.zip    = $($knownMd5['DC01-E01.zip'])" -ForegroundColor DarkGray
-    if ((Read-Host "      Open the official download page now? (y/N)") -match '^[yY]') {
-        Start-Process "https://dfirmadness.com/the-stolen-szechuan-sauce/"
+function Expand-EvidenceZip {
+    # Verify (when the MD5 is known) then extract one zip into $Dest.
+    param([string]$Zip, [string]$Dest)
+    if ($knownMd5.ContainsKey((Split-Path $Zip -Leaf))) {
+        if (-not (Test-Md5 $Zip)) { return $false }
     }
-    $path = (Read-Host "      Path to DC01-memory.zip, OR a folder that holds the DC01 zips (Enter to skip)").Trim().Trim('"').Trim()
-    if (-not $path) { return $null }
-    if (-not (Test-Path -LiteralPath $path)) {
-        Write-Host "      Path not found: $path" -ForegroundColor Yellow; return $null
-    }
-    $memZip = $null
-    if (Test-Path -LiteralPath $path -PathType Container) {
-        # A folder: prefer the memory zip; else any extracted memory image is fine as-is.
-        $memZip = Get-ChildItem -LiteralPath $path -File -ErrorAction SilentlyContinue |
-            Where-Object { $_.Name -ieq "DC01-memory.zip" } | Select-Object -First 1
-        if (-not $memZip) {
-            $img = Get-ChildItem -LiteralPath $path -File -Recurse -ErrorAction SilentlyContinue |
-                Where-Object { $_.Extension -match '^\.(mem|raw|vmem|dmp|img)$' -and $_.Length -gt 200MB } |
-                Select-Object -First 1
-            if ($img) { Write-Info "Using the extracted evidence folder directly."; return $path }
-            Write-Host "      No DC01-memory.zip or memory image found in that folder." -ForegroundColor Yellow
-            return $null
-        }
-        $memZip = $memZip.FullName
-    }
-    elseif ($path -imatch '\.zip$') { $memZip = $path }
-    else { Write-Host "      Not a .zip or a folder: $path" -ForegroundColor Yellow; return $null }
+    New-Item -ItemType Directory -Force $Dest | Out-Null
+    Write-Info "Extracting $(Split-Path $Zip -Leaf) into $Dest ..."
+    Expand-Archive -LiteralPath $Zip -DestinationPath $Dest -Force
+    return $true
+}
 
-    if (-not (Test-Md5 $memZip)) { return $null }
-    $memDir = Join-Path $env:USERPROFILE "Evidence\dc01-mem"
-    New-Item -ItemType Directory -Force $memDir | Out-Null
-    Write-Info "Extracting the memory image into $memDir ..."
-    Expand-Archive -LiteralPath $memZip -DestinationPath $memDir -Force
-    Write-Host "      DC01 memory case ready (disk is a split EWF; memory is the clean route)." -ForegroundColor Green
-    return $memDir
+function Resolve-EvidenceFolder {
+    # Turn ANY path - a .zip, a folder that holds zips, or an already-extracted
+    # folder - into a launch-ready evidence folder. If a memory-image zip is
+    # present, extract just that for a clean case (DC01's disk is a split EWF
+    # that fails closed as two disks, and memory is where Volatility works).
+    param([string]$Path)
+    $Path = $Path.Trim().Trim('"').Trim()
+    if (-not $Path) { return $null }
+    if (-not (Test-Path -LiteralPath $Path)) {
+        Write-Host "      Path not found: $Path" -ForegroundColor Yellow; return $null
+    }
+
+    # A single .zip file
+    if (Test-Path -LiteralPath $Path -PathType Leaf) {
+        if ($Path -inotmatch '\.zip$') {
+            Write-Host "      Give a folder or a .zip file." -ForegroundColor Yellow; return $null
+        }
+        $dest = Join-Path $env:USERPROFILE ("Evidence\" + [IO.Path]::GetFileNameWithoutExtension($Path))
+        if (Expand-EvidenceZip $Path $dest) { return $dest } else { return $null }
+    }
+
+    # A folder: are there zips to prepare, or already-extracted images?
+    $zips = @(Get-ChildItem -LiteralPath $Path -File -ErrorAction SilentlyContinue |
+        Where-Object { $_.Extension -ieq '.zip' })
+    if ($zips.Count -gt 0) {
+        $memZip = $zips | Where-Object { $_.Name -imatch 'memory|[-_]mem\b|[-_]mem\.' } | Select-Object -First 1
+        if ($memZip) {
+            Write-Host "      Found $($memZip.Name) - preparing a clean memory case." -ForegroundColor Cyan
+            $dest = Join-Path $env:USERPROFILE "Evidence\dc01-mem"
+            if (Expand-EvidenceZip $memZip.FullName $dest) { return $dest } else { return $null }
+        }
+        Write-Host "      Found $($zips.Count) zip(s) but no memory-image zip in that folder." -ForegroundColor Yellow
+        if ((Read-Host "      Extract them all and try to onboard? (y/N)") -match '^[yY]') {
+            $dest = Join-Path $env:USERPROFILE ("Evidence\" + (Split-Path $Path -Leaf) + "-prepared")
+            $ok = $true
+            foreach ($z in $zips) { if (-not (Expand-EvidenceZip $z.FullName $dest)) { $ok = $false } }
+            if ($ok) { return $dest } else { return $null }
+        }
+        return $null
+    }
+
+    $img = Get-ChildItem -LiteralPath $Path -File -Recurse -ErrorAction SilentlyContinue |
+        Where-Object { $_.Extension -match '^\.(mem|raw|vmem|dmp|img|e01|dd)$' -and $_.Length -gt 200MB } |
+        Select-Object -First 1
+    if ($img) { return $Path }   # already-extracted evidence folder
+    Write-Host "      No evidence images or zips found in $Path." -ForegroundColor Yellow
+    return $null
 }
 
 function Get-CaseFolder {
-    # One menu turn; return a candidate evidence folder path or "" (re-loop) or "Q".
+    # One menu turn; return a resolved evidence folder, "" (re-loop), or "Q".
     Write-Host "        1) DC01 public practice case - guided download + MD5 verify" -ForegroundColor Cyan
-    Write-Host "        2) My own evidence folder (a path I'll type)" -ForegroundColor Cyan
+    Write-Host "        2) Evidence I already have (a .zip, a folder of zips, or images)" -ForegroundColor Cyan
     Write-Host "        Q) Skip the guided run for now" -ForegroundColor DarkGray
     $pick = (Read-Host "      Choose 1, 2, or Q").Trim()
     if ($pick -match '^[qQ]$') { return "Q" }
-    if ($pick -match '^1$') { $c = Get-Dc01Case; if ($c) { return $c } else { return "" } }
+    if ($pick -match '^1$') {
+        Write-Info "Public DFIR Madness 001. You download it; I verify the MD5 and prep it."
+        Write-Host "        https://dfirmadness.com/the-stolen-szechuan-sauce/" -ForegroundColor White
+        Write-Host "      Publisher MD5s:  DC01-memory.zip = $($knownMd5['DC01-memory.zip'])" -ForegroundColor DarkGray
+        Write-Host "                       DC01-E01.zip    = $($knownMd5['DC01-E01.zip'])" -ForegroundColor DarkGray
+        if ((Read-Host "      Open the official download page now? (y/N)") -match '^[yY]') {
+            Start-Process "https://dfirmadness.com/the-stolen-szechuan-sauce/"
+        }
+        $p = (Read-Host "      Path to DC01-memory.zip OR the folder that holds the DC01 zips (Enter to skip)")
+        if (-not $p.Trim()) { return "" }
+        $c = Resolve-EvidenceFolder $p
+        if ($c) { return $c } else { return "" }
+    }
     if ($pick -match '^2$') {
-        $c = (Read-Host "      Full path to your evidence folder").Trim().Trim('"').Trim()
-        if ($c -and (Test-Path -LiteralPath $c)) { return $c }
-        Write-Host "      Path not found: $c" -ForegroundColor Yellow; return ""
+        $p = (Read-Host "      Path to your .zip, folder of zips, or evidence folder")
+        if (-not $p.Trim()) { return "" }
+        $c = Resolve-EvidenceFolder $p
+        if ($c) { return $c } else { return "" }
     }
     return ""
 }
