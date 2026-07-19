@@ -1,8 +1,25 @@
 # Unchained: quick install and run
 
-## Fastest no-key lane (three commands, zero spend)
+## Fastest no-key lane (zero spend)
 
-Any machine with Docker; no Python, no API key, no evidence image required:
+**If Python 3.11 is available, this is instant** — every command below returns
+in well under a second and never contacts OpenAI:
+
+```powershell
+git clone https://github.com/3sk1nt4n/Unchained.git; cd Unchained
+py -3.11 -m venv .judge; .judge\Scripts\python.exe -m pip install -q .
+.judge\Scripts\python.exe -m unchained onboard
+.judge\Scripts\python.exe -m unchained profile docker/fixtures --json
+```
+
+The `pip install` is the only wait (~1–2 minutes); the product commands
+themselves are instantaneous. You see the guided welcome, then deterministic
+routing, public evidence IDs, and SHA-256 custody on the committed fixture,
+with zero OpenAI calls.
+
+**Prefer full isolation?** The same experience runs in a hardened container
+(no network, read-only root, all capabilities dropped) — note
+`docker compose build` takes several minutes on a cold cache:
 
 ```powershell
 git clone https://github.com/3sk1nt4n/Unchained.git; cd Unchained
@@ -10,10 +27,7 @@ docker compose build
 docker compose run --rm offline profile /evidence --json
 ```
 
-The offline service runs with no network, a read-only root filesystem, all
-capabilities dropped, and a committed synthetic fixture at `/evidence`. You see
-deterministic routing, public evidence IDs, and SHA-256 custody with zero
-OpenAI calls. Everything below is the fuller walkthrough.
+Everything below is the fuller walkthrough.
 
 This is the shortest reliable path for a fresh Windows 10 or Windows 11 AMD64
 machine. The Build Week flagship is Windows memory evidence. Native Windows E01

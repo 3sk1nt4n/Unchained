@@ -52,24 +52,26 @@ beat for the Idea criterion:
 - [ ] Replace the literal `<COMPLETE_BUNDLE>` placeholder in SUBMISSION.md.
 
 ### 4. Three visuals at the top of the README — ~2 h
-- [ ] Screenshot/GIF: the onboarding welcome card.
-- [ ] Screenshot/GIF: live run narration ending in the status badge.
-- [ ] Screenshot: viewer.html findings/citations view.
-- [ ] Move the two status tables below the Quickstart; the first screen shows
-      product, not pending-item ledgers.
+- [x] Real onboarding welcome rendered to SVG from captured ANSI output
+      (`docs/assets/cli-welcome.svg`).
+- [x] Real case card (honest amber `ACTION NEEDED` on the synthetic fixture)
+      rendered to SVG (`docs/assets/cli-case-card.svg`).
+- [ ] Screenshot: viewer.html findings/citations view — **gated on the
+      COMPLETE bundle**; add when P0.1 lands.
+- [x] Status tables moved below the Quickstart; the first screen now shows the
+      thesis bullets, the real product screen, and the judge tables.
 
 ## P2 — point defense (~2 h total, only after P0+P1)
 
-- [ ] Add a short "Why not just guardrails, evals, or attestation?" paragraph
-      naming the prior-art families and the one-sentence delta for each —
-      pre-empts the strongest objection the Idea judge raised.
-- [ ] Promote the instant native no-key path above the `docker compose build`
-      lane in JUDGE-QUICKSTART (the audit flagged the build lane as tension
-      with the no-rebuild rule).
-- [ ] Rework demo.ps1 so the no-key demo ends on a positive VALID line instead
-      of `DEMO_BUNDLE_VERIFIED_INVALID_INPUT`.
-- [ ] Add a 10-line "Who needs this" scenario near the top of the README.
-- [ ] Name the reviewer mechanism ("monotonic review") in README and video.
+- [x] "Why not just guardrails, evals, or attestation?" section added to the
+      README with the named prior-art families and the one-sentence delta.
+- [x] Instant native no-key lane promoted above the `docker compose build`
+      lane in JUDGE-QUICKSTART, with honest timing labels.
+- [x] demo.ps1 finale reframed: "DEMO PASSED: fail-closed run sealed a
+      verifiable proof bundle" (semantics and compatibility marker unchanged).
+- [x] "Who needs this" scenario added to the README.
+- [x] Reviewer mechanism named ("monotonic review lattice") in the README —
+      still to be said aloud in the video.
 
 ## Submission gates — Monday morning, not Monday afternoon
 

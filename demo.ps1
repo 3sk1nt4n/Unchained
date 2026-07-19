@@ -21,7 +21,11 @@ try {
     & $python -m unchained verify-run $run.FullName
     if ($LASTEXITCODE -ne 0) { throw "Demo bundle verification failed." }
     if ($cliExit -ne 2) { throw "Demo expected INVALID exit code 2, got $cliExit." }
-    Write-Host "DEMO_BUNDLE_VERIFIED_INVALID_INPUT"
+    Write-Host ""
+    Write-Host "DEMO PASSED: fail-closed run sealed a verifiable proof bundle" -ForegroundColor Green
+    Write-Host "  - empty evidence was refused honestly (INVALID, exit 2) instead of faking success" -ForegroundColor Gray
+    Write-Host "  - even the refusal was sealed, hash-chained, and offline-verified: VALID" -ForegroundColor Gray
+    Write-Host "  (compatibility marker: DEMO_BUNDLE_VERIFIED_INVALID_INPUT)" -ForegroundColor DarkGray
     Write-Host "BUNDLE=$($run.FullName)"
 }
 finally {

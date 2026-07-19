@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="942" height="1079" viewBox="0 0 942 1079" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="14">
+<rect width="942" height="1079" rx="10" fill="#0d1117" stroke="#30363d"/>
+<circle cx="24" cy="24" r="6" fill="#ff5f57"/>
+<circle cx="44" cy="24" r="6" fill="#febc2e"/>
+<circle cx="64" cy="24" r="6" fill="#28c840"/>
+<text x="84" y="29" fill="#8b949e" font-size="12">sentinel onboard docker/fixtures — local SHA-256 case card</text>
+<text x="24.0" y="68.0" xml:space="preserve" fill="#4ade80" font-weight="bold">◆ PROFILE COMPLETE — deterministic, local, zero OpenAI calls</text>
+<text x="24.0" y="110.0" xml:space="preserve" fill="#c9d1d9">  </text>
+<text x="40.9" y="110.0" xml:space="preserve" fill="#4ade80" font-weight="bold">✓</text>
+<text x="49.3" y="110.0" xml:space="preserve" fill="#c9d1d9"> E001  LOG           239 B  STANDALONE LOG RECOGNIZED  </text>
+<text x="512.9" y="110.0" xml:space="preserve" fill="#9ca3af">SHA-256 c4e031531e3e…c86b4413a95e</text>
+<text x="24.0" y="152.0" xml:space="preserve" fill="#fbbf24" font-weight="bold">┌ VERIFIED CASE CARD ────────────────────────────────────────────────────────────┐</text>
+<text x="24.0" y="173.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="173.0" xml:space="preserve" fill="#c9d1d9"> Status       ACTION NEEDED                                                     </text>
+<text x="706.8" y="173.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="194.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="194.0" xml:space="preserve" fill="#c9d1d9"> OS           LINUX                                                             </text>
+<text x="706.8" y="194.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="215.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="215.0" xml:space="preserve" fill="#c9d1d9"> Scope        logs-only                                                         </text>
+<text x="706.8" y="215.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="236.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="236.0" xml:space="preserve" fill="#c9d1d9"> Filesystems  none resolved                                                     </text>
+<text x="706.8" y="236.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="257.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="257.0" xml:space="preserve" fill="#c9d1d9"> Memory       0 ready (maximum 1 per case)                                      </text>
+<text x="706.8" y="257.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="278.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="278.0" xml:space="preserve" fill="#c9d1d9"> Disk         0 ready (maximum 1 per case)                                      </text>
+<text x="706.8" y="278.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="299.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="299.0" xml:space="preserve" fill="#c9d1d9"> Tools        none ready                                                        </text>
+<text x="706.8" y="299.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="320.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="320.0" xml:space="preserve" fill="#c9d1d9"> Capability   Linux experimental path - standalone logs only; no ready forensic </text>
+<text x="706.8" y="320.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="341.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="341.0" xml:space="preserve" fill="#c9d1d9"> tool family                                                                    </text>
+<text x="706.8" y="341.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="362.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="362.0" xml:space="preserve" fill="#c9d1d9"> Custody      PASS · full SHA-256 recheck                                       </text>
+<text x="706.8" y="362.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="383.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="383.0" xml:space="preserve" fill="#c9d1d9"> Disk mount   not-requested                                                     </text>
+<text x="706.8" y="383.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="404.0" xml:space="preserve" fill="#fbbf24">└────────────────────────────────────────────────────────────────────────────────┘</text>
+<text x="24.0" y="425.0" xml:space="preserve" fill="#f87171" font-weight="bold">┌ FIX BEFORE LAUNCH ─────────────────────────────────────────────────────────────┐</text>
+<text x="24.0" y="446.0" xml:space="preserve" fill="#f87171">│</text>
+<text x="32.4" y="446.0" xml:space="preserve" fill="#c9d1d9"> 1. No typed forensic tool family is ready for this profile.                    </text>
+<text x="706.8" y="446.0" xml:space="preserve" fill="#f87171">│</text>
+<text x="24.0" y="467.0" xml:space="preserve" fill="#f87171">└────────────────────────────────────────────────────────────────────────────────┘</text>
+<text x="24.0" y="488.0" xml:space="preserve" fill="#b48cff" font-weight="bold">┌ CHOOSE A RUN BUDGET ───────────────────────────────────────────────────────────┐</text>
+<text x="24.0" y="509.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="32.4" y="509.0" xml:space="preserve" fill="#c9d1d9"> CAUTIOUS [SELECTED] · --caps strict · defaults: 20 tools / 100,000 tokens / 10 </text>
+<text x="706.8" y="509.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="24.0" y="530.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="32.4" y="530.0" xml:space="preserve" fill="#c9d1d9"> min / $2.50                                                                    </text>
+<text x="706.8" y="530.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="24.0" y="551.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="32.4" y="551.0" xml:space="preserve" fill="#c9d1d9"> FLAGSHIP  · --caps default · defaults: 60 tools / 400,000 tokens / 30 min /    </text>
+<text x="706.8" y="551.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="24.0" y="572.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="32.4" y="572.0" xml:space="preserve" fill="#c9d1d9"> $10.00                                                                         </text>
+<text x="706.8" y="572.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="24.0" y="593.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="32.4" y="593.0" xml:space="preserve" fill="#c9d1d9"> Selected effective ceilings: 20 tools / 100,000 tokens / 10 min / $2.50        </text>
+<text x="706.8" y="593.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="24.0" y="614.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="32.4" y="614.0" xml:space="preserve" fill="#c9d1d9"> Both use GPT-5.6 Sol. These are stop ceilings, not price quotes, depth modes,  </text>
+<text x="706.8" y="614.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="24.0" y="635.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="32.4" y="635.0" xml:space="preserve" fill="#c9d1d9"> or promises of result quality. Environment overrides may change effective      </text>
+<text x="706.8" y="635.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="24.0" y="656.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="32.4" y="656.0" xml:space="preserve" fill="#c9d1d9"> ceilings.                                                                      </text>
+<text x="706.8" y="656.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="24.0" y="677.0" xml:space="preserve" fill="#b48cff">└────────────────────────────────────────────────────────────────────────────────┘</text>
+<text x="24.0" y="698.0" xml:space="preserve" fill="#fbbf24" font-weight="bold">┌ CLOUD + COST BOUNDARY ─────────────────────────────────────────────────────────┐</text>
+<text x="24.0" y="719.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="719.0" xml:space="preserve" fill="#c9d1d9"> THIS STEP: local profile + custody only · OpenAI calls 0 · paid run not        </text>
+<text x="706.8" y="719.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="740.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="740.0" xml:space="preserve" fill="#c9d1d9"> started                                                                        </text>
+<text x="706.8" y="740.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="761.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="761.0" xml:space="preserve" fill="#c9d1d9"> IF YOU LAUNCH: OpenAI receives the bounded public profile and bounded typed-   </text>
+<text x="706.8" y="761.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="782.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="782.0" xml:space="preserve" fill="#c9d1d9"> tool observations; original evidence bytes and runner-local paths stay local.  </text>
+<text x="706.8" y="782.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="803.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="803.0" xml:space="preserve" fill="#c9d1d9"> STRICT HARD CEILINGS (not a price quote): 20 forensic calls · 100,000 tokens · </text>
+<text x="706.8" y="803.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="824.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="824.0" xml:space="preserve" fill="#c9d1d9"> 10 min · $2.50 estimated cost                                                  </text>
+<text x="706.8" y="824.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="845.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="845.0" xml:space="preserve" fill="#c9d1d9"> Every mount attempt is read-only. Without --mount, disks remain raw-only.      </text>
+<text x="706.8" y="845.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="866.0" xml:space="preserve" fill="#fbbf24">└────────────────────────────────────────────────────────────────────────────────┘</text>
+<text x="24.0" y="887.0" xml:space="preserve" fill="#33c7ff" font-weight="bold">┌ NEXT — NO GUESSWORK ───────────────────────────────────────────────────────────┐</text>
+<text x="24.0" y="908.0" xml:space="preserve" fill="#33c7ff">│</text>
+<text x="32.4" y="908.0" xml:space="preserve" fill="#c9d1d9"> 1. Check live dependencies and key presence: sentinel doctor                   </text>
+<text x="706.8" y="908.0" xml:space="preserve" fill="#33c7ff">│</text>
+<text x="24.0" y="929.0" xml:space="preserve" fill="#33c7ff">│</text>
+<text x="32.4" y="929.0" xml:space="preserve" fill="#c9d1d9"> 2. Optional paid Luna canary (no evidence; not proof): sentinel smoke-openai   </text>
+<text x="706.8" y="929.0" xml:space="preserve" fill="#33c7ff">│</text>
+<text x="24.0" y="950.0" xml:space="preserve" fill="#33c7ff">│</text>
+<text x="32.4" y="950.0" xml:space="preserve" fill="#c9d1d9"> 3. Optional technical record: sentinel profile &lt;same-evidence&gt; --json          </text>
+<text x="706.8" y="950.0" xml:space="preserve" fill="#33c7ff">│</text>
+<text x="24.0" y="971.0" xml:space="preserve" fill="#33c7ff">│</text>
+<text x="32.4" y="971.0" xml:space="preserve" fill="#c9d1d9"> 4. Resolve the case-card blockers, then profile again. No paid Sol launch is   </text>
+<text x="706.8" y="971.0" xml:space="preserve" fill="#33c7ff">│</text>
+<text x="24.0" y="992.0" xml:space="preserve" fill="#33c7ff">│</text>
+<text x="32.4" y="992.0" xml:space="preserve" fill="#c9d1d9"> offered.                                                                       </text>
+<text x="706.8" y="992.0" xml:space="preserve" fill="#33c7ff">│</text>
+<text x="24.0" y="1013.0" xml:space="preserve" fill="#33c7ff">└────────────────────────────────────────────────────────────────────────────────┘</text>
+<text x="24.0" y="1034.0" xml:space="preserve" fill="#c9d1d9">Local profile and custody are complete. Live model readiness is not asserted until sentinel doctor passes.</text>
+</svg>

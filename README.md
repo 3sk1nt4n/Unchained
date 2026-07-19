@@ -34,12 +34,24 @@
   <a href="JUDGE-QUICKSTART.md">Judge guide</a>
 </p>
 
-Unchained profiles an evidence folder, lets GPT-5.6 choose eligible read-only
-typed tools, executes the opening in parallel, and follows with one auditable
-action per adaptive turn. It then binds findings to exact retained output
-bytes, asks a fresh-context reviewer to preserve or downgrade them, and seals a
-deterministic report, inert viewer, custody receipts, and manifest into one
-content-addressed proof bundle.
+**The whole idea in one breath:**
+
+- 🧠 **GPT-5.6 runs the investigation** — it chooses which typed forensic
+  tools to fire (up to six in parallel), reads the results, and proposes
+  findings.
+- 🔒 **Deterministic code owns the evidence** — read-only access, SHA-256
+  custody, hard caps, all-or-none validation. The model is never allowed to
+  *be* the evidence.
+- 🧾 **Every case seals into a proof bundle** — exact byte-level citations, a
+  hash-chained audit log, and an offline verifier that rebuilds the report and
+  viewer byte-for-byte. If one byte changes, verification fails.
+
+**This is the real first screen** — `sentinel onboard`, no key, no evidence,
+zero OpenAI calls:
+
+<p align="center">
+  <img src="docs/assets/cli-welcome.svg" alt="The real sentinel onboard welcome: guided cards, budget choice, and an explicit cloud/cost boundary" width="760">
+</p>
 
 > **What “proves” means here:** code verifies what ran, what bytes were retained,
 > what exact text was cited, and whether custody still matches. It does **not**
@@ -52,38 +64,6 @@ content-addressed proof bundle.
 > evidence folder to get a local SHA-256 case card. A paid Sol run requires
 > `--launch` **and** the exact interactive phrase `LAUNCH GPT-5.6 SOL`.
 > Follow the card-by-card [first-case guide](docs/START-HERE.md).
-
-## Current release status
-
-| Capability | State |
-|---|---|
-| OpenAI-native controller and independent offline verifier | ✅ Verified offline |
-| Linux/AMD64 Docker build, 274-test gate, CLI, profile, and custody | ✅ Verified locally |
-| Cheap GPT-5.6 Luna typed-tool canary | ✅ Demonstrated live; second-reviewer-attested (project-affiliated) sanitized receipt |
-| Authentic GPT-5.6 Sol capped opening on real Windows memory | ✅ Retained bundle verifies `VALID`; terminal state is intentionally `PARTIAL` |
-| Authentic `COMPLETE` GPT-5.6 Sol evidence bundle | ⏳ Opening/tool path proven; findings → reviewer → final report still pending |
-| Same-evidence speed/cost/accuracy comparison with Qwen | ⏳ Fail-closed comparison scaffold ready; fact set, freeze lock, and measurements pending |
-
-**Live milestone:** the first retained Sol run used a 2 GiB Windows memory image,
-recorded `gpt-5.6-sol` on both model responses, executed all six model-selected
-opening tools successfully, and stopped honestly when the next reservation
-would exceed the six-tool cap. It used 59,254 provider-reported tokens, took
-43.702 seconds end to end, and produced a local cost estimate of $0.38789875.
-This proves the live opening, typed execution, cap, custody, and bundle path—not
-a completed investigation. See the
-[release handoff](docs/OPENAI_VNEXT_RELEASE_HANDOFF.md) for the full scorecard
-and fastest submission path.
-
-**Post-rehearsal hardening:** four later unscored attempts exposed a real
-terminal-contract problem. Their retained audits show completed responses with
-395–1,750 characters of visible ledger text but no typed action—not empty
-responses. The v2 controller therefore does not normalize blank text,
-punctuation, Markdown, or prose into completion. Every adaptive response must
-choose exactly one typed action: one eligible forensic tool or the closed
-`finish_investigation` action with the sole argument `status="DONE"`. The
-offline verifier understands historical literal-DONE-v1 bundles but requires
-the new runtime's typed catalog, `tool_choice=required`, and exact terminal
-schema. A live `COMPLETE` v2 bundle remains pending.
 
 ## For judges — the submission at a glance
 
@@ -105,7 +85,40 @@ schema. A live `COMPLETE` v2 bundle remains pending.
 | Potential Impact | [Why Unchained is different](#why-unchained-is-different) — inspectable autonomy for any high-consequence agent, not just DFIR |
 | Quality of the Idea | The authority split: the model chooses strategy; code owns evidence, execution, citations, custody, and the report |
 
+**🚦 Submission readiness — live and honest:**
+
+| Item | Status |
+|---|---|
+| 🟢 Public MIT repo, Codex Session ID, provenance boundary | **Done** |
+| 🟢 383-test offline gate, ruff clean, hardened Docker | **Done** |
+| 🟢 Live GPT-5.6 Sol opening on real 2 GiB Windows memory | **Done** — retained, capped `PARTIAL` by design |
+| 🟢 Zero-key guided onboarding + colorful live run experience | **Done** — see the screen above |
+| 🟡 Authentic `COMPLETE` proof bundle | **In progress** — the final live run |
+| 🟡 Public sub-3-minute video | **In progress** — recorded against the real bundle |
+| ⚪ Same-evidence Qwen benchmark | **Deliberately cut** — no unmeasured claims |
+
 ## Quickstart
+
+### ⏱️ 60 seconds, any OS, zero keys, zero spend
+
+```powershell
+# Windows (one line — installs, walks you in, never spends)
+irm https://raw.githubusercontent.com/3sk1nt4n/Unchained/main/get.ps1 | iex
+```
+
+```bash
+# Linux / macOS (one line — hardened container, never spends)
+curl -fsSL https://raw.githubusercontent.com/3sk1nt4n/Unchained/main/get.sh | bash
+```
+
+Point it at a folder and you get a local, cryptographic case card — every file
+SHA-256-hashed, classified, and routed **before any model is allowed near it**.
+The tool refuses to overstate: a synthetic logs-only fixture honestly gets an
+amber `ACTION NEEDED` card, not a fake green light:
+
+<p align="center">
+  <img src="docs/assets/cli-case-card.svg" alt="The real case card: per-file SHA-256 custody, honest ACTION NEEDED status on a synthetic fixture, budget choice, and cloud/cost boundary" width="760">
+</p>
 
 **Pick your machine. Every lane starts with zero keys and zero spend.**
 
@@ -357,6 +370,38 @@ sentinel view C:\path\to\bundle
 `view` verifies the bundle before opening it. A bundle claiming `COMPLETE`
 automatically receives strict lifecycle verification first.
 
+## Who needs this
+
+An incident-response consultancy wants AI triage on a compromised host image,
+but must show the client — and possibly a regulator or opposing counsel —
+exactly what the AI did to the evidence. A transcript is not an answer.
+Unchained gives them a sealed bundle: which tools ran, on which evidence, with
+which SHA-256 identities, what exact bytes each finding cites, and a verifier
+anyone can run offline to confirm none of it changed. The same need appears
+wherever an autonomous agent touches something that can end up in a dispute:
+security testing, compliance review, financial operations. The audience is
+anyone who wants model autonomy **and** has to answer for it afterward.
+
+## Why not just guardrails, evals, or attestation?
+
+Each existing trust family solves a different problem, and none closes this one:
+
+- **Guardrails / structured outputs** constrain what the model may *say* in one
+  response. They do not bind a multi-step investigation to retained evidence
+  bytes, and nothing re-checks the transcript afterward.
+- **Evals and LLM-as-judge** measure quality offline or ask a second model for
+  an opinion. Unchained's reviewer is deliberately weaker and therefore
+  stronger: it can only **preserve or downgrade** existing findings — a
+  monotonic review lattice, not a second opinion that can invent support.
+- **Supply-chain attestation (in-toto/SLSA-style)** proves how software was
+  built. Unchained applies the same content-addressed discipline to what an
+  *agent did at runtime*: every tool call, output byte, citation span, custody
+  hash, and report row is reconstructed and byte-compared by an independent
+  offline verifier.
+
+The delta in one sentence: **existing tools constrain or score the model;
+Unchained makes the investigation itself independently re-checkable.**
+
 ## Why Unchained is different
 
 | Layer | Authority |
@@ -398,6 +443,38 @@ flowchart TD
 
 Read the full [architecture](docs/ARCHITECTURE.md) or the detailed
 [OpenAI vNext review](docs/OPENAI_VNEXT_REVIEW.md).
+
+## Current release status
+
+| Capability | State |
+|---|---|
+| OpenAI-native controller and independent offline verifier | ✅ Verified offline |
+| Linux/AMD64 Docker build, 274-test gate, CLI, profile, and custody | ✅ Verified locally |
+| Cheap GPT-5.6 Luna typed-tool canary | ✅ Demonstrated live; second-reviewer-attested (project-affiliated) sanitized receipt |
+| Authentic GPT-5.6 Sol capped opening on real Windows memory | ✅ Retained bundle verifies `VALID`; terminal state is intentionally `PARTIAL` |
+| Authentic `COMPLETE` GPT-5.6 Sol evidence bundle | ⏳ Opening/tool path proven; findings → reviewer → final report still pending |
+| Same-evidence speed/cost/accuracy comparison with Qwen | ⏳ Fail-closed comparison scaffold ready; fact set, freeze lock, and measurements pending |
+
+**Live milestone:** the first retained Sol run used a 2 GiB Windows memory image,
+recorded `gpt-5.6-sol` on both model responses, executed all six model-selected
+opening tools successfully, and stopped honestly when the next reservation
+would exceed the six-tool cap. It used 59,254 provider-reported tokens, took
+43.702 seconds end to end, and produced a local cost estimate of $0.38789875.
+This proves the live opening, typed execution, cap, custody, and bundle path—not
+a completed investigation. See the
+[release handoff](docs/OPENAI_VNEXT_RELEASE_HANDOFF.md) for the full scorecard
+and fastest submission path.
+
+**Post-rehearsal hardening:** four later unscored attempts exposed a real
+terminal-contract problem. Their retained audits show completed responses with
+395–1,750 characters of visible ledger text but no typed action—not empty
+responses. The v2 controller therefore does not normalize blank text,
+punctuation, Markdown, or prose into completion. Every adaptive response must
+choose exactly one typed action: one eligible forensic tool or the closed
+`finish_investigation` action with the sole argument `status="DONE"`. The
+offline verifier understands historical literal-DONE-v1 bundles but requires
+the new runtime's typed catalog, `tool_choice=required`, and exact terminal
+schema. A live `COMPLETE` v2 bundle remains pending.
 
 ## Proof status
 
