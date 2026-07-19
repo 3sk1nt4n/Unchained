@@ -21,6 +21,7 @@ fi
 
 step() { printf '%s[%s]%s %s\n' "$CYAN" "$1" "$RESET" "$2"; }
 note() { printf '      %s%s%s\n' "$GRAY" "$1" "$RESET"; }
+skip() { printf '      %sOK already done - %s%s\n' "$GREEN" "$1" "$RESET"; }
 
 printf '\n%s+========================================================================+%s\n' "$CYAN" "$RESET"
 printf '%s|                               UNCHAINED                                |%s\n' "$BOLD" "$RESET"
@@ -52,14 +53,21 @@ fi
 cd "$REPO"
 
 step "2/6" "Building the hardened offline image (no key, no network at runtime)"
-docker compose build
+if docker image inspect sentinel-unchained:local >/dev/null 2>&1; then
+  skip "offline image sentinel-unchained:local already built (docker compose build to refresh)"
+else
+  docker compose build
+fi
 
 step "3/6" "Optional: store your OpenAI key for the live Luna canary (hidden input)"
 note "The key is written to a private local file (chmod 600) and referenced through"
 note "OPENAI_API_KEY_FILE. It is never echoed, never committed, never logged."
 note "Press Enter on an empty prompt to skip and stay fully offline."
+KEY_FILE_DEFAULT="${XDG_CONFIG_HOME:-$HOME/.config}/sentinel-unchained/openai_api_key"
 KEY=""
-if [ -t 0 ]; then
+if [ -s "$KEY_FILE_DEFAULT" ]; then
+  skip "a key file already exists at $KEY_FILE_DEFAULT"
+elif [ -t 0 ]; then
   printf '      Paste key (input stays hidden): '
   read -rs KEY || KEY=""
   printf '\n'
