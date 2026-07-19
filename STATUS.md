@@ -59,14 +59,13 @@
    All of it is committed locally only; GitHub still shows the older, weaker
    project — judges would walk the wrong repo. Fast-forward push to
    `origin`, no history rewrite.
-2. **[ ] Add a "Built with Codex + GPT-5.6" section to `README.md`.**
-   **Mandatory** — the rules require the Codex-collaboration story *in the
-   README*: where Codex accelerated work, which decisions the human owned, how
-   GPT-5.6 + Codex shaped the result. (Summarize `BUILD_PROVENANCE.md` §5.)
-3. **[ ] Fix the "independent-reviewer-attested" overclaim.**
-   Rename to "second-reviewer-attested (project-affiliated)" in the Luna
-   receipt kind + `README.md` + `docs/SUBMISSION.md`. Judges can puncture
-   "independent."
+2. **[x] Add a "Built with Codex + GPT-5.6" section to `README.md`.**
+   Done — "Built with Codex" section with the core-work Session ID, plus a
+   "For judges" table linking it near the top.
+3. **[x] Fix the "independent-reviewer-attested" overclaim.**
+   Done — renamed to "second-reviewer-attested (project-affiliated)" in the
+   Luna receipt kind, `README.md`, `docs/SUBMISSION.md`, the release handoff,
+   and the hackathon handover.
 4. **[ ] Confirm the prior-vs-new-work boundary + Codex Session ID.**
    Judges score **only** work added Jul 13–21; keep `BUILD_PROVENANCE.md`
    crisp and pick the Codex thread that truly holds the majority of core work.

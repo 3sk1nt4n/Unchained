@@ -105,7 +105,7 @@ lines; this canonical comprehensive handoff is intentionally longer.
 
 ### First live receipt gate (2026-07-19)
 
-An independent reviewer tested commit
+A project-affiliated second reviewer tested commit
 `51662cfb809212af3b58a680c0d9265d91692302` on the owner's Windows 11 / CPython
 3.11 environment and supplied `REPORT-LIVE-RUN.md`. Its exact SHA-256 is
 `7ebdf230de88b18af3cd8a38acecebc2b1b48ca0d6c0740e596dd0bb0df53c9c`.
@@ -114,8 +114,8 @@ The Luna canary was reported live with one `gpt-5.6-luna` request, one valid
 strict typed call, no evidence read, 186 input tokens, 27 output tokens, and 213
 total tokens. No raw Luna JSON receipt accompanied the review. The committed
 [Luna projection](runs/luna-canary-receipt.json) is therefore labeled
-independent-reviewer-attested, nonqualifying, and not cryptographically bound to
-a raw provider response.
+second-reviewer-attested (project-affiliated), nonqualifying, and not
+cryptographically bound to a raw provider response.
 
 The retained Sol bundle is stronger evidence because its own summary, audit,
 profile, manifest, and detached checksum are available. Values below come from
@@ -628,7 +628,7 @@ Do not fill in `X`, `Y`, or any semantic win until measured.
 - offline help, doctor behavior, evidence profiling, public IDs, and custody;
 - raw Volatility/Sleuth Kit substrate availability;
 - the mocked one-request Luna typed-tool contract;
-- an independently attested live Luna connectivity result, with the raw-receipt
+- a second-reviewer-attested (project-affiliated) live Luna connectivity result, with the raw-receipt
   retention limitation stated explicitly.
 
 Separately, the native Windows run now proves a recorded live Sol opening, six
@@ -707,7 +707,7 @@ add `--privileged` merely to make a demo pass.
 | Public `main` and vNext branch | Green |
 | Docker test/runtime packaging | Green locally |
 | Docker no-key profile/custody | Green locally |
-| Authentic Luna connectivity result | Live, independently attested; raw JSON receipt not retained |
+| Authentic Luna connectivity result | Live, second-reviewer-attested (project-affiliated); raw JSON receipt not retained |
 | Authentic GPT-5.6 Sol capped opening/tool run | Green: retained `PARTIAL` bundle, offline `VALID` |
 | Authentic `COMPLETE` GPT-5.6 Sol vNext run | Pending |
 | Same-evidence Qwen benchmark | Pending |
@@ -811,7 +811,7 @@ execution, exact evidence grounding, monotonic review, deterministic report
 authority, offline proof, CLI clarity, Docker preflight, and judge-facing UX.
 
 The engineering now has its first authentic recorded Sol opening/tool bundle
-and an independently attested Luna connectivity result. The remaining
+and a second-reviewer-attested (project-affiliated) Luna connectivity result. The remaining
 difference between an excellent prototype and a hackathon winner is the full
 retained evidence chain: freeze it, run one authentic `COMPLETE` Sol lifecycle,
 benchmark it fairly, score it against frozen facts, and show that complete

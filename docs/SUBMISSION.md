@@ -203,7 +203,7 @@ artifact or explicit hosted instructions before the deadline.
 
 | Claim | Current allowed status |
 |---|---|
-| Luna connectivity and strict typed call | DEMONSTRATED through an independently attested sanitized receipt |
+| Luna connectivity and strict typed call | DEMONSTRATED through a second-reviewer-attested (project-affiliated) sanitized receipt |
 | Live GPT-5.6 Sol opening on real DC01 memory | DEMONSTRATED as a capped `PARTIAL`; six tools succeeded |
 | Custody and ordinary bundle verification for capped run | VERIFIED from the retained local bundle |
 | Findings, fresh reviewer, deterministic COMPLETE report | PENDING authentic COMPLETE run |

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "receipt_kind": "independent-reviewer-attested-sanitized-projection",
+  "receipt_kind": "second-reviewer-attested-project-affiliated-sanitized-projection",
   "qualification": "NONQUALIFYING_CONNECTIVITY_SMOKE",
   "observed_at_utc_date": "2026-07-19",
   "repository_commit_reported": "51662cfb809212af3b58a680c0d9265d91692302",
@@ -25,7 +25,7 @@
     "file": "REPORT-LIVE-RUN.md",
     "bytes": 4434,
     "sha256": "7ebdf230de88b18af3cd8a38acecebc2b1b48ca0d6c0740e596dd0bb0df53c9c",
-    "reviewer_description": "independent verification on the owner's Windows 11 machine with a CPython 3.11 virtual environment",
+    "reviewer_description": "second-reviewer verification (project-affiliated) on the owner's Windows 11 machine with a CPython 3.11 virtual environment",
     "claim_label_in_source": "TESTED"
   },
   "retention_and_proof_scope": {
@@ -34,7 +34,7 @@
     "cryptographically_bound_to_a_raw_provider_response": false,
     "provider_request_id_disclosed_in_full": false,
     "provider_response_id_disclosed_in_full": false,
-    "statement": "This file is a sanitized projection of an independent reviewer's live-run report. The underlying raw Luna JSON receipt was not retained with the supplied artifacts, so these fields are attestations from the hashed source report, not a bundle-derived cryptographic proof. The canary proves no forensic claim and cannot qualify as a Sol investigation."
+    "statement": "This file is a sanitized projection of a project-affiliated second reviewer's live-run report. The underlying raw Luna JSON receipt was not retained with the supplied artifacts, so these fields are attestations from the hashed source report, not a bundle-derived cryptographic proof. The canary proves no forensic claim and cannot qualify as a Sol investigation."
   },
   "sanitization": {
     "contains_api_key": false,

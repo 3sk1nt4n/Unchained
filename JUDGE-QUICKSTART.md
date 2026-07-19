@@ -1,5 +1,20 @@
 # Unchained: quick install and run
 
+## Fastest no-key lane (three commands, zero spend)
+
+Any machine with Docker; no Python, no API key, no evidence image required:
+
+```powershell
+git clone https://github.com/3sk1nt4n/sentinel-unchained.git; cd sentinel-unchained
+docker compose build
+docker compose run --rm offline profile /evidence --json
+```
+
+The offline service runs with no network, a read-only root filesystem, all
+capabilities dropped, and a committed synthetic fixture at `/evidence`. You see
+deterministic routing, public evidence IDs, and SHA-256 custody with zero
+OpenAI calls. Everything below is the fuller walkthrough.
+
 This is the shortest reliable path for a fresh Windows 10 or Windows 11 AMD64
 machine. The Build Week flagship is Windows memory evidence. Native Windows E01
 or NTFS mounting is not part of the primary path.

@@ -1600,7 +1600,7 @@ The repository stores two deliberately sanitized projections:
 - [Luna canary receipt](docs/runs/luna-canary-receipt.json)
 - [Sol capped DC01 opening receipt](docs/runs/sol-capped-dc01-opening.json)
 
-The Luna file is an independent-reviewer-attested projection. The raw Luna JSON
+The Luna file is a second-reviewer-attested (project-affiliated) projection. The raw Luna JSON
 response was not supplied or retained with a proof bundle, so it is neither
 bundle-derived nor cryptographic provider proof. It reports one
 `gpt-5.6-luna` request, a valid strict typed call, no evidence read, 186 input
@@ -1648,7 +1648,7 @@ establish provider billing, or prove semantic forensic correctness.
 
 | Gate | Current state |
 |---|---|
-| Luna connectivity and strict typed call | **DEMONSTRATED — independently attested projection** |
+| Luna connectivity and strict typed call | **DEMONSTRATED — second-reviewer-attested (project-affiliated) projection** |
 | Luna raw/bundle-derived receipt | **NOT RETAINED** |
 | Sol provider-model metadata | **RECORDED twice as `gpt-5.6-sol`** |
 | Six-way Sol opening | **DEMONSTRATED on real memory** |
