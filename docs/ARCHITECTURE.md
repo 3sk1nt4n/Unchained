@@ -62,6 +62,30 @@ The report model never owns the authoritative findings table. The final custody
 pass occurs only after forensic work and mount access have stopped; bundle
 artifacts are sealed afterward so the manifest records that result.
 
+## Model invocation budget
+
+Every provider request site is fixed in code; there is no unbounded loop:
+
+| Phase | Provider requests | Call site |
+|---|---|---|
+| Opening book | exactly 1 | `agent.py` `_opening` |
+| Adaptive investigation | 1 per turn; each turn must return exactly one typed action, and the final turn is `finish_investigation({"status":"DONE"})` | `agent.py` `_investigate` |
+| Forced findings serialization | exactly 1 | `agent.py` `_finalize_investigation` |
+| Fresh downgrade-only review | exactly 1 | `agent.py` `_judge` |
+| Structured report draft | exactly 1 | `agent.py` `_report` |
+
+A completed case therefore makes **4 + T** provider requests, where **T ≥ 1**
+is the number of adaptive turns — minimum five requests total. T is bounded by
+the hard caps (tool calls, total tokens, wall time, estimated cost): every
+request is audited and charged before its response is used, and a cap firing
+before dispatch ends the run as `PARTIAL` rather than exceeding the budget.
+Transient provider failures may add at most two audited retries per dispatch; a
+forensic action is never re-executed because a dispatch retried.
+
+Reference point: the retained capped live run recorded exactly two provider
+requests — the opening plus one adaptive turn whose tool reservation was
+cap-blocked — matching this formula at the point the cap fired.
+
 ## Authority boundary
 
 | Domain | Deterministic authority | GPT-5.6 authority | Explicit limit |

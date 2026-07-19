@@ -81,11 +81,23 @@ else
   printf '      %sSkipped. Everything below stays local and free.%s\n' "$GREEN" "$RESET"
 fi
 
-step "4/4" "Opening the guided onboarding (zero-key, zero-spend welcome)"
+step "4/5" "Ready-made samples"
+note "A safe synthetic sample ships in the repo and is already mounted at /evidence:"
+note "  docker compose run --rm offline profile /evidence --json"
+note ""
+note "Real practice case: DFIR Madness 001 'The Stolen Szechuan Sauce' (public"
+note "Windows memory + disk; download it yourself - Unchained never fetches"
+note "evidence for you): https://dfirmadness.com/the-stolen-szechuan-sauce/"
+note "Publisher's MD5s (verify your download; Unchained then takes SHA-256"
+note "custody itself during onboarding):"
+note "  DC01-memory.zip  64A4E2CB47138084A5C2878066B2D7B1"
+note "  DC01-E01.zip     E57FC636E833C5F1AB58DFACE873BBDE"
+
+step "5/5" "Opening the guided onboarding (zero-key, zero-spend welcome)"
 docker compose run --rm offline
 
 printf '\n%sNext moves:%s\n' "$CYAN" "$RESET"
 printf '  docker compose run --rm offline profile /evidence --json     synthetic fixture, $0\n'
-printf '  SENTINEL_EVIDENCE_PATH=/cases/CASE-A \\\n'
-printf '    docker compose run --rm offline profile /evidence --json   your own folder, read-only\n'
+printf '  SENTINEL_EVIDENCE_PATH=$HOME/Evidence/dc01 \\\n'
+printf '    docker compose run --rm offline profile /evidence --json   the public practice case\n'
 printf '  OPENAI_API_KEY_FILE=<file> docker compose --profile live run --rm live-smoke\n'

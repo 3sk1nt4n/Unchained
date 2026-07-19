@@ -32,7 +32,7 @@ FROM wheels AS test
 # The release tests intentionally inspect the freeze/controller documentation,
 # setup entrypoint, Docker policy, and pinned requirements. They are copied only
 # into this disposable test stage; the final runtime still receives wheels only.
-COPY .gitattributes .dockerignore Dockerfile setup.ps1 ./
+COPY .gitattributes .dockerignore Dockerfile setup.ps1 get.ps1 get.sh ./
 COPY docs ./docs
 COPY requirements ./requirements
 COPY scripts ./scripts

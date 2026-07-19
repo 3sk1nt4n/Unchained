@@ -111,6 +111,11 @@ irm https://raw.githubusercontent.com/3sk1nt4n/Unchained/main/get.ps1 | iex
 curl -fsSL https://raw.githubusercontent.com/3sk1nt4n/Unchained/main/get.sh | bash
 ```
 
+**Ready-made samples, no hunting:** a safe synthetic case ships in the repo
+(`sentinel onboard docker/fixtures` — instant, free), and the installer walks
+you to the public **DFIR Madness 001** practice case (official download page
+plus the publisher's checksums; Unchained never fetches evidence for you).
+
 Point it at a folder and you get a local, cryptographic case card — every file
 SHA-256-hashed, classified, and routed **before any model is allowed near it**.
 The tool refuses to overstate: a synthetic logs-only fixture honestly gets an
@@ -440,6 +445,13 @@ flowchart TD
 
 - **Blue:** GPT-5.6 judgment inside a bounded protocol.
 - **Amber:** deterministic code authority and proof reconstruction.
+
+**Invocation budget:** a completed case makes exactly **4 fixed GPT-5.6
+requests** (opening book, findings serialization, fresh review, report draft)
+**plus one per adaptive action** — minimum five, never an unbounded loop. Every
+request is audited and charged before use, and the hard caps fire *before*
+dispatch, ending the run as honest `PARTIAL` instead of overspending. Details:
+[Model invocation budget](docs/ARCHITECTURE.md#model-invocation-budget).
 
 Read the full [architecture](docs/ARCHITECTURE.md) or the detailed
 [OpenAI vNext review](docs/OPENAI_VNEXT_REVIEW.md).

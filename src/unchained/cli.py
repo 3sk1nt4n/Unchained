@@ -383,6 +383,29 @@ def _interactive_terminal() -> bool:
     )
 
 
+def _choose_analysis_depth(selected: str) -> str:
+    """Offer the interactive HEAVY/LIGHT pick; any non-answer keeps the selection.
+
+    Both depths run the same GPT-5.6 Sol investigator — this chooses hard stop
+    ceilings, never a different model. EOF or a closed stdin keeps the current
+    selection so noninteractive callers are unaffected.
+    """
+
+    current = "HEAVY (FLAGSHIP)" if selected == "default" else "LIGHT (CAUTIOUS)"
+    try:
+        answer = input(
+            f"Choose analysis depth [Enter = keep {current} · 1 = HEAVY · 2 = LIGHT · "
+            "both GPT-5.6 Sol]: "
+        ).strip()
+    except (EOFError, OSError):
+        return selected
+    if answer == "1":
+        return "default"
+    if answer == "2":
+        return "strict"
+    return selected
+
+
 def _confirm_paid_sol_launch(caps_profile: str, caps: CapConfig) -> bool:
     """Require a high-friction, exact phrase before crossing the cloud boundary."""
 
@@ -490,6 +513,16 @@ def _onboard(
         return EXIT_INVALID
     if not launch:
         return EXIT_COMPLETE
+    chosen_profile = _choose_analysis_depth(caps_profile)
+    if chosen_profile != caps_profile:
+        caps_profile = chosen_profile
+        caps = CapConfig.from_env(caps_profile)
+        depth_name = "HEAVY (FLAGSHIP)" if caps_profile == "default" else "LIGHT (CAUTIOUS)"
+        print(
+            f"Depth set: {depth_name} — ceilings {caps.max_tool_calls} tools / "
+            f"{caps.max_total_tokens:,} tokens / {caps.max_wall_seconds / 60:g} min / "
+            f"${caps.max_cost_usd:.2f} estimated cost"
+        )
     if not _confirm_paid_sol_launch(caps_profile, caps):
         print("Launch cancelled. The local profile remains valid; OpenAI calls: 0.")
         return EXIT_COMPLETE

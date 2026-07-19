@@ -219,7 +219,9 @@ def test_human_case_card_is_junior_friendly_and_does_not_echo_child_paths(
     assert "PROFILE READY" in output
     assert "OpenAI calls 0" in output
     assert "HARD CEILINGS (not a price quote)" in output
-    assert "CHOOSE A RUN BUDGET" in output
+    assert "CHOOSE ANALYSIS DEPTH" in output
+    assert "HEAVY" in output
+    assert "LIGHT" in output
     assert "CAUTIOUS [SELECTED]" in output
     assert "FLAGSHIP" in output
     assert "promises of result quality" in output

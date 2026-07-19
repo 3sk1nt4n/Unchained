@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="739" height="1121" viewBox="0 0 739 1121" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="14">
-<rect width="739" height="1121" rx="10" fill="#0d1117" stroke="#30363d"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="739" height="1289" viewBox="0 0 739 1289" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="14">
+<rect width="739" height="1289" rx="10" fill="#0d1117" stroke="#30363d"/>
 <circle cx="24" cy="24" r="6" fill="#ff5f57"/>
 <circle cx="44" cy="24" r="6" fill="#febc2e"/>
 <circle cx="64" cy="24" r="6" fill="#28c840"/>
@@ -63,65 +63,89 @@
 <text x="32.4" y="572.0" xml:space="preserve" fill="#c9d1d9"> sentinel onboard &lt;one-case-evidence-folder&gt;                                    </text>
 <text x="706.8" y="572.0" xml:space="preserve" fill="#4ade80">│</text>
 <text x="24.0" y="593.0" xml:space="preserve" fill="#4ade80">│</text>
-<text x="32.4" y="593.0" xml:space="preserve" fill="#c9d1d9"> Optional read-only disk capabilities: add --mount                              </text>
+<text x="32.4" y="593.0" xml:space="preserve" fill="#c9d1d9"> No evidence yet? A safe synthetic sample ships in the repo: sentinel onboard   </text>
 <text x="706.8" y="593.0" xml:space="preserve" fill="#4ade80">│</text>
 <text x="24.0" y="614.0" xml:space="preserve" fill="#4ade80">│</text>
-<text x="32.4" y="614.0" xml:space="preserve" fill="#c9d1d9"> Machine-readable, noninteractive preview: add --json                           </text>
+<text x="32.4" y="614.0" xml:space="preserve" fill="#c9d1d9"> docker/fixtures                                                                </text>
 <text x="706.8" y="614.0" xml:space="preserve" fill="#4ade80">│</text>
 <text x="24.0" y="635.0" xml:space="preserve" fill="#4ade80">│</text>
-<text x="32.4" y="635.0" xml:space="preserve" fill="#c9d1d9"> Optional paid Luna connectivity canary (no evidence; not proof): sentinel      </text>
+<text x="32.4" y="635.0" xml:space="preserve" fill="#c9d1d9"> Real practice case (public DFIR Madness 001): download from the official page, </text>
 <text x="706.8" y="635.0" xml:space="preserve" fill="#4ade80">│</text>
 <text x="24.0" y="656.0" xml:space="preserve" fill="#4ade80">│</text>
-<text x="32.4" y="656.0" xml:space="preserve" fill="#c9d1d9"> smoke-openai                                                                   </text>
+<text x="32.4" y="656.0" xml:space="preserve" fill="#c9d1d9"> then onboard the folder — see the README samples section.                      </text>
 <text x="706.8" y="656.0" xml:space="preserve" fill="#4ade80">│</text>
-<text x="24.0" y="677.0" xml:space="preserve" fill="#4ade80">└────────────────────────────────────────────────────────────────────────────────┘</text>
-<text x="24.0" y="698.0" xml:space="preserve" fill="#b48cff" font-weight="bold">┌ 4 · CHOOSE A RUN BUDGET ───────────────────────────────────────────────────────┐</text>
-<text x="24.0" y="719.0" xml:space="preserve" fill="#b48cff">│</text>
-<text x="32.4" y="719.0" xml:space="preserve" fill="#c9d1d9"> CAUTIOUS [SELECTED] · --caps strict · defaults: 20 tools / 100,000 tokens / 10 </text>
-<text x="706.8" y="719.0" xml:space="preserve" fill="#b48cff">│</text>
-<text x="24.0" y="740.0" xml:space="preserve" fill="#b48cff">│</text>
-<text x="32.4" y="740.0" xml:space="preserve" fill="#c9d1d9"> min / $2.50                                                                    </text>
-<text x="706.8" y="740.0" xml:space="preserve" fill="#b48cff">│</text>
-<text x="24.0" y="761.0" xml:space="preserve" fill="#b48cff">│</text>
-<text x="32.4" y="761.0" xml:space="preserve" fill="#c9d1d9"> FLAGSHIP  · --caps default · defaults: 60 tools / 400,000 tokens / 30 min /    </text>
-<text x="706.8" y="761.0" xml:space="preserve" fill="#b48cff">│</text>
-<text x="24.0" y="782.0" xml:space="preserve" fill="#b48cff">│</text>
-<text x="32.4" y="782.0" xml:space="preserve" fill="#c9d1d9"> $10.00                                                                         </text>
-<text x="706.8" y="782.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="24.0" y="677.0" xml:space="preserve" fill="#4ade80">│</text>
+<text x="32.4" y="677.0" xml:space="preserve" fill="#c9d1d9"> Optional read-only disk capabilities: add --mount                              </text>
+<text x="706.8" y="677.0" xml:space="preserve" fill="#4ade80">│</text>
+<text x="24.0" y="698.0" xml:space="preserve" fill="#4ade80">│</text>
+<text x="32.4" y="698.0" xml:space="preserve" fill="#c9d1d9"> Machine-readable, noninteractive preview: add --json                           </text>
+<text x="706.8" y="698.0" xml:space="preserve" fill="#4ade80">│</text>
+<text x="24.0" y="719.0" xml:space="preserve" fill="#4ade80">│</text>
+<text x="32.4" y="719.0" xml:space="preserve" fill="#c9d1d9"> Optional paid Luna connectivity canary (no evidence; not proof): sentinel      </text>
+<text x="706.8" y="719.0" xml:space="preserve" fill="#4ade80">│</text>
+<text x="24.0" y="740.0" xml:space="preserve" fill="#4ade80">│</text>
+<text x="32.4" y="740.0" xml:space="preserve" fill="#c9d1d9"> smoke-openai                                                                   </text>
+<text x="706.8" y="740.0" xml:space="preserve" fill="#4ade80">│</text>
+<text x="24.0" y="761.0" xml:space="preserve" fill="#4ade80">└────────────────────────────────────────────────────────────────────────────────┘</text>
+<text x="24.0" y="782.0" xml:space="preserve" fill="#b48cff" font-weight="bold">┌ 4 · CHOOSE ANALYSIS DEPTH — HEAVY OR LIGHT ────────────────────────────────────┐</text>
 <text x="24.0" y="803.0" xml:space="preserve" fill="#b48cff">│</text>
-<text x="32.4" y="803.0" xml:space="preserve" fill="#c9d1d9"> Selected effective ceilings: 20 tools / 100,000 tokens / 10 min / $2.50        </text>
+<text x="32.4" y="803.0" xml:space="preserve" fill="#c9d1d9"> 1) HEAVY — FLAGSHIP  · --caps default · deepest bounded investigation          </text>
 <text x="706.8" y="803.0" xml:space="preserve" fill="#b48cff">│</text>
 <text x="24.0" y="824.0" xml:space="preserve" fill="#b48cff">│</text>
-<text x="32.4" y="824.0" xml:space="preserve" fill="#c9d1d9"> Both use GPT-5.6 Sol. These are stop ceilings, not price quotes, depth modes,  </text>
+<text x="32.4" y="824.0" xml:space="preserve" fill="#c9d1d9"> ceilings: 60 tools / 400,000 tokens / 30 min / $10.00 estimated cost           </text>
 <text x="706.8" y="824.0" xml:space="preserve" fill="#b48cff">│</text>
 <text x="24.0" y="845.0" xml:space="preserve" fill="#b48cff">│</text>
-<text x="32.4" y="845.0" xml:space="preserve" fill="#c9d1d9"> or promises of result quality. Environment overrides may change effective      </text>
+<text x="32.4" y="845.0" xml:space="preserve" fill="#c9d1d9"> 2) LIGHT — CAUTIOUS [SELECTED] · --caps strict · same investigator, tighter    </text>
 <text x="706.8" y="845.0" xml:space="preserve" fill="#b48cff">│</text>
 <text x="24.0" y="866.0" xml:space="preserve" fill="#b48cff">│</text>
-<text x="32.4" y="866.0" xml:space="preserve" fill="#c9d1d9"> ceilings.                                                                      </text>
+<text x="32.4" y="866.0" xml:space="preserve" fill="#c9d1d9"> stop ceilings                                                                  </text>
 <text x="706.8" y="866.0" xml:space="preserve" fill="#b48cff">│</text>
-<text x="24.0" y="887.0" xml:space="preserve" fill="#b48cff">└────────────────────────────────────────────────────────────────────────────────┘</text>
-<text x="24.0" y="908.0" xml:space="preserve" fill="#fbbf24" font-weight="bold">┌ CLOUD + COST BOUNDARY ─────────────────────────────────────────────────────────┐</text>
-<text x="24.0" y="929.0" xml:space="preserve" fill="#fbbf24">│</text>
-<text x="32.4" y="929.0" xml:space="preserve" fill="#c9d1d9"> THIS STEP: local profile + custody only · OpenAI calls 0 · paid run not        </text>
-<text x="706.8" y="929.0" xml:space="preserve" fill="#fbbf24">│</text>
-<text x="24.0" y="950.0" xml:space="preserve" fill="#fbbf24">│</text>
-<text x="32.4" y="950.0" xml:space="preserve" fill="#c9d1d9"> started                                                                        </text>
-<text x="706.8" y="950.0" xml:space="preserve" fill="#fbbf24">│</text>
-<text x="24.0" y="971.0" xml:space="preserve" fill="#fbbf24">│</text>
-<text x="32.4" y="971.0" xml:space="preserve" fill="#c9d1d9"> IF YOU LAUNCH: OpenAI receives the bounded public profile and bounded typed-   </text>
-<text x="706.8" y="971.0" xml:space="preserve" fill="#fbbf24">│</text>
-<text x="24.0" y="992.0" xml:space="preserve" fill="#fbbf24">│</text>
-<text x="32.4" y="992.0" xml:space="preserve" fill="#c9d1d9"> tool observations; original evidence bytes and runner-local paths stay local.  </text>
-<text x="706.8" y="992.0" xml:space="preserve" fill="#fbbf24">│</text>
-<text x="24.0" y="1013.0" xml:space="preserve" fill="#fbbf24">│</text>
-<text x="32.4" y="1013.0" xml:space="preserve" fill="#c9d1d9"> STRICT HARD CEILINGS (not a price quote): 20 forensic calls · 100,000 tokens · </text>
-<text x="706.8" y="1013.0" xml:space="preserve" fill="#fbbf24">│</text>
-<text x="24.0" y="1034.0" xml:space="preserve" fill="#fbbf24">│</text>
-<text x="32.4" y="1034.0" xml:space="preserve" fill="#c9d1d9"> 10 min · $2.50 estimated cost                                                  </text>
-<text x="706.8" y="1034.0" xml:space="preserve" fill="#fbbf24">│</text>
-<text x="24.0" y="1055.0" xml:space="preserve" fill="#fbbf24">│</text>
-<text x="32.4" y="1055.0" xml:space="preserve" fill="#c9d1d9"> Every mount attempt is read-only. Without --mount, disks remain raw-only.      </text>
-<text x="706.8" y="1055.0" xml:space="preserve" fill="#fbbf24">│</text>
-<text x="24.0" y="1076.0" xml:space="preserve" fill="#fbbf24">└────────────────────────────────────────────────────────────────────────────────┘</text>
+<text x="24.0" y="887.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="32.4" y="887.0" xml:space="preserve" fill="#c9d1d9"> ceilings: 20 tools / 100,000 tokens / 10 min / $2.50 estimated cost            </text>
+<text x="706.8" y="887.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="24.0" y="908.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="32.4" y="908.0" xml:space="preserve" fill="#c9d1d9"> Selected effective ceilings: 20 tools / 100,000 tokens / 10 min / $2.50        </text>
+<text x="706.8" y="908.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="24.0" y="929.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="32.4" y="929.0" xml:space="preserve" fill="#c9d1d9"> Both depths run the same GPT-5.6 Sol investigator. These are hard stop         </text>
+<text x="706.8" y="929.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="24.0" y="950.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="32.4" y="950.0" xml:space="preserve" fill="#c9d1d9"> ceilings, not price quotes, reasoning modes, or promises of result quality.    </text>
+<text x="706.8" y="950.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="24.0" y="971.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="32.4" y="971.0" xml:space="preserve" fill="#c9d1d9"> Environment overrides may change effective ceilings.                           </text>
+<text x="706.8" y="971.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="24.0" y="992.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="32.4" y="992.0" xml:space="preserve" fill="#c9d1d9"> Model invocations per completed case: 4 fixed (opening book, findings          </text>
+<text x="706.8" y="992.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="24.0" y="1013.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="32.4" y="1013.0" xml:space="preserve" fill="#c9d1d9"> serialization, fresh review, report draft) + one per adaptive action — every   </text>
+<text x="706.8" y="1013.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="24.0" y="1034.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="32.4" y="1034.0" xml:space="preserve" fill="#c9d1d9"> one inside the ceilings above.                                                 </text>
+<text x="706.8" y="1034.0" xml:space="preserve" fill="#b48cff">│</text>
+<text x="24.0" y="1055.0" xml:space="preserve" fill="#b48cff">└────────────────────────────────────────────────────────────────────────────────┘</text>
+<text x="24.0" y="1076.0" xml:space="preserve" fill="#fbbf24" font-weight="bold">┌ CLOUD + COST BOUNDARY ─────────────────────────────────────────────────────────┐</text>
+<text x="24.0" y="1097.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="1097.0" xml:space="preserve" fill="#c9d1d9"> THIS STEP: local profile + custody only · OpenAI calls 0 · paid run not        </text>
+<text x="706.8" y="1097.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="1118.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="1118.0" xml:space="preserve" fill="#c9d1d9"> started                                                                        </text>
+<text x="706.8" y="1118.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="1139.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="1139.0" xml:space="preserve" fill="#c9d1d9"> IF YOU LAUNCH: OpenAI receives the bounded public profile and bounded typed-   </text>
+<text x="706.8" y="1139.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="1160.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="1160.0" xml:space="preserve" fill="#c9d1d9"> tool observations; original evidence bytes and runner-local paths stay local.  </text>
+<text x="706.8" y="1160.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="1181.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="1181.0" xml:space="preserve" fill="#c9d1d9"> STRICT HARD CEILINGS (not a price quote): 20 forensic calls · 100,000 tokens · </text>
+<text x="706.8" y="1181.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="1202.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="1202.0" xml:space="preserve" fill="#c9d1d9"> 10 min · $2.50 estimated cost                                                  </text>
+<text x="706.8" y="1202.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="1223.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="32.4" y="1223.0" xml:space="preserve" fill="#c9d1d9"> Every mount attempt is read-only. Without --mount, disks remain raw-only.      </text>
+<text x="706.8" y="1223.0" xml:space="preserve" fill="#fbbf24">│</text>
+<text x="24.0" y="1244.0" xml:space="preserve" fill="#fbbf24">└────────────────────────────────────────────────────────────────────────────────┘</text>
 </svg>

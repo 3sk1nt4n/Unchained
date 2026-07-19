@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import os
+import shutil
 import textwrap
 from dataclasses import asdict, dataclass
+from pathlib import Path
 from typing import TextIO, cast
 
 from .caps import CapConfig
@@ -251,17 +253,30 @@ def _guardrail_lines(caps_profile: str, caps: CapConfig) -> list[str]:
 def _budget_choice_lines(selected: str, effective: CapConfig) -> list[str]:
     strict = _preset_caps("strict")
     flagship = _preset_caps("default")
+
+    def marker(profile: str) -> str:
+        return "[SELECTED]" if selected == profile else ""
+
     return [
         (
-            f"CAUTIOUS {'[SELECTED]' if selected == 'strict' else ''} · --caps strict · "
-            f"defaults: {strict.max_tool_calls} tools / {strict.max_total_tokens:,} tokens / "
-            f"{strict.max_wall_seconds / 60:g} min / ${strict.max_cost_usd:.2f}"
+            f"1) HEAVY — FLAGSHIP {marker('default')} · --caps default · "
+            "deepest bounded investigation"
         ),
         (
-            f"FLAGSHIP {'[SELECTED]' if selected == 'default' else ''} · --caps default · "
-            f"defaults: {flagship.max_tool_calls} tools / "
+            f"ceilings: {flagship.max_tool_calls} tools / "
             f"{flagship.max_total_tokens:,} tokens / "
-            f"{flagship.max_wall_seconds / 60:g} min / ${flagship.max_cost_usd:.2f}"
+            f"{flagship.max_wall_seconds / 60:g} min / ${flagship.max_cost_usd:.2f} "
+            "estimated cost"
+        ),
+        (
+            f"2) LIGHT — CAUTIOUS {marker('strict')} · --caps strict · "
+            "same investigator, tighter stop ceilings"
+        ),
+        (
+            f"ceilings: {strict.max_tool_calls} tools / "
+            f"{strict.max_total_tokens:,} tokens / "
+            f"{strict.max_wall_seconds / 60:g} min / ${strict.max_cost_usd:.2f} "
+            "estimated cost"
         ),
         (
             f"Selected effective ceilings: {effective.max_tool_calls} tools / "
@@ -269,8 +284,14 @@ def _budget_choice_lines(selected: str, effective: CapConfig) -> list[str]:
             f"{effective.max_wall_seconds / 60:g} min / ${effective.max_cost_usd:.2f}"
         ),
         (
-            "Both use GPT-5.6 Sol. These are stop ceilings, not price quotes, depth modes, "
-            "or promises of result quality. Environment overrides may change effective ceilings."
+            "Both depths run the same GPT-5.6 Sol investigator. These are hard stop "
+            "ceilings, not price quotes, reasoning modes, or promises of result quality. "
+            "Environment overrides may change effective ceilings."
+        ),
+        (
+            "Model invocations per completed case: 4 fixed (opening book, findings "
+            "serialization, fresh review, report draft) + one per adaptive action — "
+            "every one inside the ceilings above."
         ),
     ]
 
@@ -441,6 +462,14 @@ def render_welcome(
         "3 · START HERE",
         [
             "sentinel onboard <one-case-evidence-folder>",
+            (
+                "No evidence yet? A safe synthetic sample ships in the repo: "
+                "sentinel onboard docker/fixtures"
+            ),
+            (
+                "Real practice case (public DFIR Madness 001): download from the "
+                "official page, then onboard the folder — see the README samples section."
+            ),
             "Optional read-only disk capabilities: add --mount",
             "Machine-readable, noninteractive preview: add --json",
             (
@@ -453,7 +482,7 @@ def render_welcome(
         accent=_GREEN,
     )
     _boxed(
-        "4 · CHOOSE A RUN BUDGET",
+        "4 · CHOOSE ANALYSIS DEPTH — HEAVY OR LIGHT",
         _budget_choice_lines(caps_profile, caps),
         stream=stream,
         color=color,
@@ -484,6 +513,29 @@ def render_profile(
 
     stream = _encoding_safe_stream(stream)
     color = _supports_color(stream, no_color=no_color)
+    try:
+        free_gb = shutil.disk_usage(Path.cwd()).free / 1024**3
+        runs_root = Path.cwd() / "unchained-runs"
+        retained = sum(1 for p in runs_root.iterdir() if p.is_dir()) if runs_root.is_dir() else 0
+        preflight = f"{free_gb:.1f} GB free · {retained} retained run bundle(s)"
+        healthy = free_gb >= 5.0
+    except OSError:
+        preflight = "storage facts unavailable"
+        healthy = True
+    print(
+        _paint("◆ STORAGE PREFLIGHT ", _BLUE + _BOLD, color)
+        + _paint(preflight, _WHITE if healthy else _AMBER, color),
+        file=stream,
+    )
+    if not healthy:
+        print(
+            _paint(
+                "  ! Low free space for multi-GiB evidence and retained tool output.",
+                _AMBER,
+                color,
+            ),
+            file=stream,
+        )
     print(
         _paint(
             "◆ PROFILE COMPLETE — deterministic, local, zero OpenAI calls",
@@ -493,6 +545,15 @@ def render_profile(
         file=stream,
     )
     print(file=stream)
+    print(
+        _paint(
+            "◆ Looking at what you gave me — classified by bounded content probes, "
+            "never by file name:",
+            _VIOLET + _BOLD,
+            color,
+        ),
+        file=stream,
+    )
     for item in profile.items:
         state = _safe_health(item)
         ready = item.kind != "unknown" and item.available
@@ -544,7 +605,7 @@ def render_profile(
             accent=_RED,
         )
     _boxed(
-        "CHOOSE A RUN BUDGET",
+        "CHOOSE ANALYSIS DEPTH — HEAVY OR LIGHT",
         _budget_choice_lines(caps_profile, caps),
         stream=stream,
         color=color,

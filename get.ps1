@@ -89,13 +89,38 @@ else {
     Write-Host "      Skipped. Everything below stays local and free." -ForegroundColor Green
 }
 
-# 4/4 - guided onboarding
-Write-Step "4/4" "Opening the guided onboarding (zero-key, zero-spend welcome)"
+# 4/5 - ready-made samples
+Write-Step "4/5" "Ready-made samples"
 $sentinel = Join-Path $env:LOCALAPPDATA "venvs\sentinel-unchained-py311\Scripts\sentinel.exe"
+Write-Host "      A safe synthetic sample ships in the repo - no download, no key, no spend." -ForegroundColor Gray
+$trySample = Read-Host "      Profile the built-in sample now? (Y/n)"
+if ($trySample -notmatch '^[nN]') {
+    & $sentinel onboard (Join-Path $repo "docker\fixtures")
+}
+Write-Host ""
+Write-Host "      Real practice case: DFIR Madness 001 'The Stolen Szechuan Sauce'" -ForegroundColor Gray
+Write-Host "      (public Windows memory + disk images; download it yourself from the" -ForegroundColor Gray
+Write-Host "      official page - Unchained never fetches evidence for you):" -ForegroundColor Gray
+Write-Host "        https://dfirmadness.com/the-stolen-szechuan-sauce/" -ForegroundColor White
+Write-Host "      Publisher's MD5 checksums for the core files (verify your download;" -ForegroundColor Gray
+Write-Host "      Unchained then takes SHA-256 custody itself during onboarding):" -ForegroundColor Gray
+Write-Host "        DC01-memory.zip  64A4E2CB47138084A5C2878066B2D7B1" -ForegroundColor DarkGray
+Write-Host "        DC01-E01.zip     E57FC636E833C5F1AB58DFACE873BBDE" -ForegroundColor DarkGray
+$evidenceDir = Join-Path $env:USERPROFILE "Evidence\dc01"
+Write-Host "      Suggested extract location: $evidenceDir" -ForegroundColor Gray
+$openCase = Read-Host "      Open the official case page in your browser now? (y/N)"
+if ($openCase -match '^[yY]') {
+    New-Item -ItemType Directory -Force $evidenceDir | Out-Null
+    Start-Process "https://dfirmadness.com/the-stolen-szechuan-sauce/"
+}
+
+# 5/5 - guided onboarding
+Write-Step "5/5" "Opening the guided onboarding (zero-key, zero-spend welcome)"
 & $sentinel onboard
 Write-Host ""
 Write-Host "Next moves:" -ForegroundColor Cyan
 Write-Host "  sentinel onboard <one-case-evidence-folder>          local case card, `$0" -ForegroundColor White
+Write-Host "  sentinel onboard $evidenceDir       the public practice case" -ForegroundColor White
 Write-Host "  sentinel smoke-openai                                cheap Luna canary" -ForegroundColor White
-Write-Host "  sentinel onboard <evidence> --launch --caps strict   CAUTIOUS ceilings" -ForegroundColor White
-Write-Host "  sentinel onboard <evidence> --launch --caps default  FLAGSHIP ceilings" -ForegroundColor White
+Write-Host "  sentinel onboard <evidence> --launch --caps strict   LIGHT - CAUTIOUS ceilings" -ForegroundColor White
+Write-Host "  sentinel onboard <evidence> --launch --caps default  HEAVY - FLAGSHIP ceilings" -ForegroundColor White
