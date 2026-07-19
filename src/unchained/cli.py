@@ -724,6 +724,14 @@ class _AuditNarrator:
                     f"opening book: {selected} selected · {executed} executed · "
                     f"{rejected} rejected — all-or-none validated"
                 )
+            elif event_type == "investigator.notes.updated" and isinstance(payload, dict):
+                turn = payload.get("turn")
+                update = str(payload.get("case_ledger_update", "")).strip().replace("\n", " ")
+                if update:
+                    self._console.detail(f"turn {turn} reasoning: {update[:120]}")
+            elif event_type == "investigator.action" and isinstance(payload, dict):
+                turn = payload.get("turn")
+                self._console.step(f"turn {turn}: one typed action", elapsed=_elapsed())
             elif event_type == "investigator.finished" and isinstance(payload, dict):
                 findings = [f for f in payload.get("findings") or [] if isinstance(f, dict)]
                 self._proposed = {str(f.get("finding_id")): f for f in findings}
