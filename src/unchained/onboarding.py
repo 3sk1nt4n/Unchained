@@ -600,14 +600,28 @@ def render_profile(
         color=color,
         accent=_GREEN if assessment.profile_ready else _AMBER,
     )
-    if assessment.blockers:
-        _boxed(
-            "FIX BEFORE LAUNCH",
-            [f"{index}. {blocker}" for index, blocker in enumerate(assessment.blockers, 1)],
-            stream=stream,
-            color=color,
-            accent=_RED,
+    # Not launch-ready: show the blockers and one short next line, nothing else.
+    if not assessment.profile_ready:
+        if assessment.blockers:
+            _boxed(
+                "FIX BEFORE LAUNCH",
+                [f"{index}. {blocker}" for index, blocker in enumerate(assessment.blockers, 1)],
+                stream=stream,
+                color=color,
+                accent=_RED,
+            )
+        print(
+            _paint(
+                "◆ Resolve the blocker(s) above, then profile again. "
+                "No paid Sol launch is offered.",
+                _AMBER + _BOLD,
+                color,
+            ),
+            file=stream,
         )
+        return
+
+    # Launch-ready: the depth pick plus three compact honest lines.
     _boxed(
         "CHOOSE ANALYSIS DEPTH — HEAVY OR LIGHT",
         _budget_choice_lines(caps_profile, caps),
@@ -615,31 +629,30 @@ def render_profile(
         color=color,
         accent=_VIOLET,
     )
-    _boxed(
-        "CLOUD + COST BOUNDARY",
-        _guardrail_lines(caps_profile, caps),
-        stream=stream,
-        color=color,
-        accent=_AMBER,
-    )
-    next_lines = [
-        "1. Check live dependencies and key presence: sentinel doctor",
-        "2. Optional paid Luna canary (no evidence; not proof): sentinel smoke-openai",
-        "3. Optional technical record: sentinel profile <same-evidence> --json",
-    ]
-    if assessment.profile_ready:
-        next_lines.append(
-            "4. Explicit paid Sol launch: sentinel onboard <same-evidence> "
-            f"--launch --caps {caps_profile}"
-        )
-        next_lines.append("   You will still have to type an exact confirmation phrase.")
-    else:
-        next_lines.append(
-            "4. Resolve the case-card blockers, then profile again. No paid Sol launch is offered."
-        )
-    _boxed("NEXT — NO GUESSWORK", next_lines, stream=stream, color=color, accent=_BLUE)
     print(
-        "Local profile and custody are complete. Live model readiness is not asserted "
-        "until sentinel doctor passes.",
+        _paint(
+            "◆ THIS STEP: local profile + custody only · OpenAI calls 0 · paid run not started",
+            _GREEN + _BOLD,
+            color,
+        ),
+        file=stream,
+    )
+    print(
+        _paint(
+            f"◆ HARD CEILINGS (not a price quote): {caps.max_tool_calls} calls · "
+            f"{caps.max_total_tokens:,} tokens · {caps.max_wall_seconds / 60:g} min · "
+            f"${caps.max_cost_usd:.2f}",
+            _AMBER,
+            color,
+        ),
+        file=stream,
+    )
+    print(
+        _paint(
+            f"◆ LAUNCH: sentinel onboard <same-evidence> --launch --caps {caps_profile}  "
+            "→ then type the exact confirmation phrase LAUNCH GPT-5.6 SOL",
+            _CYAN + _BOLD,
+            color,
+        ),
         file=stream,
     )

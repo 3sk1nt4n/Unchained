@@ -576,14 +576,14 @@ def _onboard(
         return EXIT_COMPLETE
 
     if not json_output:
-        render_welcome(
-            caps_profile=caps_profile,
-            caps=caps,
-            stream=sys.stdout,
-            no_color=no_color,
-        )
-        print()
-        print("* Looking at the supplied case with bounded local probes...", flush=True)
+        # A specific case skips the teaching welcome (that's for bare `onboard`).
+        # One compact line, then straight to the verified card.
+        console = Console(sys.stdout)
+        if console.enabled:
+            console.banner("U N C H A I N E D", "One case, profiled locally before any model call.")
+            console.step("bounded local probes · SHA-256 custody · zero OpenAI calls")
+        else:
+            print("UNCHAINED — profiling one case locally (zero OpenAI calls)...", flush=True)
 
     session = EvidenceSession(evidence, mount=mount, case_card_stream=None)
     with session:

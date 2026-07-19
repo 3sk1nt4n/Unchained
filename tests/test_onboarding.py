@@ -212,8 +212,9 @@ def test_human_case_card_is_junior_friendly_and_does_not_echo_child_paths(
     assert main(["onboard", "operator-case"]) == EXIT_COMPLETE
 
     output = capsys.readouterr().out
+    # A specific case skips the teaching welcome and goes straight to the card.
     assert "UNCHAINED" in output
-    assert "Point me at one case" in output
+    assert "Point me at one case" not in output
     assert "PROFILE COMPLETE" in output
     assert "VERIFIED CASE CARD" in output
     assert "PROFILE READY" in output
@@ -225,8 +226,7 @@ def test_human_case_card_is_junior_friendly_and_does_not_echo_child_paths(
     assert "CAUTIOUS [SELECTED]" in output
     assert "FLAGSHIP" in output
     assert "promises of result quality" in output
-    assert "Archives are not unpacked" in output
-    assert "type an exact confirmation phrase" in output
+    assert "LAUNCH GPT-5.6 SOL" in output
     assert "never-print-host" not in output
     assert "C:/private" not in output
     assert "\x1b[" not in output
