@@ -231,11 +231,21 @@ class RunBudget:
         estimated_input_tokens: int,
         preferred_output_tokens: int,
         model_id: str,
+        *,
+        minimum_output_tokens: int = 1,
     ) -> int:
         """Conservatively bound a pending response by remaining tokens and dollars."""
 
         estimated_input_tokens = max(1, estimated_input_tokens)
         preferred_output_tokens = max(1, preferred_output_tokens)
+        if (
+            isinstance(minimum_output_tokens, bool)
+            or not isinstance(minimum_output_tokens, int)
+            or minimum_output_tokens < 1
+        ):
+            raise ValueError("minimum_output_tokens must be a positive integer")
+        if minimum_output_tokens > preferred_output_tokens:
+            raise ValueError("minimum_output_tokens cannot exceed preferred_output_tokens")
         with self._lock:
             self._raise_fired_unlocked()
             elapsed = self._clock() - self._started
@@ -274,7 +284,20 @@ class RunBudget:
                     CapKind.COST_USD,
                     "remaining estimated cost permits no response token",
                 )
-            return min(preferred_output_tokens, remaining_tokens, cost_limited_tokens)
+            allowed = min(preferred_output_tokens, remaining_tokens, cost_limited_tokens)
+            if allowed < minimum_output_tokens:
+                if remaining_tokens < minimum_output_tokens:
+                    self._fire_unlocked(
+                        CapKind.TOTAL_TOKENS,
+                        "conservative request estimate cannot preserve the phase minimum "
+                        f"of {minimum_output_tokens} output tokens",
+                    )
+                self._fire_unlocked(
+                    CapKind.COST_USD,
+                    "remaining estimated cost cannot preserve the phase minimum "
+                    f"of {minimum_output_tokens} output tokens",
+                )
+            return allowed
 
 
 def estimate_usage_cost(

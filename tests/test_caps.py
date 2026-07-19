@@ -170,3 +170,48 @@ def test_cache_accounting_larger_than_input_is_rejected() -> None:
 
     with pytest.raises(ValueError, match="cache read/write tokens"):
         estimate_usage_cost(CapConfig(), usage)
+
+
+def test_request_preflight_fires_token_cap_before_starving_phase_minimum() -> None:
+    budget = RunBudget(config(max_total_tokens=5_000))
+
+    with pytest.raises(CapExceeded) as raised:
+        budget.prepare_model_request(
+            1_500,
+            4_096,
+            "gpt-5.6",
+            minimum_output_tokens=4_096,
+        )
+
+    assert raised.value.kind is CapKind.TOTAL_TOKENS
+    assert "phase minimum of 4096" in raised.value.detail
+    assert_sticky_cap(budget, CapKind.TOTAL_TOKENS)
+
+
+def test_request_preflight_fires_cost_cap_before_starving_phase_minimum() -> None:
+    budget = RunBudget(config(max_cost_usd=0.001))
+
+    with pytest.raises(CapExceeded) as raised:
+        budget.prepare_model_request(
+            100,
+            4_096,
+            "gpt-5.6",
+            minimum_output_tokens=4_096,
+        )
+
+    assert raised.value.kind is CapKind.COST_USD
+    assert "phase minimum of 4096" in raised.value.detail
+    assert_sticky_cap(budget, CapKind.COST_USD)
+
+
+@pytest.mark.parametrize("minimum", [0, True, 1.5, 4_097])
+def test_request_preflight_rejects_invalid_phase_minimum(minimum: object) -> None:
+    budget = RunBudget(config())
+
+    with pytest.raises(ValueError, match="minimum_output_tokens"):
+        budget.prepare_model_request(
+            100,
+            4_096,
+            "gpt-5.6",
+            minimum_output_tokens=minimum,  # type: ignore[arg-type]
+        )

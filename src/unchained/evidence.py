@@ -1589,7 +1589,7 @@ def _terminal_text(value: object) -> str:
 def print_case_card(profile: EvidenceProfile, stream: TextIO = sys.stdout) -> None:
     """Print the human-readable deterministic profile and full custody hashes."""
 
-    print("SENTINEL UNCHAINED - CASE CARD", file=stream)
+    print("UNCHAINED - CASE CARD", file=stream)
     print(f"OS: {profile.os}", file=stream)
     print(f"Shape: {profile.shape}", file=stream)
     print(f"Filesystems: {', '.join(profile.filesystems) or 'none resolved'}", file=stream)

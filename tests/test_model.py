@@ -649,6 +649,7 @@ def test_response_above_requested_output_ceiling_is_audited_then_rejected(
         "model.error",
     ]
     assert entries[1]["payload"]["max_output_tokens"] == 1
+    assert entries[1]["payload"]["minimum_output_tokens"] == 1
     assert entries[2]["payload"]["token_counts"]["output_tokens"] == 40
     assert entries[3]["payload"]["error_type"] == "response_protocol"
 

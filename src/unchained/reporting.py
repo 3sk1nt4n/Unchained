@@ -139,7 +139,7 @@ def render_report_markdown(
     findings = tuple(state.findings)
     verdict_by_id = {verdict.finding_id: verdict for verdict in verdicts}
     lines = [
-        "# Sentinel Unchained DFIR Report - COMPLETE",
+        "# Unchained DFIR Report - COMPLETE",
         "",
         "## Verification scope",
         "",

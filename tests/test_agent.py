@@ -25,6 +25,7 @@ from unchained.audit import AuditLog
 from unchained.caps import CapConfig, CapKind, RunBudget
 from unchained.model import ModelRequest
 from unchained.models import (
+    INVESTIGATION_FINISH_TOOL_NAME,
     EvidenceItem,
     EvidenceProfile,
     FindingStatus,
@@ -136,6 +137,8 @@ class FakeInvestigatorModel:
     always_request_tool: bool = False
     opening_tool_names: tuple[str, ...] = ("windows.pslist",)
     terminal_text: str = "DONE"
+    typed_terminal_status: str = "DONE"
+    typed_terminal_call_id: str | None = None
     done_with_tool: bool = False
     done_with_tool_text: str = "DONE"
     loop_update: str = (
@@ -295,6 +298,22 @@ class FakeInvestigatorModel:
                     ),
                     usage=self.usage,
                 )
+            if self.terminal_text == "DONE":
+                return ModelResponse(
+                    response_id=f"response-{index}",
+                    function_calls=(
+                        FunctionCall(
+                            call_id=(
+                                self.typed_terminal_call_id
+                                if self.typed_terminal_call_id is not None
+                                else f"finish-{index}"
+                            ),
+                            name=INVESTIGATION_FINISH_TOOL_NAME,
+                            arguments={"status": self.typed_terminal_status},
+                        ),
+                    ),
+                    usage=self.usage,
+                )
             return ModelResponse(
                 response_id=f"response-{index}",
                 text=self.terminal_text,
@@ -378,7 +397,9 @@ def test_fresh_judge_downgrades_deliberately_unsupported_finding(tmp_path: Path)
     assert all(request.include == () for request in model.requests)
     loop_request = model.requests[1]
     assert loop_request.parallel_tool_calls is False
-    assert loop_request.tool_choice == "auto"
+    assert loop_request.tool_choice == "required"
+    assert loop_request.minimum_output_tokens == 4_096
+    assert INVESTIGATION_FINISH_TOOL_NAME in tool_names(loop_request)
     assert "submit_investigation" not in tool_names(loop_request)
     loop_instructions = " ".join(loop_request.instructions.split())
     assert "nonempty visible case-ledger update" in loop_instructions
@@ -389,6 +410,9 @@ def test_fresh_judge_downgrades_deliberately_unsupported_finding(tmp_path: Path)
         "name": "submit_investigation",
     }
     assert finalizer_request.reasoning_context == "current_turn"
+    finalizer_instructions = " ".join(finalizer_request.instructions.split())
+    assert "called finish_investigation with status DONE" in finalizer_instructions
+    assert "because you output DONE" not in finalizer_instructions
     assert tool_names(finalizer_request) == {"submit_investigation"}
     opening_packet = json.loads(str(model.requests[0].input_items[0]["content"][0]["text"]))
     judge_packet = json.loads(str(model.requests[3].input_items[0]["content"][0]["text"]))
@@ -411,6 +435,13 @@ def test_fresh_judge_downgrades_deliberately_unsupported_finding(tmp_path: Path)
         12_288,
         8_192,
     ]
+    assert [request.minimum_output_tokens for request in model.requests] == [
+        1,
+        4_096,
+        4_096,
+        4_096,
+        1,
+    ]
 
     entries = AuditLog.verify(audit.path)
     assert [
@@ -422,6 +453,9 @@ def test_fresh_judge_downgrades_deliberately_unsupported_finding(tmp_path: Path)
     assert sum(entry["event_type"] == "tool.started" for entry in entries) == 1
     assert sum(entry["event_type"] == "tool.completed" for entry in entries) == 1
     assert sum(entry["event_type"] == "investigator.done" for entry in entries) == 1
+    done = next(entry for entry in entries if entry["event_type"] == "investigator.done")
+    assert done["payload"]["terminal_protocol"] == "typed-DONE-v2"
+    assert done["payload"]["terminal_action_call_id"] == "finish-2"
     finished = next(entry for entry in entries if entry["event_type"] == "investigator.finished")
     assert finished["payload"]["case_notes"] != "DONE"
     report_completed = next(entry for entry in entries if entry["event_type"] == "report.completed")
@@ -491,7 +525,7 @@ def test_investigate_tool_call_accepts_update_at_exact_utf8_limit(tmp_path: Path
     assert notes["payload"]["case_ledger_update_bytes"] == MAX_CASE_LEDGER_UPDATE_BYTES
 
 
-def test_investigator_must_end_with_literal_done(tmp_path: Path) -> None:
+def test_investigator_rejects_a_turn_without_one_typed_action(tmp_path: Path) -> None:
     model = FakeInvestigatorModel(terminal_text="Investigation complete")
     budget = RunBudget(CapConfig())
     agent, audit = build_agent(tmp_path, model=model, budget=budget)
@@ -503,7 +537,49 @@ def test_investigator_must_end_with_literal_done(tmp_path: Path) -> None:
 
     assert run.status is RunStatus.PARTIAL
     assert run.cap is None
-    assert run.partial_reason == "investigator without a tool call must output exactly DONE"
+    assert run.partial_reason == "investigator must issue exactly one typed action"
+    assert all(request.phase != "investigation-finalize" for request in model.requests)
+
+
+def test_investigator_rejects_noncanonical_typed_done(tmp_path: Path) -> None:
+    model = FakeInvestigatorModel(typed_terminal_status="done")
+    agent, audit = build_agent(tmp_path, model=model, budget=RunBudget(CapConfig()))
+
+    try:
+        run = agent.run(profile(tmp_path))
+    finally:
+        audit.close()
+
+    assert run.status is RunStatus.PARTIAL
+    assert run.partial_reason == "typed terminal action must contain only status DONE"
+    assert all(request.phase != "investigation-finalize" for request in model.requests)
+
+
+@pytest.mark.parametrize(
+    ("call_id", "expected"),
+    [
+        ("", "typed terminal action call_id must be nonempty"),
+        (
+            "opening-tool",
+            "typed terminal action call_id must be distinct from forensic call_ids",
+        ),
+    ],
+)
+def test_investigator_rejects_invalid_typed_terminal_call_id(
+    tmp_path: Path,
+    call_id: str,
+    expected: str,
+) -> None:
+    model = FakeInvestigatorModel(typed_terminal_call_id=call_id)
+    agent, audit = build_agent(tmp_path, model=model, budget=RunBudget(CapConfig()))
+
+    try:
+        run = agent.run(profile(tmp_path))
+    finally:
+        audit.close()
+
+    assert run.status is RunStatus.PARTIAL
+    assert run.partial_reason == expected
     assert all(request.phase != "investigation-finalize" for request in model.requests)
 
 
@@ -521,7 +597,7 @@ def test_investigator_rejects_whitespace_surrounded_done(
         audit.close()
 
     assert run.status is RunStatus.PARTIAL
-    assert run.partial_reason == "investigator without a tool call must output exactly DONE"
+    assert run.partial_reason == "investigator must issue exactly one typed action"
     assert all(request.phase != "investigation-finalize" for request in model.requests)
 
 
@@ -540,7 +616,7 @@ def test_done_like_text_cannot_accompany_a_tool_call(
         audit.close()
 
     assert run.status is RunStatus.PARTIAL
-    assert run.partial_reason == "DONE must be the only output and cannot accompany a tool call"
+    assert run.partial_reason == "raw DONE is not a terminal action under typed-DONE-v2"
     entries = AuditLog.verify(audit.path)
     assert sum(entry["event_type"] == "tool.started" for entry in entries) == 1
     assert all(
@@ -906,9 +982,9 @@ def test_prompt_two_canonical_rules_are_regression_protected() -> None:
     assert "memory is UNAVAILABLE" in normalized
     assert "[t17]" in normalized
     assert "Dead ends are findings too" in normalized
-    assert "four ASCII characters DONE" in normalized
-    assert "no leading or trailing whitespace" in normalized
-    assert "no newline" in normalized
+    assert "strict finish_investigation action" in normalized
+    assert "status exactly DONE" in normalized
+    assert "Do not emit raw DONE text" in normalized
 
 
 def test_agent_opening_book_traverses_parallel_batch_path(tmp_path: Path) -> None:
@@ -1062,3 +1138,30 @@ def test_agent_loop_gracefully_terminates_on_every_cap(
     assert run.cap.kind is cap_kind
     assert "PARTIAL" in run.report_markdown
     assert budget.fired is cap_kind
+
+
+def test_low_remaining_output_budget_stops_by_cap_before_typed_terminal(
+    tmp_path: Path,
+) -> None:
+    # The opening can complete, but the next reasoning phase cannot retain its
+    # deterministic 4,096-token response allocation.
+    budget = RunBudget(
+        CapConfig(
+            max_tool_calls=100,
+            max_total_tokens=4_500,
+            max_wall_seconds=30.0,
+            max_cost_usd=1_000.0,
+        )
+    )
+    model = FakeInvestigatorModel()
+    agent, audit = build_agent(tmp_path, model=model, budget=budget)
+
+    try:
+        run = agent.run(profile(tmp_path))
+    finally:
+        audit.close()
+
+    assert run.status is RunStatus.PARTIAL
+    assert run.cap is not None and run.cap.kind is CapKind.TOTAL_TOKENS
+    entries = AuditLog.verify(audit.path)
+    assert not any(entry["event_type"] == "model.protocol_error" for entry in entries)

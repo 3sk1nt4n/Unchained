@@ -80,7 +80,7 @@ def render_viewer_html(
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src 'none'; font-src 'none'; media-src 'none'; connect-src 'none'; script-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
-  <title>Sentinel Unchained proof — {_escape(run_id)}</title>
+  <title>Unchained proof — {_escape(run_id)}</title>
   <style>
     :root {{ color-scheme: dark; --bg:#07111f; --panel:#0d1b2d; --line:#233852; --ink:#e8f0fb; --muted:#9db0c8; --cyan:#56d7e8; --green:#55d692; --amber:#f2be63; --red:#ff7b84; }}
     * {{ box-sizing:border-box; }}
@@ -110,7 +110,7 @@ def render_viewer_html(
 <body>
 <main>
   <header>
-    <div><div class="eyebrow">Recorded local proof bundle · verify before trust</div><h1>Sentinel Unchained</h1><p><code>{_escape(run_id)}</code></p></div>
+    <div><div class="eyebrow">Recorded local proof bundle · verify before trust</div><h1>Unchained</h1><p><code>{_escape(run_id)}</code></p></div>
     <div class="badge {status_class}">RECORDED {_escape(status)}</div>
   </header>
   <section class="grid" aria-label="Run overview">

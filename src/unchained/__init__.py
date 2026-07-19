@@ -1,4 +1,4 @@
-"""Sentinel Unchained: a model-driven DFIR investigator with a deterministic floor."""
+"""Unchained: a model-driven DFIR investigator with a deterministic floor."""
 
 from .models import RunStatus
 

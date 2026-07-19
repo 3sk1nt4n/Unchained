@@ -27,6 +27,7 @@ class ModelRequest:
     tool_choice: str | dict[str, JsonValue] | None = None
     previous_response_id: str | None = None
     max_output_tokens: int = 16_384
+    minimum_output_tokens: int = 1
     timeout_seconds: float | None = None
     store: bool = False
     include: tuple[str, ...] = ()
@@ -287,6 +288,7 @@ class AuditedModel:
             estimated_input_tokens,
             request.max_output_tokens,
             self.model_id,
+            minimum_output_tokens=request.minimum_output_tokens,
         )
         remaining_wall = self.budget.remaining_wall_seconds()
         bounded = replace(
@@ -309,6 +311,7 @@ class AuditedModel:
                 "parallel_tool_calls": bounded.parallel_tool_calls,
                 "tool_choice": bounded.tool_choice,
                 "max_output_tokens": bounded.max_output_tokens,
+                "minimum_output_tokens": bounded.minimum_output_tokens,
                 "estimated_input_tokens": estimated_input_tokens,
                 "timeout_seconds": bounded.timeout_seconds,
                 "store": bounded.store,

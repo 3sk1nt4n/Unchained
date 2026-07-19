@@ -1,4 +1,4 @@
-"""Command-line lifecycle for one isolated Sentinel Unchained run."""
+"""Command-line lifecycle for one isolated Unchained run."""
 
 from __future__ import annotations
 
@@ -36,6 +36,13 @@ from .model import (
     openai_api_key_status,
 )
 from .models import EvidenceProfile, RunStatus
+from .onboarding import (
+    assess_profile,
+    profile_payload,
+    render_profile,
+    render_welcome,
+    welcome_payload,
+)
 from .tools import ToolRegistry
 from .viewer import render_viewer_html
 
@@ -75,8 +82,47 @@ def build_root_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "command",
         nargs="?",
-        choices=("doctor", "profile", "smoke-openai", "run", "verify", "view"),
+        choices=("onboard", "doctor", "profile", "smoke-openai", "run", "verify", "view"),
         help="lifecycle command; run 'sentinel <command> --help' for details",
+    )
+    return parser
+
+
+def build_onboard_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="sentinel onboard",
+        description=(
+            "Walk through one case, profile it locally, and require an exact confirmation "
+            "before any paid GPT-5.6 Sol run."
+        ),
+    )
+    parser.add_argument(
+        "evidence",
+        nargs="?",
+        type=Path,
+        help="one case's evidence file or folder; omit it for the welcome walkthrough",
+    )
+    parser.add_argument(
+        "--mount",
+        action="store_true",
+        help="attempt a read-only disk mount during the local profile",
+    )
+    parser.add_argument(
+        "--caps",
+        choices=("default", "strict"),
+        default="strict",
+        help="hard ceilings shown now and applied if launch is explicitly confirmed",
+    )
+    parser.add_argument(
+        "--launch",
+        action="store_true",
+        help="after a ready profile, offer an interactive paid-run confirmation gate",
+    )
+    parser.add_argument("--json", action="store_true", dest="json_output")
+    parser.add_argument(
+        "--no-color",
+        action="store_true",
+        help="disable ANSI color; NO_COLOR is also honored",
     )
     return parser
 
@@ -86,7 +132,7 @@ def build_verify_parser() -> argparse.ArgumentParser:
 
     parser = argparse.ArgumentParser(
         prog="sentinel verify",
-        description="Verify a retained Sentinel Unchained proof bundle without rebuilding it.",
+        description="Verify a retained Unchained proof bundle without rebuilding it.",
     )
     parser.add_argument("run_directory", type=Path, help="completed proof-bundle directory")
     parser.add_argument("--json", action="store_true", dest="json_output")
@@ -193,7 +239,7 @@ def _smoke_openai(*, model_id: str, json_output: bool) -> int:
     tool = {
         "type": "function",
         "name": "sentinel_smoke_ok",
-        "description": "Confirm the bounded Sentinel OpenAI protocol canary.",
+        "description": "Confirm the bounded Unchained OpenAI protocol canary.",
         "strict": True,
         "parameters": {
             "type": "object",
@@ -318,6 +364,135 @@ def _profile(evidence: Path, *, mount: bool, json_output: bool) -> int:
     return EXIT_COMPLETE
 
 
+def _interactive_terminal() -> bool:
+    """Return whether an operator can see and answer the paid-launch gate."""
+
+    stdin_isatty = getattr(sys.stdin, "isatty", None)
+    stdout_isatty = getattr(sys.stdout, "isatty", None)
+    return bool(
+        callable(stdin_isatty) and stdin_isatty() and callable(stdout_isatty) and stdout_isatty()
+    )
+
+
+def _confirm_paid_sol_launch(caps_profile: str, caps: CapConfig) -> bool:
+    """Require a high-friction, exact phrase before crossing the cloud boundary."""
+
+    print()
+    print("+-- EXPLICIT PAID CLOUD LAUNCH --------------------------------------------+")
+    print("| GPT-5.6 Sol may receive the bounded profile and typed-tool observations. |")
+    print("| Original evidence bytes stay local. This is no longer the $0 preview.   |")
+    print(
+        f"| {caps_profile.upper()} hard ceiling: ${caps.max_cost_usd:.2f} estimated cost; "
+        f"{caps.max_total_tokens:,} tokens.{' ' * 11}|"
+    )
+    print("+--------------------------------------------------------------------------+")
+    try:
+        answer = input("Type exactly LAUNCH GPT-5.6 SOL (anything else cancels): ")
+    except EOFError:
+        return False
+    return answer == "LAUNCH GPT-5.6 SOL"
+
+
+def _onboard(
+    evidence: Path | None,
+    *,
+    mount: bool,
+    caps_profile: str,
+    launch: bool,
+    json_output: bool,
+    no_color: bool,
+) -> int:
+    """Run the local profile-first onboarding and optional explicit launch gate."""
+
+    caps = CapConfig.from_env(caps_profile)
+    if launch and evidence is None:
+        raise ValueError("--launch requires one evidence file or folder")
+    if launch and json_output:
+        raise ValueError("--launch cannot be combined with --json")
+    if launch and not _interactive_terminal():
+        raise ValueError(
+            "--launch requires an interactive terminal; use 'sentinel run' only when "
+            "automation has separately authorized a paid run"
+        )
+
+    if evidence is None:
+        if json_output:
+            print(json.dumps(welcome_payload(caps_profile, caps), indent=2, sort_keys=True))
+        else:
+            render_welcome(
+                caps_profile=caps_profile,
+                caps=caps,
+                stream=sys.stdout,
+                no_color=no_color,
+            )
+        return EXIT_COMPLETE
+
+    if not json_output:
+        render_welcome(
+            caps_profile=caps_profile,
+            caps=caps,
+            stream=sys.stdout,
+            no_color=no_color,
+        )
+        print()
+        print("* Looking at the supplied case with bounded local probes...", flush=True)
+
+    session = EvidenceSession(evidence, mount=mount, case_card_stream=None)
+    with session:
+        profile = session.profile()
+        final_hashes = session.verify_custody()
+    mount_released = session.close()
+    if not mount_released:
+        raise CustodyError("read-only mount release could not be positively verified")
+    if final_hashes != profile.hashes:
+        raise CustodyError("profile custody receipts changed namespace or content")
+    assessment = assess_profile(profile)
+
+    if json_output:
+        print(
+            json.dumps(
+                profile_payload(
+                    profile,
+                    assessment,
+                    caps_profile=caps_profile,
+                    caps=caps,
+                    custody_match=True,
+                    mount_requested=mount,
+                    mount_released=mount_released,
+                ),
+                indent=2,
+                sort_keys=True,
+            )
+        )
+    else:
+        render_profile(
+            profile,
+            assessment,
+            caps_profile=caps_profile,
+            caps=caps,
+            custody_match=True,
+            mount_requested=mount,
+            mount_released=mount_released,
+            stream=sys.stdout,
+            no_color=no_color,
+        )
+
+    if not assessment.profile_ready:
+        return EXIT_INVALID
+    if not launch:
+        return EXIT_COMPLETE
+    if not _confirm_paid_sol_launch(caps_profile, caps):
+        print("Launch cancelled. The local profile remains valid; OpenAI calls: 0.")
+        return EXIT_COMPLETE
+    print("Confirmation accepted. Starting the bounded GPT-5.6 Sol lifecycle...")
+    return run_cli(
+        evidence,
+        caps_profile,
+        show_case_card=False,
+        mount_evidence=mount,
+    )
+
+
 def _progress(message: str) -> None:
     print(f"[sentinel] {message}", file=sys.stderr, flush=True)
 
@@ -372,7 +547,7 @@ def _fatal_report(reason: str, profile: EvidenceProfile | None = None) -> str:
         "not established" if profile is None else f"{profile.os} / {profile.shape}"
     )
     safe_reason = defang_untrusted_inline(reason)
-    return f"""# Sentinel Unchained DFIR Report - FATAL
+    return f"""# Unchained DFIR Report - FATAL
 
 The run aborted because a deterministic safety or runtime invariant failed.
 
@@ -389,7 +564,7 @@ evidence custody before relying on any preserved observations.
 
 def _invalid_report(reason: str) -> str:
     safe_reason = defang_untrusted_inline(reason)
-    return f"""# Sentinel Unchained DFIR Report - INVALID
+    return f"""# Unchained DFIR Report - INVALID
 
 The input or configuration did not pass preflight: {safe_reason}
 
@@ -402,7 +577,7 @@ def _cap_report(error: CapExceeded, profile: EvidenceProfile | None) -> str:
         "not established" if profile is None else f"{profile.os} / {profile.shape}"
     )
     detail = defang_untrusted_inline(error.detail)
-    return f"""# Sentinel Unchained DFIR Report - PARTIAL
+    return f"""# Unchained DFIR Report - PARTIAL
 
 The hard cap `{error.kind.value}` fired and the run stopped gracefully.
 
@@ -460,7 +635,13 @@ def _tool_output_artifacts(
     return [by_path[path] for path in sorted(by_path)]
 
 
-def run_cli(evidence_path: Path, caps_profile: str) -> int:
+def run_cli(
+    evidence_path: Path,
+    caps_profile: str,
+    *,
+    show_case_card: bool = True,
+    mount_evidence: bool = True,
+) -> int:
     """Execute, close, manifest, and immediately verify one isolated run."""
 
     _progress("checking GPT-5.6 configuration before evidence I/O")
@@ -498,7 +679,12 @@ def run_cli(evidence_path: Path, caps_profile: str) -> int:
             budget = RunBudget(cap_config)
             _progress("profiling and hashing the evidence set")
             audit.append("caps.configured", asdict(cap_config))
-            session = EvidenceSession(evidence_path, budget=budget)
+            session = EvidenceSession(
+                evidence_path,
+                budget=budget,
+                mount=mount_evidence,
+                case_card_stream=sys.stdout if show_case_card else None,
+            )
             audit.append("custody.initial.started", {})
             profile = session.profile()
             custody_required = True
@@ -795,6 +981,34 @@ def main(argv: Sequence[str] | None = None) -> int:
                 print(f"Error: {error}", file=sys.stderr)
         return EXIT_COMPLETE if result.passed else EXIT_FATAL
 
+    if raw_arguments[:1] == ["onboard"]:
+        arguments = build_onboard_parser().parse_args(raw_arguments[1:])
+        try:
+            return _onboard(
+                arguments.evidence,
+                mount=arguments.mount,
+                caps_profile=arguments.caps,
+                launch=arguments.launch,
+                json_output=arguments.json_output,
+                no_color=arguments.no_color,
+            )
+        except KeyboardInterrupt:
+            print(
+                "Unchained onboarding interrupted; no launch confirmation accepted.",
+                file=sys.stderr,
+            )
+            return EXIT_FATAL
+        except ValueError as exc:
+            print(f"Unchained onboarding configuration invalid: {exc}", file=sys.stderr)
+            return EXIT_INVALID
+        except (EvidenceError, OSError) as exc:
+            print(
+                f"Unchained onboarding could not profile the supplied source: "
+                f"{type(exc).__name__}; child paths and probe details suppressed",
+                file=sys.stderr,
+            )
+            return EXIT_INVALID
+
     if raw_arguments[:1] == ["doctor"]:
         arguments = build_doctor_parser().parse_args(raw_arguments[1:])
         return _doctor(json_output=arguments.json_output)
@@ -804,11 +1018,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         try:
             return _smoke_openai(model_id=arguments.model, json_output=arguments.json_output)
         except ValueError as exc:
-            print(f"Sentinel OpenAI smoke configuration invalid: {exc}", file=sys.stderr)
+            print(f"Unchained OpenAI smoke configuration invalid: {exc}", file=sys.stderr)
             return EXIT_INVALID
         except Exception as exc:  # noqa: BLE001 - never print provider text or credentials
             print(
-                f"Sentinel OpenAI smoke failed: {type(exc).__name__}; "
+                f"Unchained OpenAI smoke failed: {type(exc).__name__}; "
                 "credential and provider-response text suppressed",
                 file=sys.stderr,
             )
@@ -823,7 +1037,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 json_output=arguments.json_output,
             )
         except (EvidenceError, OSError, ValueError) as exc:
-            print(f"Sentinel profile failed: {type(exc).__name__}: {exc}", file=sys.stderr)
+            print(f"Unchained profile failed: {type(exc).__name__}: {exc}", file=sys.stderr)
             return EXIT_INVALID
 
     if raw_arguments[:1] == ["view"]:
@@ -831,7 +1045,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         try:
             return _view(arguments.run_directory, no_open=arguments.no_open)
         except (OSError, ValueError) as exc:
-            print(f"Sentinel viewer failed: {exc}", file=sys.stderr)
+            print(f"Unchained viewer failed: {exc}", file=sys.stderr)
             return EXIT_INVALID
 
     if raw_arguments[:1] == ["run"]:
@@ -841,11 +1055,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         return run_cli(arguments.evidence, arguments.caps)
     except KeyboardInterrupt:
-        print("Sentinel Unchained interrupted.", file=sys.stderr)
+        print("Unchained interrupted.", file=sys.stderr)
         return EXIT_FATAL
     except ValueError as exc:
-        print(f"Sentinel Unchained configuration invalid: {exc}", file=sys.stderr)
+        print(f"Unchained configuration invalid: {exc}", file=sys.stderr)
         return EXIT_INVALID
     except Exception as exc:  # noqa: BLE001 - stable CLI code even if finalization fails
-        print(f"Sentinel Unchained fatal error: {type(exc).__name__}: {exc}", file=sys.stderr)
+        print(f"Unchained fatal error: {type(exc).__name__}: {exc}", file=sys.stderr)
         return EXIT_FATAL

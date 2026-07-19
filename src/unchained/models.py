@@ -14,6 +14,7 @@ OsFamily: TypeAlias = Literal["windows", "linux", "macos", "unknown"]
 EvidenceShape: TypeAlias = Literal["memory-only", "disk-only", "both", "logs-only", "unknown"]
 MODEL_TOOL_OUTPUT_MAX_BYTES = 64 * 1024
 CASE_LEDGER_UPDATE_MAX_BYTES = 8_192
+INVESTIGATION_FINISH_TOOL_NAME = "finish_investigation"
 OS_EVIDENCE_CONFLICT_WARNING = (
     "OS CONFLICT: disk and memory content disagree; OS-specific tool families are disabled."
 )
@@ -26,6 +27,26 @@ EVIDENCE_ROUTE_WARNINGS = frozenset(
         LOG_OS_CONFLICT_WARNING,
     }
 )
+
+
+def investigation_finish_schema() -> dict[str, JsonValue]:
+    """Return the one strict, non-forensic action that terminates investigation."""
+
+    return {
+        "type": "function",
+        "name": INVESTIGATION_FINISH_TOOL_NAME,
+        "description": (
+            "End adaptive investigation only when no further forensic call can "
+            "materially change the conclusions."
+        ),
+        "strict": True,
+        "parameters": {
+            "type": "object",
+            "properties": {"status": {"type": "string", "enum": ["DONE"]}},
+            "required": ["status"],
+            "additionalProperties": False,
+        },
+    }
 
 
 def matches_json_schema_type(value: JsonValue, expected: JsonValue) -> bool:

@@ -1,4 +1,4 @@
-"""Standard-library, offline verification for Sentinel Unchained proof bundles.
+"""Standard-library, offline verification for Unchained proof bundles.
 
 The verifier proves the internal integrity and consistency of a completed run
 directory.  It deliberately does not import the OpenAI SDK, forensic tools, or
@@ -25,6 +25,7 @@ from .caps import CapConfig, estimate_usage_cost
 from .models import (
     CASE_LEDGER_UPDATE_MAX_BYTES,
     EVIDENCE_ROUTE_WARNINGS,
+    INVESTIGATION_FINISH_TOOL_NAME,
     EvidenceItem,
     EvidenceProfile,
     EvidenceQuote,
@@ -37,6 +38,7 @@ from .models import (
     ToolResult,
     derive_evidence_shape,
     derive_filesystems,
+    investigation_finish_schema,
     matches_json_schema_type,
     reconcile_evidence_os,
 )
@@ -2087,6 +2089,7 @@ class _Verifier:
         request_events = [entry for _index, entry in request_records]
         option_events = [entry for _index, entry in option_records]
         response_events = [entry for _index, entry in response_records]
+        typed_done_protocol = self._uses_typed_done_protocol(request_events)
         request_phases = self._model_phases(request_events, "model.request")
         option_phases = self._model_phases(option_events, "model.request.options")
         response_phases = self._model_phases(response_events, "model.response")
@@ -2126,22 +2129,44 @@ class _Verifier:
                 ),
             )
             self._verify_model_request_contract(request, response)
-            self._verify_model_options_contract(option, cap_config)
+            self._verify_model_options_contract(
+                option,
+                cap_config,
+                typed_done_protocol=typed_done_protocol,
+            )
             self._verify_response_options_binding(option, response)
 
         self._verify_phase_windows(entries, request_records, response_records)
         self._verify_no_orphan_retry_events(entries)
 
-        forensic_catalogs = [
+        opening_catalogs = [
+            entry.get("payload", {}).get("tools")
+            for entry in request_events
+            if isinstance(entry.get("payload"), dict) and entry["payload"].get("phase") == "opening"
+        ]
+        investigate_catalogs = [
             entry.get("payload", {}).get("tools")
             for entry in request_events
             if isinstance(entry.get("payload"), dict)
-            and entry["payload"].get("phase") in {"opening", "investigate"}
+            and entry["payload"].get("phase") == "investigate"
         ]
-        if forensic_catalogs and any(
-            catalog != forensic_catalogs[0] for catalog in forensic_catalogs[1:]
-        ):
-            self.error("opening and investigate requests do not share one immutable tool catalog")
+        if opening_catalogs and investigate_catalogs:
+            opening_catalog = opening_catalogs[0]
+            typed_catalog = (
+                [*opening_catalog, investigation_finish_schema()]
+                if isinstance(opening_catalog, list)
+                else None
+            )
+            if any(
+                catalog != opening_catalog and catalog != typed_catalog
+                for catalog in investigate_catalogs
+            ):
+                self.error(
+                    "investigate requests must use the opening forensic catalog plus only "
+                    "the canonical typed-DONE action"
+                )
+            if any(catalog != investigate_catalogs[0] for catalog in investigate_catalogs[1:]):
+                self.error("investigate requests do not share one immutable action catalog")
 
         self._verify_artifact_write_receipts(entries)
         self._verify_model_controller_bindings(entries, receipts)
@@ -2797,6 +2822,8 @@ class _Verifier:
         self,
         entry: dict[str, Any],
         cap_config: CapConfig | None,
+        *,
+        typed_done_protocol: bool,
     ) -> None:
         payload = entry.get("payload")
         sequence = entry.get("sequence")
@@ -2804,7 +2831,7 @@ class _Verifier:
         if not isinstance(payload, dict):
             self.error(f"{label} payload must be an object")
             return
-        required = {
+        legacy_required = {
             "phase",
             "parallel_tool_calls",
             "tool_choice",
@@ -2819,12 +2846,17 @@ class _Verifier:
             "max_tool_calls",
             "prompt_cache_mode",
         }
-        if set(payload) != required:
-            self.error(f"{label} does not match the audited options shape")
+        current_required = legacy_required | {"minimum_output_tokens"}
+        payload_keys = set(payload)
+        if typed_done_protocol:
+            if payload_keys != current_required:
+                self.error(f"{label} does not match the typed-DONE-v2 audited options shape")
+        elif payload_keys not in (legacy_required, current_required):
+            self.error(f"{label} does not match a supported audited options shape")
         phase = payload.get("phase")
         policies: dict[str, tuple[Any, ...]] = {
             "opening": (True, "required", 2_048, "low", "low", 6),
-            "investigate": (False, "auto", 4_096, "medium", "low", 1),
+            "investigate": (False, "required", 4_096, "medium", "low", 1),
             "investigation-finalize": (
                 False,
                 {"type": "function", "name": "submit_investigation"},
@@ -2866,11 +2898,43 @@ class _Verifier:
             "prompt_cache_mode": "implicit",
         }
         for field, expected in exact.items():
+            if field == "tool_choice" and phase == "investigate":
+                investigate_choice = payload.get(field)
+                if not isinstance(investigate_choice, str):
+                    self.error(f"{label} investigate tool_choice must be a string")
+                elif typed_done_protocol and investigate_choice != "required":
+                    self.error(f"{label} typed-DONE-v2 investigate tool_choice must be required")
+                elif not typed_done_protocol and investigate_choice not in (
+                    "auto",
+                    "required",
+                ):
+                    self.error(f"{label} tool_choice violates the investigate phase policy")
+                continue
             if payload.get(field) != expected:
                 self.error(f"{label} {field} violates the {phase} phase policy")
         output_tokens = payload.get("max_output_tokens")
         if not _is_int(output_tokens) or not 1 <= output_tokens <= maximum:
             self.error(f"{label} max_output_tokens violates the {phase} hard ceiling")
+        phase_minimum = {
+            "investigate": 4_096,
+            "investigation-finalize": 4_096,
+            "judge": 4_096,
+        }.get(phase, 1)
+        has_minimum = "minimum_output_tokens" in payload
+        audited_minimum = payload.get("minimum_output_tokens")
+        if typed_done_protocol and not has_minimum:
+            self.error(f"{label} omits typed-DONE-v2 minimum_output_tokens")
+        if has_minimum:
+            if not _is_int(audited_minimum) or audited_minimum < 1:
+                self.error(f"{label} minimum_output_tokens must be a positive integer")
+            elif audited_minimum != phase_minimum:
+                self.error(f"{label} minimum_output_tokens violates the {phase} phase policy")
+        if (
+            (typed_done_protocol or has_minimum)
+            and _is_int(output_tokens)
+            and output_tokens < phase_minimum
+        ):
+            self.error(f"{label} max_output_tokens violates the {phase} phase minimum")
         estimated = payload.get("estimated_input_tokens")
         if not _is_int(estimated) or estimated < 1:
             self.error(f"{label} estimated_input_tokens must be positive")
@@ -3115,31 +3179,69 @@ class _Verifier:
                 self.error("opening.completed executed count does not match tool receipts")
 
         investigate_responses = responses[1:-3]
-        investigate_request_indices = [
-            index
+        investigate_request_records = [
+            (index, entry)
             for index, entry in enumerate(entries)
             if entry.get("event_type") == "model.request"
             and isinstance(entry.get("payload"), dict)
             and entry["payload"].get("phase") == "investigate"
         ]
+        investigate_request_indices = [index for index, _entry in investigate_request_records]
+        typed_done_protocol = self._uses_typed_done_protocol(
+            [entry for _index, entry in investigate_request_records]
+        )
+        investigate_options = [
+            entry.get("payload")
+            for entry in entries
+            if entry.get("event_type") == "model.request.options"
+            and isinstance(entry.get("payload"), dict)
+            and entry["payload"].get("phase") == "investigate"
+        ]
+        expected_choice = "required" if typed_done_protocol else "auto"
+        if any(option.get("tool_choice") != expected_choice for option in investigate_options):
+            self.error(
+                "investigate tool_choice does not match its literal-DONE or typed-DONE catalog"
+            )
         action_events = [
             (index, entry)
             for index, entry in enumerate(entries)
             if entry.get("event_type") == "investigator.action"
         ]
         nonterminal_calls: list[tuple[int, int, dict[str, Any], _ToolReceipt | None, str, int]] = []
+        terminal_action_call_id: str | None = None
         for ordinal, (response_index, response) in enumerate(investigate_responses, start=1):
             is_terminal = ordinal == len(investigate_responses)
             calls = self._response_calls(response, require_valid=True)
             message = self._response_message(response)
             if is_terminal:
-                if calls:
-                    self.error("terminal investigate response must not contain a function call")
-                if message != "DONE":
-                    self.error("terminal investigate response must be the literal DONE")
+                if typed_done_protocol:
+                    if len(calls) != 1:
+                        self.error(
+                            "terminal investigate response must contain one typed-DONE action"
+                        )
+                    elif calls[0].get("name") != INVESTIGATION_FINISH_TOOL_NAME or calls[0].get(
+                        "arguments"
+                    ) != {"status": "DONE"}:
+                        self.error(
+                            "terminal investigate response does not contain canonical typed DONE"
+                        )
+                    else:
+                        call_id = calls[0].get("call_id")
+                        if isinstance(call_id, str) and call_id:
+                            terminal_action_call_id = call_id
+                else:
+                    if calls:
+                        self.error(
+                            "legacy terminal investigate response must not contain a function call"
+                        )
+                    if message != "DONE":
+                        self.error("terminal investigate response must be the literal DONE")
                 continue
             if len(calls) != 1:
                 self.error("each nonterminal investigate response must contain one function call")
+                continue
+            if calls[0].get("name") == INVESTIGATION_FINISH_TOOL_NAME:
+                self.error("typed-DONE action may appear only on the terminal investigate turn")
                 continue
             if message is None or not message.strip() or message.strip() == "DONE":
                 self.error(
@@ -3257,6 +3359,35 @@ class _Verifier:
                     self.error("investigator.done turn count does not match investigate responses")
                 if done_payload.get("response_id") != self._response_id(terminal_response):
                     self.error("investigator.done response_id does not match terminal DONE")
+                terminal_protocol = done_payload.get("terminal_protocol")
+                if typed_done_protocol:
+                    if not isinstance(terminal_protocol, str):
+                        self.error("typed investigator.done terminal_protocol must be text")
+                    elif terminal_protocol != "typed-DONE-v2":
+                        self.error("investigator.done does not identify the typed-DONE-v2 protocol")
+                    recorded_call_id = done_payload.get("terminal_action_call_id")
+                    if not isinstance(recorded_call_id, str) or not recorded_call_id:
+                        self.error(
+                            "typed investigator.done terminal_action_call_id must be nonempty text"
+                        )
+                    elif recorded_call_id != terminal_action_call_id:
+                        self.error(
+                            "investigator.done terminal_action_call_id does not match terminal DONE"
+                        )
+                else:
+                    if terminal_protocol is not None and not isinstance(terminal_protocol, str):
+                        self.error(
+                            "legacy investigator.done terminal_protocol must be text or null"
+                        )
+                    elif terminal_protocol not in (None, "literal-DONE-v1"):
+                        self.error(
+                            "legacy investigator.done has an invalid terminal protocol label"
+                        )
+
+        if terminal_action_call_id is not None and terminal_action_call_id in (
+            set(all_call_ids) | set(receipts)
+        ):
+            self.error("typed terminal action reuses a forensic function call_id")
 
         if len(all_call_ids) != len(set(all_call_ids)):
             self.error("model responses reuse a forensic function call_id")
@@ -4155,6 +4286,20 @@ class _Verifier:
         except (KeyError, TypeError, ValueError, ReportProtocolError) as exc:
             self.error(f"deterministic report inputs are malformed: {exc}")
             return None
+
+    @staticmethod
+    def _uses_typed_done_protocol(request_events: list[dict[str, Any]]) -> bool:
+        investigate_requests = [
+            entry
+            for entry in request_events
+            if isinstance(entry.get("payload"), dict)
+            and entry["payload"].get("phase") == "investigate"
+        ]
+        return bool(investigate_requests) and all(
+            isinstance((tools := entry["payload"].get("tools")), list)
+            and any(schema == investigation_finish_schema() for schema in tools)
+            for entry in investigate_requests
+        )
 
     def _model_phases(
         self,

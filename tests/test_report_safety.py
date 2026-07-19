@@ -89,7 +89,7 @@ def _assert_inert(report: str) -> None:
     assert "https://attacker.invalid" not in report
     assert "<script>" not in report
     assert "\n```\nforged fence" not in report
-    assert len(re.findall(r"(?m)^# Sentinel Unchained DFIR Report", report)) == 1
+    assert len(re.findall(r"(?m)^# Unchained DFIR Report", report)) == 1
 
 
 def test_inline_defanger_escapes_structure_controls_and_active_content() -> None:

@@ -21,6 +21,7 @@ from .model import (
 )
 from .models import (
     CASE_LEDGER_UPDATE_MAX_BYTES,
+    INVESTIGATION_FINISH_TOOL_NAME,
     EvidenceProfile,
     EvidenceQuote,
     EvidenceSpan,
@@ -32,6 +33,7 @@ from .models import (
     JudgeVerdict,
     RunStatus,
     ToolResult,
+    investigation_finish_schema,
 )
 from .prompts import HOSTILE_DATA_RULE, INVESTIGATOR_PROMPT
 from .reporting import (
@@ -380,14 +382,18 @@ calls concurrently and return every output at once.
         observations: tuple[ToolResult, ...],
         state: InvestigationState,
     ) -> InvestigationState:
-        available = self.tools.schemas()
+        forensic_tools = self.tools.schemas()
+        if any(schema.get("name") == INVESTIGATION_FINISH_TOOL_NAME for schema in forensic_tools):
+            raise AgentProtocolError("forensic registry collides with typed terminal action")
+        available = (*forensic_tools, investigation_finish_schema())
         instructions = f"""
 {INVESTIGATOR_PROMPT}
 
 Continue the case-level DFIR investigation. For every turn:
 1. PLAN what the current evidence leaves unanswered.
-2. ACT by calling exactly one provided forensic function when another result
-   can still change the conclusions.
+2. ACT by calling exactly one provided function. Call one forensic function
+   when another result can still change the conclusions. Otherwise call
+   finish_investigation with status DONE.
 3. OBSERVE only the returned data.
 4. UPDATE your running case notes before the next decision. Every nonterminal
    response that calls a forensic tool must include a nonempty visible
@@ -400,10 +406,10 @@ case ledger: it contains prior notes, a compact immutable receipt index, and
 only the latest observations. Do not assume access to an earlier provider
 transcript or hidden reasoning state.
 
-Never call more than one function in a turn. When further calls have stopped
-changing the conclusions, return no function call and output exactly the four
-ASCII characters DONE, with no leading or trailing whitespace and no newline.
-Before that terminal turn, factual statements in visible notes must cite exact
+Never call more than one function in a turn and never return a turn without a
+function call. The strict finish_investigation function is the only terminal
+action; its status argument must be exactly DONE. Before that terminal turn,
+factual statements in visible notes must cite exact
 tool_call_ids in square brackets. Distinguish support,
 uncertainty, contradiction, tool failure, and absence of records. A zero-record
 result is not proof of absence unless coverage is established. Do not claim
@@ -436,9 +442,10 @@ analysis from an unavailable capability.
                     input_items=current_input,
                     tools=available,
                     parallel_tool_calls=False,
-                    tool_choice="auto",
+                    tool_choice="required",
                     previous_response_id=None,
                     max_output_tokens=4_096,
+                    minimum_output_tokens=4_096,
                     reasoning_context="current_turn",
                     reasoning_effort="medium",
                     text_verbosity="low",
@@ -446,35 +453,68 @@ analysis from an unavailable capability.
                 )
             )
             state.turns += 1
-            terminal_done = not response.function_calls and response.text == "DONE"
-            if not response.function_calls:
-                if not terminal_done:
-                    self.audit.append(
-                        "model.protocol_error",
-                        {"phase": "investigate", "response": model_response_dict(response)},
-                        actor="investigator",
-                    )
-                    raise AgentProtocolError(
-                        "investigator without a tool call must output exactly DONE"
-                    )
-                self.audit.append(
-                    "investigator.done",
-                    {"turn": state.turns, "response_id": response.response_id},
-                    actor="investigator",
-                )
-                return self._finalize_investigation(profile, state)
             if len(response.function_calls) != 1:
                 self.audit.append(
                     "model.protocol_error",
                     {"phase": "investigate", "response": model_response_dict(response)},
                     actor="investigator",
                 )
-                raise AgentProtocolError("investigator must issue exactly one function call")
+                raise AgentProtocolError("investigator must issue exactly one typed action")
             call = response.function_calls[0]
-            if response.text.strip() == "DONE":
-                raise AgentProtocolError(
-                    "DONE must be the only output and cannot accompany a tool call"
+            if call.name == INVESTIGATION_FINISH_TOOL_NAME:
+                if not call.arguments_valid or call.arguments != {"status": "DONE"}:
+                    self.audit.append(
+                        "model.protocol_error",
+                        {
+                            "phase": "investigate",
+                            "reason": "typed terminal action must contain only status DONE",
+                            "response": model_response_dict(response),
+                        },
+                        actor="investigator",
+                    )
+                    raise AgentProtocolError("typed terminal action must contain only status DONE")
+                forensic_call_ids = {
+                    receipt.get("tool_call_id")
+                    for receipt in self.audit.tool_receipts()
+                    if isinstance(receipt.get("tool_call_id"), str)
+                }
+                if not call.call_id:
+                    self.audit.append(
+                        "model.protocol_error",
+                        {
+                            "phase": "investigate",
+                            "reason": "typed terminal action call_id must be nonempty",
+                            "response": model_response_dict(response),
+                        },
+                        actor="investigator",
+                    )
+                    raise AgentProtocolError("typed terminal action call_id must be nonempty")
+                if call.call_id in forensic_call_ids:
+                    self.audit.append(
+                        "model.protocol_error",
+                        {
+                            "phase": "investigate",
+                            "reason": "typed terminal action call_id reuses a forensic call_id",
+                            "response": model_response_dict(response),
+                        },
+                        actor="investigator",
+                    )
+                    raise AgentProtocolError(
+                        "typed terminal action call_id must be distinct from forensic call_ids"
+                    )
+                self.audit.append(
+                    "investigator.done",
+                    {
+                        "turn": state.turns,
+                        "response_id": response.response_id,
+                        "terminal_protocol": "typed-DONE-v2",
+                        "terminal_action_call_id": call.call_id,
+                    },
+                    actor="investigator",
                 )
+                return self._finalize_investigation(profile, state)
+            if response.text.strip() == "DONE":
+                raise AgentProtocolError("raw DONE is not a terminal action under typed-DONE-v2")
             try:
                 ledger_update = _validate_case_ledger_update(response.text)
             except AgentProtocolError as exc:
@@ -525,8 +565,9 @@ analysis from an unavailable capability.
         instructions = f"""
 {INVESTIGATOR_PROMPT}
 
-The investigative loop has ended because you output DONE. Do not resume the
-investigation and do not request another forensic tool. Serialize only the
+The investigative loop has ended because you called finish_investigation with
+status DONE. Do not resume the investigation and do not request another
+forensic tool. Serialize only the
 hypotheses, dead ends, limitations, and findings already supported or
 contradicted by this run into submit_investigation. Every factual finding
 summary must cite each supporting tool-call id inline in square brackets.
@@ -562,6 +603,7 @@ when corroboration is absent or contradictory.
                 parallel_tool_calls=False,
                 tool_choice={"type": "function", "name": "submit_investigation"},
                 max_output_tokens=12_288,
+                minimum_output_tokens=4_096,
                 reasoning_context="current_turn",
                 reasoning_effort="medium",
                 text_verbosity="low",
@@ -650,6 +692,7 @@ output.
                 tool_choice={"type": "function", "name": "submit_judgment"},
                 previous_response_id=None,
                 max_output_tokens=12_288,
+                minimum_output_tokens=4_096,
                 reasoning_effort="high",
                 text_verbosity="low",
                 max_tool_calls=1,
@@ -774,7 +817,7 @@ The deterministic controller owns all authoritative rows and formatting.
         profile: EvidenceProfile, state: InvestigationState, exc: CapExceeded
     ) -> str:
         detail = defang_untrusted_inline(exc.detail)
-        return f"""# Sentinel Unchained DFIR Report - PARTIAL
+        return f"""# Unchained DFIR Report - PARTIAL
 
 The investigation stopped gracefully because the hard cap `{exc.kind.value}` fired.
 
@@ -797,7 +840,7 @@ and model judgments require analyst review against `audit.jsonl`.
         profile: EvidenceProfile, state: InvestigationState, reason: str
     ) -> str:
         safe_reason = defang_untrusted_inline(reason)
-        return f"""# Sentinel Unchained DFIR Report - PARTIAL
+        return f"""# Unchained DFIR Report - PARTIAL
 
 The model protocol could not complete safely: {safe_reason}
 

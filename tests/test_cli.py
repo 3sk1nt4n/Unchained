@@ -206,14 +206,28 @@ def test_luna_smoke_is_one_bounded_nonqualifying_typed_call(
 
 
 def test_luna_smoke_compose_service_cannot_mount_evidence_or_runs() -> None:
-    compose = (Path(__file__).resolve().parents[1] / "compose.yaml").read_text(encoding="utf-8")
+    repository = Path(__file__).resolve().parents[1]
+    compose = (repository / "compose.yaml").read_text(encoding="utf-8")
+    dockerfile = (repository / "Dockerfile").read_text(encoding="utf-8")
     shared_runtime, services = compose.split("\nservices:\n", 1)
     offline, live_smoke = services.split("\n  live-smoke:\n", 1)
     live_smoke, _top_level_volumes = live_smoke.split("\nvolumes:\n", 1)
 
     assert "\n  volumes:\n" not in shared_runtime
+    assert "platform: linux/amd64" in shared_runtime
+    assert (
+        "python:3.11.9-slim-bookworm@sha256:"
+        "8fb099199b9f2d70342674bd9dbccd3ed03a258f26bbd1d556822c6dfc60c317"
+    ) in dockerfile
+    assert "python -m unchained onboard --json >/dev/null" in dockerfile
+    assert "/opt/sentinel/bin/sentinel onboard --json >/dev/null" in dockerfile
+    assert "COPY docs ./docs" in dockerfile
+    assert "COPY requirements ./requirements" in dockerfile
+    assert "COPY scripts ./scripts" in dockerfile
+    assert "git init" in dockerfile
     assert "target: /evidence" in offline
     assert "target: /workspace/unchained-runs" in offline
+    assert 'command: ["onboard", "--json"]' in offline
     assert "volumes:" not in live_smoke
     assert "/evidence" not in live_smoke
     assert "unchained-runs" not in live_smoke

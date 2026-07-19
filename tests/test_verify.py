@@ -14,6 +14,7 @@ import pytest
 from unchained.artifacts import build_summary
 from unchained.caps import CapConfig, estimate_usage_cost
 from unchained.models import (
+    INVESTIGATION_FINISH_TOOL_NAME,
     EvidenceItem,
     EvidenceProfile,
     EvidenceQuote,
@@ -24,6 +25,7 @@ from unchained.models import (
     JudgeVerdict,
     ModelUsage,
     ToolResult,
+    investigation_finish_schema,
 )
 from unchained.reporting import ReportDraft, render_report_markdown
 from unchained.verify import (
@@ -59,10 +61,10 @@ _SAFE_VIEWER = (
     "<head>\n"
     '<meta charset="utf-8">\n'
     f'<meta http-equiv="Content-Security-Policy" content="{_CSP}">\n'
-    "<title>Sentinel proof</title>\n"
+    "<title>Unchained proof</title>\n"
     "<style>body { font-family: sans-serif; }</style>\n"
     "</head>\n"
-    "<body><main><h1>Sentinel proof</h1></main></body>\n"
+    "<body><main><h1>Unchained proof</h1></main></body>\n"
     "</html>\n"
 ).encode()
 _REPORT_DRAFT = {
@@ -130,7 +132,7 @@ def _tool_schema(name: str, argument_names: tuple[str, ...] = ()) -> dict[str, A
 
 def _complete_report(span_id: str) -> bytes:
     return (
-        "# Sentinel Unchained DFIR Report - COMPLETE\n"
+        "# Unchained DFIR Report - COMPLETE\n"
         "\n"
         "## Verification scope\n"
         "\n"
@@ -333,6 +335,7 @@ def _complete_events(
     terminal_status: str,
     exit_code: int,
     model_overrides: dict[str, Any] | None,
+    typed_done: bool = False,
 ) -> tuple[list[dict[str, Any]], dict[str, bytes]]:
     output_bytes = output.encode("utf-8")
     output_hash = hashlib.sha256(output_bytes).hexdigest()
@@ -482,6 +485,8 @@ def _complete_events(
     ) -> None:
         if phase in {"opening", "investigate"}:
             tools = [_tool_schema("windows.pslist")]
+            if phase == "investigate" and typed_done:
+                tools.append(investigation_finish_schema())
         else:
             call = function_calls[0]
             tools = [
@@ -492,7 +497,13 @@ def _complete_events(
             ]
         effort, verbosity, maximum, parallel, choice = {
             "opening": ("low", "low", 2_048, True, "required"),
-            "investigate": ("medium", "low", 4_096, False, "auto"),
+            "investigate": (
+                "medium",
+                "low",
+                4_096,
+                False,
+                "required" if typed_done else "auto",
+            ),
             "investigation-finalize": (
                 "medium",
                 "low",
@@ -557,6 +568,17 @@ def _complete_events(
                         "parallel_tool_calls": parallel,
                         "tool_choice": choice,
                         "max_output_tokens": maximum,
+                        **(
+                            {
+                                "minimum_output_tokens": (
+                                    4_096
+                                    if phase in {"investigate", "investigation-finalize", "judge"}
+                                    else 1
+                                )
+                            }
+                            if typed_done
+                            else {}
+                        ),
                         "estimated_input_tokens": 100,
                         "timeout_seconds": 30.0,
                         "store": False,
@@ -696,8 +718,28 @@ def _complete_events(
             ),
         ]
     )
-    append_model("investigate", 3, message="DONE", function_calls=[])
-    payloads.append(("investigator.done", {"turn": 2, "response_id": "resp_live_003"}))
+    terminal_calls = (
+        [
+            _function_call(
+                "finish-1",
+                INVESTIGATION_FINISH_TOOL_NAME,
+                {"status": "DONE"},
+            )
+        ]
+        if typed_done
+        else []
+    )
+    append_model(
+        "investigate",
+        3,
+        message="" if typed_done else "DONE",
+        function_calls=terminal_calls,
+    )
+    done_payload: dict[str, Any] = {"turn": 2, "response_id": "resp_live_003"}
+    if typed_done:
+        done_payload["terminal_protocol"] = "typed-DONE-v2"
+        done_payload["terminal_action_call_id"] = "finish-1"
+    payloads.append(("investigator.done", done_payload))
     append_model(
         "investigation-finalize",
         4,
@@ -1109,6 +1151,7 @@ def _build_bundle(
     model_payload: dict[str, Any] | None = None,
     complete_lifecycle: bool = False,
     model_overrides: dict[str, Any] | None = None,
+    typed_done: bool = False,
 ) -> dict[str, Any]:
     run_directory.mkdir()
     output_content = output.encode("utf-8")
@@ -1124,6 +1167,7 @@ def _build_bundle(
             terminal_status=terminal_status,
             exit_code=exit_code,
             model_overrides=model_overrides,
+            typed_done=typed_done,
         )
     else:
         events = _events(
@@ -1216,6 +1260,208 @@ def test_complete_recorded_gpt56_lifecycle_verifies_offline(tmp_path: Path) -> N
         "original_evidence_rehashed": False,
         "statement": RECORDED_CUSTODY_NOTICE,
     }
+
+
+def test_complete_typed_done_v2_lifecycle_verifies_offline(tmp_path: Path) -> None:
+    run_directory = tmp_path / "run"
+    _build_bundle(run_directory, complete_lifecycle=True, typed_done=True)
+
+    result = verify_run(run_directory, require_complete=True, require_live_gpt56=True)
+
+    assert result.passed, result.public_dict()
+    assert result.terminal_status == "COMPLETE"
+    assert result.verified_audit_entries == 44
+
+
+def test_literal_done_v1_low_output_ceilings_remain_verifier_readable(tmp_path: Path) -> None:
+    run_directory = tmp_path / "run"
+    manifest = _build_bundle(run_directory, complete_lifecycle=True)
+
+    def mutate(entries: list[dict[str, Any]]) -> None:
+        for entry in entries:
+            if entry["event_type"] == "model.request.options" and entry["payload"]["phase"] in {
+                "investigate",
+                "investigation-finalize",
+                "judge",
+            }:
+                entry["payload"]["max_output_tokens"] = 2_048
+
+    _rechain_audit(run_directory, manifest, mutate)
+
+    result = verify_run(run_directory, require_complete=True, require_live_gpt56=True)
+
+    assert result.passed, result.public_dict()
+
+
+def test_typed_done_v2_requires_audited_minimum_output_tokens(tmp_path: Path) -> None:
+    run_directory = tmp_path / "run"
+    manifest = _build_bundle(run_directory, complete_lifecycle=True, typed_done=True)
+
+    def mutate(entries: list[dict[str, Any]]) -> None:
+        options = next(
+            entry
+            for entry in entries
+            if entry["event_type"] == "model.request.options"
+            and entry["payload"]["phase"] == "investigate"
+        )
+        del options["payload"]["minimum_output_tokens"]
+
+    _rechain_audit(run_directory, manifest, mutate)
+
+    result = verify_run(run_directory, require_complete=True)
+
+    _assert_failed_with(result, "omits typed-DONE-v2 minimum_output_tokens")
+
+
+def test_typed_done_v2_rejects_output_ceiling_below_phase_minimum(tmp_path: Path) -> None:
+    run_directory = tmp_path / "run"
+    manifest = _build_bundle(run_directory, complete_lifecycle=True, typed_done=True)
+
+    def mutate(entries: list[dict[str, Any]]) -> None:
+        options = next(
+            entry
+            for entry in entries
+            if entry["event_type"] == "model.request.options"
+            and entry["payload"]["phase"] == "investigate"
+        )
+        options["payload"]["max_output_tokens"] = 2_048
+
+    _rechain_audit(run_directory, manifest, mutate)
+
+    result = verify_run(run_directory, require_complete=True)
+
+    _assert_failed_with(result, "max_output_tokens violates the investigate phase minimum")
+
+
+def test_typed_done_v2_rejects_wrong_audited_phase_minimum(tmp_path: Path) -> None:
+    run_directory = tmp_path / "run"
+    manifest = _build_bundle(run_directory, complete_lifecycle=True, typed_done=True)
+
+    def mutate(entries: list[dict[str, Any]]) -> None:
+        options = next(
+            entry
+            for entry in entries
+            if entry["event_type"] == "model.request.options"
+            and entry["payload"]["phase"] == "investigate"
+        )
+        options["payload"]["minimum_output_tokens"] = 1
+
+    _rechain_audit(run_directory, manifest, mutate)
+
+    result = verify_run(run_directory, require_complete=True)
+
+    _assert_failed_with(
+        result,
+        "minimum_output_tokens violates the investigate phase policy",
+    )
+
+
+@pytest.mark.parametrize("replacement", [{}, []])
+def test_malformed_investigate_tool_choice_fails_with_specific_diagnostic(
+    tmp_path: Path,
+    replacement: Any,
+) -> None:
+    run_directory = tmp_path / "run"
+    manifest = _build_bundle(run_directory, complete_lifecycle=True)
+
+    def mutate(entries: list[dict[str, Any]]) -> None:
+        options = next(
+            entry
+            for entry in entries
+            if entry["event_type"] == "model.request.options"
+            and entry["payload"]["phase"] == "investigate"
+        )
+        options["payload"]["tool_choice"] = replacement
+
+    _rechain_audit(run_directory, manifest, mutate)
+
+    result = verify_run(run_directory, require_complete=True)
+
+    _assert_failed_with(result, "investigate tool_choice must be a string")
+
+
+def test_typed_done_requires_required_tool_choice(tmp_path: Path) -> None:
+    run_directory = tmp_path / "run"
+    manifest = _build_bundle(run_directory, complete_lifecycle=True, typed_done=True)
+
+    def mutate(entries: list[dict[str, Any]]) -> None:
+        options = next(
+            entry
+            for entry in entries
+            if entry["event_type"] == "model.request.options"
+            and entry["payload"]["phase"] == "investigate"
+        )
+        options["payload"]["tool_choice"] = "auto"
+
+    _rechain_audit(run_directory, manifest, mutate)
+
+    result = verify_run(run_directory, require_complete=True)
+
+    _assert_failed_with(
+        result,
+        "typed-DONE-v2 investigate tool_choice must be required",
+    )
+    assert not any("verification stopped safely" in error for error in result.errors)
+
+
+@pytest.mark.parametrize("replacement", [{}, []])
+def test_malformed_legacy_terminal_protocol_fails_with_specific_diagnostic(
+    tmp_path: Path,
+    replacement: Any,
+) -> None:
+    run_directory = tmp_path / "run"
+    manifest = _build_bundle(run_directory, complete_lifecycle=True)
+
+    def mutate(entries: list[dict[str, Any]]) -> None:
+        done = next(entry for entry in entries if entry["event_type"] == "investigator.done")
+        done["payload"]["terminal_protocol"] = replacement
+
+    _rechain_audit(run_directory, manifest, mutate)
+
+    result = verify_run(run_directory, require_complete=True)
+
+    _assert_failed_with(result, "legacy investigator.done terminal_protocol must be text or null")
+    assert not any("verification stopped safely" in error for error in result.errors)
+
+
+def test_typed_done_terminal_call_id_is_bound_and_unique(tmp_path: Path) -> None:
+    run_directory = tmp_path / "run"
+    manifest = _build_bundle(run_directory, complete_lifecycle=True, typed_done=True)
+
+    def mutate(entries: list[dict[str, Any]]) -> None:
+        terminal = [
+            entry
+            for entry in entries
+            if entry["event_type"] == "model.response"
+            and entry["payload"]["phase"] == "investigate"
+        ][-1]
+        terminal["payload"]["function_calls"][0]["call_id"] = "t1"
+        done = next(entry for entry in entries if entry["event_type"] == "investigator.done")
+        done["payload"]["terminal_action_call_id"] = "t1"
+
+    _rechain_audit(run_directory, manifest, mutate)
+
+    result = verify_run(run_directory, require_complete=True)
+
+    _assert_failed_with(result, "typed terminal action reuses a forensic function call_id")
+
+
+def test_typed_done_event_must_bind_terminal_action_call_id(tmp_path: Path) -> None:
+    run_directory = tmp_path / "run"
+    manifest = _build_bundle(run_directory, complete_lifecycle=True, typed_done=True)
+
+    def mutate(entries: list[dict[str, Any]]) -> None:
+        done = next(entry for entry in entries if entry["event_type"] == "investigator.done")
+        done["payload"]["terminal_action_call_id"] = "forged-finish"
+
+    _rechain_audit(run_directory, manifest, mutate)
+
+    result = verify_run(run_directory, require_complete=True)
+
+    _assert_failed_with(
+        result,
+        "investigator.done terminal_action_call_id does not match terminal DONE",
+    )
 
 
 def test_strict_evidence_span_resolves_beyond_legacy_2kb_prefix(tmp_path: Path) -> None:

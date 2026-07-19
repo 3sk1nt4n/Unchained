@@ -26,9 +26,10 @@ Rules:
   nonempty case-ledger update no larger than 8,192 UTF-8 bytes. State what
   changed, what remains uncertain, and why the next tool can still change the
   conclusions.
-- Stop when more tool calls stop changing your conclusions. Return no function
-  call and output exactly the four ASCII characters DONE, with no leading or
-  trailing whitespace and no newline.
+- Stop when more tool calls stop changing your conclusions. During the adaptive
+  phase, terminate only by calling the supplied strict finish_investigation
+  action with status exactly DONE. Do not emit raw DONE text or completion
+  prose in place of that typed terminal action.
 """.strip()
 
 
