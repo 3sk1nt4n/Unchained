@@ -234,22 +234,6 @@ def _boxed(
     print(_paint(f"└{'─' * inner}┘", accent, color), file=stream)
 
 
-def _guardrail_lines(caps_profile: str, caps: CapConfig) -> list[str]:
-    return [
-        "THIS STEP: local profile + custody only · OpenAI calls 0 · paid run not started",
-        (
-            "IF YOU LAUNCH: OpenAI receives the bounded public profile and bounded typed-tool "
-            "observations; original evidence bytes and runner-local paths stay local."
-        ),
-        (
-            f"{caps_profile.upper()} HARD CEILINGS (not a price quote): "
-            f"{caps.max_tool_calls} forensic calls · {caps.max_total_tokens:,} tokens · "
-            f"{caps.max_wall_seconds / 60:g} min · ${caps.max_cost_usd:.2f} estimated cost"
-        ),
-        "Every mount attempt is read-only. Without --mount, disks remain raw-only.",
-    ]
-
-
 def _budget_choice_lines(selected: str, effective: CapConfig) -> list[str]:
     strict = _preset_caps("strict")
     flagship = _preset_caps("default")
@@ -421,83 +405,43 @@ def render_welcome(
         )
     print(_paint("╚" + "═" * (width - 2) + "╝", _BLUE + _BOLD, color), file=stream)
     print(file=stream)
-    _boxed(
-        "1 · PREPARE ONE CASE",
-        [
-            "Best fit: one ready memory image + one ready disk image from the same host.",
-            (
-                "Common memory containers include .raw, .img, .mem, .vmem, and .dmp; "
-                "common disk containers include .E01, .dd, .raw, and .img."
-            ),
-            "Names and extensions are hints only; bounded probes decide the evidence kind.",
-            "Memory-only or disk-only is supported when a typed forensic route is ready.",
-            (
-                "Multiple ready memory images or multiple ready disk images fail closed: "
-                "split them into separate cases."
-            ),
-        ],
-        stream=stream,
-        color=color,
+
+    def line(marker_color: str, label: str, detail: str) -> None:
+        print(
+            _paint("◆ ", marker_color + _BOLD, color)
+            + _paint(f"{label:<9}", marker_color + _BOLD, color)
+            + _paint(detail, _DIM, color),
+            file=stream,
+        )
+
+    strict = _preset_caps("strict")
+    flagship = _preset_caps("default")
+    line(
+        _BLUE,
+        "ONE CASE",
+        "memory and/or disk from one host; bounded probes decide the kind, not the name.",
     )
-    _boxed(
-        "2 · WHAT THE SAFE PREVIEW DOES",
-        [
-            (
-                "Enumerates regular files, probes bounded content and forensic metadata, "
-                "assigns public evidence IDs, and hashes every input with SHA-256."
-            ),
-            (
-                "Archives are not unpacked. Unknown documents and other unsupported files "
-                "are hashed and listed, then set aside from forensic analysis."
-            ),
-            (
-                "The default onboarding command does not mount disks, contact OpenAI, "
-                "create a run bundle, or spend API credits."
-            ),
-        ],
-        stream=stream,
-        color=color,
+    line(
+        _GREEN,
+        "PREVIEW",
+        "enumerate, classify, public IDs, SHA-256 every file — no mount, no OpenAI, no spend.",
     )
-    _boxed(
-        "3 · START HERE",
-        [
-            "sentinel onboard <one-case-evidence-folder>",
-            (
-                "No evidence yet? A safe synthetic sample ships in the repo: "
-                "sentinel onboard docker/fixtures"
-            ),
-            (
-                "Real practice case (public DFIR Madness 001): download from the "
-                "official page, then onboard the folder — see the README samples section."
-            ),
-            "Optional read-only disk capabilities: add --mount",
-            "Machine-readable, noninteractive preview: add --json",
-            (
-                "Optional paid Luna connectivity canary (no evidence; not proof): "
-                "sentinel smoke-openai"
-            ),
-            (
-                "One-time key setup for paid runs — hidden input, saved privately, "
-                "found automatically by every later command: sentinel key"
-            ),
-        ],
-        stream=stream,
-        color=color,
-        accent=_GREEN,
+    line(
+        _CYAN,
+        "START",
+        "sentinel onboard <folder>  ·  key: sentinel key  ·  canary: sentinel smoke-openai",
     )
-    _boxed(
-        "4 · CHOOSE ANALYSIS DEPTH — HEAVY OR LIGHT",
-        _budget_choice_lines(caps_profile, caps),
-        stream=stream,
-        color=color,
-        accent=_VIOLET,
+    line(
+        _VIOLET,
+        "DEPTH",
+        f"LIGHT {strict.max_tool_calls} tools/${strict.max_cost_usd:.2f}  ·  "
+        f"HEAVY {flagship.max_tool_calls} tools/${flagship.max_cost_usd:.0f}  — "
+        "same GPT-5.6 Sol, hard ceilings only.",
     )
-    _boxed(
-        "CLOUD + COST BOUNDARY",
-        _guardrail_lines(caps_profile, caps),
-        stream=stream,
-        color=color,
-        accent=_AMBER,
+    line(
+        _AMBER,
+        "BOUNDARY",
+        "OpenAI calls 0 · paid run not started · launch needs the phrase LAUNCH GPT-5.6 SOL.",
     )
 
 

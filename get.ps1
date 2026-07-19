@@ -121,24 +121,18 @@ function Find-Cases {
 }
 
 # 2/5 - pick your first case, then see the verified card + depth options
-Write-Step "2/5" "Pick your first case (you'll see a verified card next)"
+Write-Step "2/5" "Pick a case"
 $chosenCase = $null
 try {
     $detected = @(Find-Cases)
-    $i = 0
-    if ($detected.Count -gt 0) {
-        Write-Host "      Cases I found on your machine:" -ForegroundColor Gray
-        foreach ($c in $detected) { $i++; Write-Host "        $i) $c" -ForegroundColor White }
-    }
-    Write-Host "        S) Built-in synthetic sample (instant, `$0)" -ForegroundColor White
-    Write-Host "        D) DC01 public practice case (guided download + MD5 verify)" -ForegroundColor White
-    Write-Host "        P) A folder path I'll type" -ForegroundColor White
-    Write-Host "        W) Just show me the welcome" -ForegroundColor White
-    $pick = (Read-Host "      Choose").Trim()
+    $n = 0
+    foreach ($c in $detected) { $n++; Write-Host "        $n) $c" -ForegroundColor White }
+    Write-Host "        D) DC01 public practice case - guided download + MD5 verify" -ForegroundColor Cyan
+    Write-Host "        P) My own evidence folder (a path I'll type)" -ForegroundColor Cyan
+    $pick = (Read-Host "      Choose a number, D, or P (Enter to skip)").Trim()
     if ($pick -match '^[0-9]+$' -and [int]$pick -ge 1 -and [int]$pick -le $detected.Count) {
         $chosenCase = $detected[[int]$pick - 1]
     }
-    elseif ($pick -match '^[sS]$') { $chosenCase = (Join-Path $repo "docker\fixtures") }
     elseif ($pick -match '^[dD]$') { $chosenCase = Invoke-Dc01Verify }
     elseif ($pick -match '^[pP]$') {
         $chosenCase = (Read-Host "      Full path to your evidence folder").Trim().Trim('"').Trim()

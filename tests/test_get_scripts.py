@@ -25,7 +25,6 @@ def test_windows_bootstrap_is_key_safe_and_hands_off_to_onboarding() -> None:
     assert not re.search(r"sk-[A-Za-z0-9]{10,}", script)
     # Samples: the built-in fixture is offered, the public case is guided —
     # and evidence is never auto-downloaded by the bootstrap.
-    assert "docker\\fixtures" in script
     assert "dfirmadness.com/the-stolen-szechuan-sauce" in script
     assert not re.search(r"(Invoke-WebRequest|Start-BitsTransfer|curl)[^\n]*dfirmadness", script)
     # DC01 is verify-and-onboard, never a hardcoded download: MD5 check gates it.
