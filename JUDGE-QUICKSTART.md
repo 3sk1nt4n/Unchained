@@ -63,6 +63,11 @@ run requires `--launch` in an interactive terminal and the exact phrase
 
 The full junior-analyst walkthrough is [Start Here](docs/START-HERE.md).
 
+**Hardware note:** no GPU is needed — GPT-5.6 runs on OpenAI's side. For the
+real memory-image path, 4 cores / 8 threads and 16 GB RAM are comfortable (the
+opening runs up to six Volatility processes concurrently); keep evidence on a
+local SSD path, not a OneDrive/cloud-synced folder.
+
 ## 1. Install prerequisites
 
 Install Git for Windows and official CPython 3.11 AMD64:

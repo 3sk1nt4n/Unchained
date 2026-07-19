@@ -494,6 +494,33 @@ sentinel view <bundle>
 | `2` | Invalid input or configuration |
 | `3` | `PARTIAL`: a cap or mandatory phase failed safely |
 
+## Performance and recommended hardware
+
+All GPT-5.6 compute runs on OpenAI's side — **no local GPU is used or
+required**. Local performance is decided by CPU, RAM, and the disk path:
+
+| Component | Minimum | Recommended | Why it matters |
+|---|---|---|---|
+| CPU | 4 cores / 8 threads | 6+ cores | The opening book executes up to **six typed tools concurrently**, each in its own private child process |
+| RAM | 8 GB | **16 GB** | Up to six Volatility processes read the same multi-GiB memory image at once; 16 GB keeps the six-way opening out of swap |
+| Disk | SSD, local path | NVMe, non-synced folder | Full SHA-256 custody hashing plus parallel image reads; a OneDrive/cloud-synced or network path can dominate total runtime |
+| GPU | none | none | Model inference is an OpenAI API call, not local |
+| Network | stable HTTPS egress | — | Used only for GPT-5.6 requests; evidence bytes never leave the machine |
+
+**Measured reference point** (retained live run, Windows 11): a 2 GiB Windows
+memory image, six-tool concurrent opening, 43.7 seconds end to end. Rows above
+are sizing recommendations, not measurements.
+
+For the Docker Desktop lane with multi-gigabyte evidence, give WSL2 enough
+headroom and keep evidence on WSL2 ext4 (not a Windows OneDrive bind):
+
+```ini
+# %UserProfile%\.wslconfig  — then run: wsl --shutdown
+[wsl2]
+memory=12GB
+processors=6
+```
+
 ## Troubleshooting
 
 | Symptom | What to do |
