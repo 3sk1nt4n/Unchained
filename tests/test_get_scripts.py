@@ -36,7 +36,11 @@ def test_windows_bootstrap_is_key_safe_and_hands_off_to_onboarding() -> None:
     # instead of an old installed copy silently persisting.
     assert "function Write-Skip" in script
     assert "ALWAYS (re)install" in script
-    assert "git -C $repo pull" in script
+    # The clone update must route git's stderr through cmd.exe (Windows
+    # PowerShell 5.1 + EAP Stop otherwise dies on fetch progress) and must
+    # recover a diverged clone instead of stranding the user on stale code.
+    assert 'pull --quiet --ff-only >nul 2>&1"' in script
+    assert "reset --quiet --hard origin/main" in script
 
 
 def test_posix_bootstrap_is_key_safe_and_uses_the_offline_lane() -> None:

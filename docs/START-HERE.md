@@ -116,10 +116,25 @@ evidence and calls OpenAI zero times.** Re-running is safe.
 sentinel
 ```
 
-That's the whole experience. Answer one question (the evidence folder), read the
-case card, confirm from the one launch card (`1` to LAUNCH, `2` to switch depth,
-`3` to switch model, `Q` to quit), then pass the final key step (Enter = saved
-key, or a hidden paste). Nothing spends money until both.
+That's the whole experience. It asks **one question — where is the case?** —
+and there are two easy answers:
+
+- 🧪 **No evidence yet?** Use the Windows one-liner (`get.ps1`): its guided
+  menu offers the **public DC01 practice case** — MD5-verified download,
+  auto-extracted into a clean case folder, ready to investigate.
+- 📁 **Your own case?** Paste the path to ONE folder holding ONE host's
+  evidence:
+
+  ```text
+  C:\Evidence\CASE-A\
+  ├─ host-memory.raw    ← one memory image (.raw / .mem / .vmem / .dmp)
+  └─ host-disk.E01      ← one disk image (.E01 / .dd / raw)
+  ```
+
+Then read the verified case card, confirm from the one launch card (`1` to
+LAUNCH, `2` to switch depth, `3` to switch model, `Q` to quit), and pass the
+final key step (Enter = saved key, or a hidden shape-checked paste). Nothing
+spends money until both.
 
 Then **watch it live**: the opening tools with timings, the model's reasoning
 each turn, findings, the reviewer keeping or downgrading them, and a sealed,
@@ -128,9 +143,11 @@ commands when it finishes.
 
 > **One folder = one case.** Put at most one ready memory image and one ready
 > disk image in a folder. Two of the same kind fail closed — split them into
-> separate folders. Archives (`.zip`, `.7z`) are **not** unpacked; extract
-> permitted contents yourself first. Original evidence bytes stay local; OpenAI
-> only receives the bounded public profile and bounded typed-tool outputs.
+> separate folders. **`.zip` archives are welcome** — the guided flow offers to
+> extract them into a clean sibling folder and re-profiles automatically; other
+> archive types are flagged EXTRACT FIRST and must be unpacked manually.
+> Original evidence bytes stay local; OpenAI only receives the bounded public
+> profile and bounded typed-tool outputs.
 
 Depth is only a set of **hard stop ceilings**, never a different model or a
 quality promise. Both depths use the same GPT-5.6 Sol investigator:

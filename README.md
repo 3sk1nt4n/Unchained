@@ -200,7 +200,18 @@ git clone https://github.com/3sk1nt4n/Unchained.git && cd Unchained
 locally (`$0`, no key, no OpenAI), one launch card
 (`1 = LAUNCH · 2 = depth · 3 = model · Q = quit`), and then the ONE final key
 step before the pipeline starts: Enter uses the saved key, or a hidden paste
-replaces it right there
+replaces it right there.
+
+**Answering the one question** is a card with two easy routes:
+
+- 🧪 **No evidence yet?** The `get.ps1` one-liner's guided menu offers the
+  **public DC01 practice case** — MD5-verified download, auto-extracted into a
+  clean case folder.
+- 📁 **Your own case?** ONE folder = ONE case = ONE host — at most one ready
+  memory image (`.raw`/`.mem`/`.vmem`/`.dmp`) plus at most one disk image
+  (`.E01`/`.dd`/raw); two of the same kind fail closed. `.zip` archives are
+  welcome — the flow offers to extract them locally and re-profiles
+  automatically. Original evidence bytes never leave the machine
 before it runs live and verifies the sealed bundle. No flags, no environment
 variables. Depth (option 2) sets only hard stop ceilings; the same GPT-5.6 Sol
 investigator runs either way:

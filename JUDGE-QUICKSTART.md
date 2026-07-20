@@ -67,9 +67,12 @@ sentinel
 ```
 
 It opens a zero-key welcome (reads nothing, zero OpenAI calls), asks **one
-thing** — where the evidence is — then profiles content and rechecks SHA-256
-custody locally to print a deterministic case card. Archives are not unpacked;
-unsupported documents are hashed/listed and set aside. The router accepts at
+thing** — where the evidence is — with a card that shows exactly what a good
+case folder looks like (one memory image and/or one disk image from one host),
+then profiles content and rechecks SHA-256 custody locally to print a
+deterministic case card. `.zip` archives are offered for local extraction into
+a clean sibling folder; other archives and unsupported documents are
+hashed/listed and set aside. The router accepts at
 most one ready memory image and one ready disk image per case; same-class
 multiples fail closed. It then stops at one launch card that owns model and
 depth (`1 = LAUNCH · 2 = depth · 3 = model · Q = quit`), followed by the one

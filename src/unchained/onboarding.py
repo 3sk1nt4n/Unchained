@@ -287,6 +287,29 @@ def render_launch_gate(
     _boxed("LAUNCH - EVERYTHING ON ONE CARD", lines, stream=stream, color=color, accent=_AMBER)
 
 
+def render_case_prompt_card(*, stream: TextIO, no_color: bool = False) -> None:
+    """The one question a run needs, as a colorful card: what a good case
+    folder looks like, and where to get a public practice case when you have
+    none. Rules mirror the router exactly - never a promise the code refuses."""
+
+    stream = _encoding_safe_stream(stream)
+    color = _supports_color(stream, no_color=no_color)
+    lines = [
+        "ONE folder = ONE case = ONE host. Paste its path below.",
+        "",
+        "  C:\\Evidence\\CASE-A\\",
+        "   |- host-memory.raw    one memory image (.raw .mem .vmem .dmp)",
+        "   |- host-disk.E01      one disk image  (.E01 .dd .img raw)",
+        "",
+        "ZIPs are welcome - I offer to extract them locally, for free.",
+        "Two images of the SAME kind fail closed - use separate folders.",
+        "No evidence yet? The one-line installer (get.ps1) offers the",
+        "public DC01 practice case: MD5-verified download, auto-extracted.",
+        "Original evidence bytes never leave this machine.",
+    ]
+    _boxed("YOUR CASE - PASTE ONE FOLDER", lines, stream=stream, color=color, accent=_CYAN)
+
+
 def render_key_card(
     found: bool, source_label: str | None = None, *, stream: TextIO, no_color: bool = False
 ) -> None:

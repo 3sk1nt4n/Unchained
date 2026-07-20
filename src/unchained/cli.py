@@ -722,18 +722,13 @@ def _prompt_evidence_path() -> Path | None:
     discarded, never used, so a fat-fingered credential can't leak into a path.
     """
 
+    from .onboarding import render_case_prompt_card
+
     print()
-    print("  -- YOUR CASE " + "-" * 52)
-    print("     Paste the path to ONE case's evidence: a folder holding a")
-    print("     memory image and/or a disk image from one host (a memory+disk")
-    print("     PAIR is welcome). ZIP archives are fine - I can extract them")
-    print("     for you. Unchained never downloads evidence itself; for the")
-    print("     public DC01 practice case, the installer walks you to it.")
-    print("     Example: C:\\Evidence\\CASE-A" + " " * 18 + "q = quit")
-    print("  " + "-" * 65)
+    render_case_prompt_card(stream=sys.stdout)
     while True:
         try:
-            raw = input("  > Paste the evidence path (folder or file): ")
+            raw = input("  > Evidence folder path (q = quit): ")
         except (EOFError, OSError):
             return None
         answer = (raw or "").strip().strip('"').strip("'").strip()
