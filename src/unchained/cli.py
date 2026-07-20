@@ -994,6 +994,16 @@ def _progress(message: str) -> None:
         print(f"[sentinel] {message}", file=sys.stderr, flush=True)
 
 
+def _stage(label: str) -> None:
+    """Announce one numbered architecture stage as a banner on the live screen."""
+
+    console = Console(sys.stderr)
+    if console.enabled:
+        console.phase(label)
+    else:
+        print(f"[sentinel] == {label} ==", file=sys.stderr, flush=True)
+
+
 class _AuditNarrator:
     """Display-only proxy over :class:`AuditLog` for an interactive terminal.
 
@@ -1002,18 +1012,21 @@ class _AuditNarrator:
     sole authority. A narration failure can never alter or abort the run.
     """
 
+    # Numbered to the architecture flow so the live screen reads step-by-step.
+    # Keys are the exact model-request phase strings emitted by the agent.
     _PHASE_LABELS = {
-        "opening": "GPT-5.6 opening book",
-        "investigation": "Adaptive investigation",
-        "serialization": "Structured findings serialization",
-        "judge": "Fresh downgrade-only review",
-        "report": "Deterministic report draft",
+        "opening": "STEP 2  OPENING BOOK - GPT-5.6 selects up to 12 typed tools",
+        "investigate": "STEP 5  CASE LEDGER -> PLAN -> ACT -> OBSERVE -> UPDATE (GPT-5.6)",
+        "investigation-finalize": "STEP 6  FORCED SERIALIZATION - strict findings, no tools",
+        "judge": "STEP 8  FRESH JUDGE - preserve or downgrade, never promote",
+        "report": "STEP 9  STRUCTURED REPORT DRAFT - GPT-5.6 narrative",
     }
 
     def __init__(self, audit: AuditLog, console: Console) -> None:
         self._audit = audit
         self._console = console
         self._phase_seen: str | None = None
+        self._execution_announced = False
         self._proposed: dict[str, dict[str, object]] = {}
 
     def __getattr__(self, name: str) -> object:
@@ -1068,6 +1081,9 @@ class _AuditNarrator:
                         f"● {finding.get('finding_id')} - {finding.get('proposed_status')} - "
                         f"{finding.get('severity')} - {str(finding.get('title', ''))[:56]}"
                     )
+                self._console.phase(
+                    "STEP 7  EXACT SPAN RESOLUTION - quote -> artifact SHA-256 + byte range"
+                )
             elif event_type == "judge.completed" and isinstance(payload, dict):
                 for verdict in payload.get("verdicts") or []:
                     if not isinstance(verdict, dict):
@@ -1085,6 +1101,9 @@ class _AuditNarrator:
             elif event_type == "report.completed" and isinstance(payload, dict):
                 report_bytes = payload.get("report_bytes")
                 digest = str(payload.get("report_sha256", ""))[:12]
+                self._console.phase(
+                    "STEP 10  DETERMINISTIC RENDERER - authoritative rows, verdicts, citations"
+                )
                 self._console.ok(
                     f"deterministic report sealed - {report_bytes:,} bytes - sha256 {digest}…"
                 )
@@ -1130,7 +1149,17 @@ class _AuditNarrator:
 
     def tool_started(self, call_id: str, name: str, arguments: object, **kwargs: object) -> None:
         self._audit.tool_started(call_id, name, arguments, **kwargs)  # type: ignore[arg-type]
-        self._narrate(lambda: self._console.step(f"⚒ {name} executing", elapsed=_elapsed()))
+
+        def render() -> None:
+            if not self._execution_announced:
+                self._execution_announced = True
+                self._console.phase(
+                    "STEP 3  PARALLEL TYPED EXECUTION - atomic caps, owned paths, "
+                    "receipts bound to evidence ID + digest"
+                )
+            self._console.step(f"⚒ {name} executing", elapsed=_elapsed())
+
+        self._narrate(render)
 
     def tool_completed(self, result: object, **kwargs: object) -> None:
         self._audit.tool_completed(result, **kwargs)  # type: ignore[arg-type]
@@ -1343,6 +1372,7 @@ def run_cli(
         try:
             cap_config = CapConfig.from_env(caps_profile)
             budget = RunBudget(cap_config)
+            _stage("STEP 1  PROFILE + ROUTE - classify, hash (EID-keyed SHA-256), capability truth")
             _progress("profiling and hashing the evidence set")
             audit.append("caps.configured", asdict(cap_config))
             session = EvidenceSession(
@@ -1464,6 +1494,7 @@ def run_cli(
             )
 
         if custody_required and session is not None:
+            _stage("STEP 11  CLOSE TOOLS/MOUNTS -> FINAL FULL SHA-256 CUSTODY CHECK")
             _progress("performing final full SHA-256 custody verification")
             audit.append("custody.final.started", {})
             try:
@@ -1491,6 +1522,7 @@ def run_cli(
             if investigation is not None and investigation.cap is not None
             else None
         )
+        _stage("STEP 12  SEAL REPORT + STATIC VIEWER + CONTENT-ADDRESSED PROOF BUNDLE")
         try:
             report = report.rstrip() + "\n"
             report_ref = store.write_text(
@@ -1597,6 +1629,7 @@ def run_cli(
 
     from .verify import verify_run
 
+    _stage("STEP 13  OFFLINE LIFECYCLE, HASH, RECEIPT, AND SPAN VERIFICATION")
     verification = verify_run(
         run_directory,
         require_complete=terminal_status is RunStatus.COMPLETE,

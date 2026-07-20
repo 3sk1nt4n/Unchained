@@ -23,6 +23,7 @@ from .models import (
     CASE_LEDGER_UPDATE_MAX_BYTES,
     INVESTIGATION_FINISH_TOOL_NAME,
     MAX_OPENING_TOOLS,
+    MODEL_TOOL_OUTPUT_MAX_BYTES,
     EvidenceProfile,
     EvidenceQuote,
     EvidenceSpan,
@@ -439,9 +440,20 @@ analysis from an unavailable capability.
                 "budget": self.budget.snapshot().public_dict(),
                 "latest_observation_call_ids": [result.call_id for result in observations],
             }
+            # Bound the combined observation payload so the first turn - which
+            # carries the whole opening book - fits the remaining token cap
+            # instead of firing MAX_TOTAL_TOKENS before the model can run. Full
+            # outputs stay retained on disk for exact-span citations.
+            per_observation_bytes = _per_observation_bytes(
+                self.budget.remaining_total_tokens(), len(observations)
+            )
             current_input = [
                 *_user_input(packet),
-                *(item for result in observations for item in _observation_input(result)),
+                *(
+                    item
+                    for result in observations
+                    for item in _observation_input(result, per_observation_bytes)
+                ),
             ]
             response = self.model.create(
                 ModelRequest(
@@ -587,6 +599,11 @@ when corroboration is absent or contradictory.
 
 {HOSTILE_DATA_RULE}
 """.strip()
+        # Bound the batched observations so serializing a large opening fits the
+        # remaining token cap; the full retained outputs remain the span source.
+        finalize_observation_bytes = _per_observation_bytes(
+            self.budget.remaining_total_tokens(), len(self._tool_results)
+        )
         serialization_input = [
             *_user_input(
                 {
@@ -599,7 +616,7 @@ when corroboration is absent or contradictory.
             *(
                 item
                 for result in self._tool_results.values()
-                for item in _observation_input(result)
+                for item in _observation_input(result, finalize_observation_bytes)
             ),
         ]
         response = self.model.create(
@@ -878,8 +895,14 @@ def _user_input(packet: dict[str, Any]) -> list[dict[str, JsonValue]]:
     ]
 
 
-def _observation_input(result: ToolResult) -> tuple[dict[str, JsonValue], ...]:
-    """Pair one local call with its output without replaying provider state."""
+def _observation_input(
+    result: ToolResult, max_bytes: int | None = None
+) -> tuple[dict[str, JsonValue], ...]:
+    """Pair one local call with its output without replaying provider state.
+
+    ``max_bytes`` bounds the retained-output view for THIS request so a batch of
+    large observations fits the total-token cap; the full output stays retained.
+    """
 
     return (
         {
@@ -888,8 +911,25 @@ def _observation_input(result: ToolResult) -> tuple[dict[str, JsonValue], ...]:
             "name": result.tool_name,
             "arguments": canonical_json(result.arguments),
         },
-        function_output(result.call_id, result.model_output()),
+        function_output(result.call_id, result.model_output(max_bytes)),
     )
+
+
+def _per_observation_bytes(remaining_tokens: int, count: int) -> int:
+    """Bytes to feed per observation so a batch fits the remaining token cap.
+
+    Reserves half the remaining budget for the fixed request overhead
+    (instructions, tool schemas, the case-ledger packet, and the response),
+    spends the other half on observations at a conservative ~3 UTF-8 bytes per
+    token, and splits it across the batch. Floored so each tool always shows
+    something, and never above the per-tool model-view cap.
+    """
+
+    if count <= 0:
+        return MODEL_TOOL_OUTPUT_MAX_BYTES
+    observation_tokens = max(0, remaining_tokens) // 2
+    per_observation = (observation_tokens * 3) // count
+    return max(2_048, min(MODEL_TOOL_OUTPUT_MAX_BYTES, per_observation))
 
 
 def _receipt_index(receipts: list[dict[str, JsonValue]]) -> list[dict[str, JsonValue]]:

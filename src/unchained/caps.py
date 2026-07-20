@@ -141,6 +141,16 @@ class RunBudget:
         with self._lock:
             return self._snapshot_unlocked()
 
+    def remaining_total_tokens(self) -> int:
+        """Tokens still available under the total-token cap (never negative).
+
+        Used to bound how much retained tool output is fed to one request so a
+        batch of large observations cannot blow the cap before the model runs.
+        """
+
+        with self._lock:
+            return max(0, self.config.max_total_tokens - self._total_tokens)
+
     def _raise_fired_unlocked(self) -> None:
         if self._fired is not None:
             raise CapExceeded(self._fired, self._fired_detail, self._snapshot_unlocked())

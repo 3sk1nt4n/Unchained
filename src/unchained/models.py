@@ -294,11 +294,21 @@ class ToolResult:
     duration_ms: int
     error: str | None = None
 
-    def model_output(self) -> str:
-        """Return a byte-bounded view while retaining the full accepted output on disk."""
+    def model_output(self, max_bytes: int | None = None) -> str:
+        """Return a byte-bounded view while retaining the full accepted output on disk.
 
+        ``max_bytes`` bounds THIS view (clamped to ``[256, MODEL_TOOL_OUTPUT_MAX_BYTES]``)
+        so a batch of large observations can be fed to one request without
+        exceeding the total-token cap. The full accepted output is always
+        retained on disk and remains the citation source; only the model's
+        prefix view shrinks, and the delivery receipt records the applied cap.
+        """
+
+        cap = MODEL_TOOL_OUTPUT_MAX_BYTES
+        if max_bytes is not None:
+            cap = max(256, min(int(max_bytes), MODEL_TOOL_OUTPUT_MAX_BYTES))
         accepted_bytes = len(self.output.encode("utf-8"))
-        if accepted_bytes <= MODEL_TOOL_OUTPUT_MAX_BYTES:
+        if accepted_bytes <= cap:
             return self.output
 
         def render(prefix_characters: int) -> str:
@@ -309,7 +319,7 @@ class ToolResult:
                         "accepted_output_bytes": accepted_bytes,
                         "accepted_output_sha256": self.output_sha256,
                         "model_view_complete": False,
-                        "model_view_max_bytes": MODEL_TOOL_OUTPUT_MAX_BYTES,
+                        "model_view_max_bytes": cap,
                         "model_view_prefix_characters": prefix_characters,
                         "selection": "native-order UTF-8 prefix",
                     },
@@ -326,7 +336,7 @@ class ToolResult:
         while low <= high:
             middle = (low + high) // 2
             candidate = render(middle)
-            if len(candidate.encode("utf-8")) <= MODEL_TOOL_OUTPUT_MAX_BYTES:
+            if len(candidate.encode("utf-8")) <= cap:
                 best = candidate
                 low = middle + 1
             else:
