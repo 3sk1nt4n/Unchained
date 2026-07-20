@@ -54,7 +54,20 @@ if (Test-Path (Join-Path (Get-Location) "setup.ps1")) {
     $repo = Join-Path $env:USERPROFILE "Unchained"
     if (Test-Path (Join-Path $repo ".git")) {
         Write-Info "Updating the existing clone to the latest main..."
-        git -C $repo pull --ff-only 2>&1 | Out-Null
+        # Windows PowerShell 5.1 + ErrorActionPreference=Stop turns any native
+        # stderr line (git prints fetch progress there) into a terminating
+        # NativeCommandError, killing this installer on its first run after a
+        # push. Route the redirection through cmd.exe so PowerShell never sees
+        # git's stderr, and fall back to a hard reset onto origin/main so a
+        # diverged script-owned clone can never strand the user on stale code.
+        cmd /c "git -C ""$repo"" pull --quiet --ff-only >nul 2>&1"
+        if ($LASTEXITCODE -ne 0) {
+            cmd /c "git -C ""$repo"" fetch --quiet origin main >nul 2>&1"
+            cmd /c "git -C ""$repo"" reset --quiet --hard origin/main >nul 2>&1"
+            if ($LASTEXITCODE -ne 0) {
+                throw "Could not update the existing clone at $repo (git exit $LASTEXITCODE). Delete that folder and re-run this one-liner."
+            }
+        }
     } else {
         git clone https://github.com/3sk1nt4n/Unchained.git $repo
         if ($LASTEXITCODE -ne 0) { throw "git clone failed with exit code $LASTEXITCODE." }
