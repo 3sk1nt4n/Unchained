@@ -49,12 +49,12 @@ bundle that ships in the repository.
 | Time | Screen content | Command / slide | Narration (read aloud) |
 |---|---|---|---|
 | 0:00-0:15 | **Slide 1** (hero + pitch) | Slide 1 | Autonomous forensic agents are easy to demo and hard to trust. Unchained splits the job: GPT-5.6 chooses where to look; deterministic code controls what may run and verifies exactly what was executed and cited. |
-| 0:15-0:38 | Terminal. Type the one word `sentinel`. Guided flow appears: onboarding, evidence checks, the API-key step (skip it, type nothing), the launch gate text. | `sentinel` | One word starts a case. Typing sentinel opens the guided flow: onboarding, evidence checks, and a clearly gated launch step. Nothing here spends money. A paid GPT-5.6 run starts only after an explicit launch confirmation on a money screen that shows the model and its hard cost ceilings. Everything before that gate is free and offline. |
+| 0:15-0:38 | Terminal. Type the one word `sentinel`. Guided flow appears: onboarding, evidence checks, the launch card. Quit it with Q on camera - the hidden key step sits BEHIND the launch card (it appears only after 1 = LAUNCH) and must never be filmed. | `sentinel` | One word starts a case. Typing sentinel opens the guided flow: onboarding, evidence checks, and a clearly gated launch step. Nothing here spends money. A paid GPT-5.6 run starts only after an explicit launch confirmation on a money screen that shows the model and its hard cost ceilings. Everything before that gate is free and offline. |
 | 0:38-0:58 | The $0 case card: `E001 · Windows memory · 2,147,483,648 bytes · SHA-256 8079a7459b1739caf7d4fbf6dde5eb0ae7a9d24dbde657debf4d5202c8dc6b62` and `openai_called: false` highlighted. | `sentinel profile <EVIDENCE_FOLDER> --json` (see Scene 3 note) | Before any model call, deterministic code profiles the evidence: public ID E001, Windows memory, two gigabytes, and its SHA-256 custody hash. Note openai underscore called: false. This step costs zero dollars. Local paths never become model authority. |
 | 0:58-1:23 | Run verify on the shipped authentic bundle. As output prints, highlight fourteen typed tool receipts, all status success, and `gpt-5.6-luna` on the model line. On-screen caption: "Committed copy of run 20260720T013927Z-9f12ec6f — clone the repo and run this yourself." | `sentinel verify examples\public-run-partial` | Now the real thing. This bundle ships in the repository: an authentic GPT-5.6 run on that two-gigabyte memory image, provider-recorded gpt-5.6-luna across four responses. GPT-5.6 opened with a parallel batch of typed Volatility tools and kept investigating: fourteen tool receipts, every one successful, every byte of output retained. |
 | 1:23-1:43 | Same terminal. Highlight: terminal cap reason `MAX_TOOL_CALLS: reservation would reach 14 > 13`; result **VALID**; terminal status PARTIAL; 20 artifacts and 62 audit entries verified. **[SPLICE SLOT eligible, see below]** | (same command, output already on screen) | Then the hard tool budget ended the run as an honest PARTIAL before any overspend: about fifty-six seconds, one hundred eighty thousand provider tokens, a local cost estimate near a dollar sixteen. The offline verifier reconstructs 20 artifacts and 62 hash-chained audit entries and returns VALID. No network, no key. |
 | 1:43-2:06 | The inert viewer. Scroll: custody row (initial SHA-256 equals final), typed tool receipts, the honest hard-budget stop labeled plainly. | `sentinel view examples\public-run-partial` | The bundle ships an inert, no-JavaScript viewer. A judge needs no Python, no key, and no server. Custody intact: initial and final SHA-256 match. A receipt for every tool, and the cap stop labeled plainly. Receipts prove what ran and what was cited. Interpretation stays human. |
-| 2:06-2:26 | **Slide 2** (Built with Codex, Session ID on screen) | Slide 2 | Codex was the primary implementation and adversarial-review collaborator: the evidence lifecycle, the Responses API adapter, the typed execution boundary, caps, the forced serializer, exact evidence spans, the downgrade-only review, the renderers, the verifier, and the 404-test offline gate. The Codex session ID is on screen and committed in the repo. |
+| 2:06-2:26 | **Slide 2** (Built with Codex, Session ID on screen) | Slide 2 | Codex was the primary implementation and adversarial-review collaborator: the evidence lifecycle, the Responses API adapter, the typed execution boundary, caps, the forced serializer, exact evidence spans, the downgrade-only review, the renderers, the verifier, and the 428-test offline gate. The Codex session ID is on screen and committed in the repo. |
 | 2:26-2:45 | **Slide 3** (track, repo URL, verify-it-yourself commands) | Slide 3 | Unchained is not an LLM pretending to be evidence. It is GPT-5.6 directing a bounded investigation whose actions, citations, custody, and final report can be checked independently. Clone the repo and verify it yourself, for zero dollars. |
 
 Do not shorten the closing line to "code proves the incident."
@@ -131,8 +131,8 @@ caps · typed-DONE-v2 · forced serializer · exact evidence spans
 fresh-context downgrade-only review · report + inert viewer renderers
 independent offline verifier · CLI · Docker isolation · tests · docs
 
-404 passing tests across 24 test files · ruff clean
-Runs GPT-5.6 at runtime (Sol investigator/reviewer, Luna canary)
+428 passing tests across 25 test files · ruff clean
+Runs GPT-5.6 at runtime (Sol investigator/reviewer, Terra smoke canary)
 ```
 
 ### Slide 3 (close, 2:26-2:45)
@@ -186,7 +186,7 @@ cut. Section breaks match the scene table.
 7. Codex was the primary implementation and adversarial-review collaborator:
    the evidence lifecycle, the Responses API adapter, the typed execution
    boundary, caps, the forced serializer, exact evidence spans, the
-   downgrade-only review, the renderers, the verifier, and the 404-test offline
+   downgrade-only review, the renderers, the verifier, and the 428-test offline
    gate. The Codex session ID is on screen and committed in the repo.
 8. Unchained is not an LLM pretending to be evidence. It is GPT-5.6 directing a
    bounded investigation whose actions, citations, custody, and final report
@@ -211,12 +211,14 @@ cut. Section breaks match the scene table.
       INVALID on current code.
 - [ ] No secrets on screen: never run `sentinel key`; never echo
       `$env:OPENAI_API_KEY`; the key file path under
-      `%LOCALAPPDATA%\sentinel-unchained\` must never appear; skip the guided
-      key step by typing nothing.
+      `%LOCALAPPDATA%\sentinel-unchained\` must never appear. The guided key
+      step appears only AFTER pressing 1 = LAUNCH, so quitting the launch card
+      with Q keeps it off camera entirely.
 - [ ] No private filesystem paths, hidden browser tabs, or notification pop-ups
       in frame; enable Do Not Disturb.
 - [ ] At the guided-flow money screen, do NOT press 1 (LAUNCH) on camera;
-      show the gate, spend nothing.
+      show the card, press Q, spend nothing. (Pressing 1 would open the final
+      key card and, on Enter, start a paid run.)
 - [ ] Every number shown exists in a committed artifact
       (`docs/runs/sol-capped-dc01-opening.json` for all bundle figures).
 - [ ] Audio clear at normal laptop volume; narration ~150 wpm.

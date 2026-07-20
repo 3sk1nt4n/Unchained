@@ -33,7 +33,7 @@
 
 ### Runtime & platform
 - [x] Cap profiles: **CAUTIOUS** (`--caps strict`) / **FLAGSHIP**
-      (`--caps default`); models: **Sol** (investigator) + **Luna** (cheap canary).
+      (`--caps default`); models: **Sol** (investigator) + **Terra** (cheap canary).
 - [x] Linux/AMD64 hardened Docker + no-key, no-network offline front door.
 - [x] Deterministic native DC01 memory smoke (pstree/psscan/netscan) with
       matching custody — pre-freeze, no model.

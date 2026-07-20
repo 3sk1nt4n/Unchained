@@ -30,7 +30,7 @@ What backs this up, all from the repository:
 
 | Proof | Status |
 |---|---|
-| 404 passing tests across 24 test files (25.11 s run, ruff clean) | Proven, run 2026-07-20 |
+| 428 passing tests across 25 test files (23.09 s run, ruff clean) | Proven, run 2026-07-20 |
 | Authentic retained GPT-5.6 run on real Windows DC01 memory (2,147,483,648 bytes, SHA-256 custody match), 14/14 typed tool receipts | Shipped in the repo at `examples/public-run-partial`; verifies VALID on current code (20 artifacts, 62 hash-chained audit entries) |
 | Earlier `gpt-5.6-sol` capped opening (6/6 tools, VALID recorded at creation: 13 artifacts, 38 audit entries) | Committed at `docs/runs/sol-capped-dc01-opening.json` |
 | Codex Session ID | 019f61e5-5755-7a02-adb4-618d32baab27 |

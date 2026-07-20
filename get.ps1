@@ -220,10 +220,10 @@ while (-not ($keyStatus -match "Key configured via")) {
 }
 if ($keyStatus -match "Key configured via") { Write-Skip "key configured; every command finds it" }
 
-# 4/4 - the live run. onboard --launch shows the verified case card, the key
-# card, then ONE launch card that owns model AND depth (1 = LAUNCH, 2 = depth,
-# 3 = model, Q = quit). No model question here - the card is the only model
-# authority, so nothing is ever asked twice.
+# 4/4 - the live run. onboard --launch shows the verified case card, then ONE
+# launch card that owns model AND depth (1 = LAUNCH, 2 = depth, 3 = model,
+# Q = quit), then the final key step (hidden paste). No model question here -
+# the card is the only model authority, so nothing is ever asked twice.
 Write-Step "4/4" "Launch - one card asks model, depth, and confirmation"
 # An older bootstrap persisted UNCHAINED_MODEL at User scope; clear it so a
 # stale variable can never silently preselect the expensive model.
@@ -233,7 +233,7 @@ if ([Environment]::GetEnvironmentVariable("UNCHAINED_MODEL", "User")) {
 $env:UNCHAINED_MODEL = $null
 $env:UNCHAINED_ALLOW_TEST_MODEL = $null
 if ($keyStatus -match "Key configured via") {
-    Write-Host "      Next: the verified case card, the key card, then the one launch card:" -ForegroundColor Gray
+    Write-Host "      Next: the verified case card, the one launch card, then the final key step:" -ForegroundColor Gray
     Write-Host "      1 = LAUNCH  -  2 = depth  -  3 = model  -  Q = quit" -ForegroundColor Yellow
     Write-Host ""
     & $sentinelExe onboard $chosenCase --launch --caps strict

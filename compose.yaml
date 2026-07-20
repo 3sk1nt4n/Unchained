@@ -41,7 +41,7 @@ services:
     profiles: ["live"]
     environment:
       OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
-      SENTINEL_SMOKE_MODEL: ${SENTINEL_SMOKE_MODEL:-gpt-5.6-luna}
+      SENTINEL_SMOKE_MODEL: ${SENTINEL_SMOKE_MODEL:-gpt-5.6-terra}
     secrets:
       - openai_api_key
     command: ["smoke-openai", "--json"]

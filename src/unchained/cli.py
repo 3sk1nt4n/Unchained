@@ -315,11 +315,16 @@ def _key_command(*, status: bool, remove: bool) -> int:
     if not entered:
         print("Cancelled; nothing was saved.")
         return EXIT_INVALID
-    if "\n" in entered or "\r" in entered or len(entered.encode("utf-8")) > 512:
+    entered = _normalize_pasted_key(entered)
+    if not entered or "\n" in entered or "\r" in entered or len(entered.encode("utf-8")) > 512:
         print("That does not look like one single-line API key; nothing was saved.")
         return EXIT_INVALID
 
-    _store_key_material(entered)
+    try:
+        _store_key_material(entered)
+    except OSError as exc:
+        print(f"Could not write the key file ({type(exc).__name__}); nothing was saved.")
+        return EXIT_INVALID
     entered = ""
 
     success = "Key saved. Every sentinel command now finds it automatically."
@@ -837,12 +842,22 @@ def _offer_zip_extraction(evidence: Path, profile: EvidenceProfile) -> Path | No
     return destination
 
 
+def _normalize_pasted_key(entered: str) -> str:
+    """Undo the two common paste mistakes without weakening any guard: a key
+    copied from an .env line (``OPENAI_API_KEY=...``) and a key wrapped in
+    shell quotes. Anything else passes through untouched."""
+
+    token = entered.strip()
+    token = re.sub(r"^(?:export\s+)?OPENAI_API_KEY\s*=\s*", "", token, flags=re.IGNORECASE)
+    return token.strip().strip('"').strip("'").strip()
+
+
 def _final_key_gate() -> bool:
     """The ONE final step between the launch card and the pipeline: the key
     card with the hidden paste always offered. Enter keeps a saved key, a paste
-    (never echoed) replaces it for this and future runs, and q cancels. The
-    pasted key also overrides any inherited OPENAI_API_KEY for this process, so
-    the key just pasted is always the key the run uses."""
+    (never echoed) replaces the saved key file, and q/n cancels. The pasted key
+    also overrides any inherited OPENAI_API_KEY for this process, so the key
+    just pasted is always the key THIS run uses."""
 
     from .onboarding import render_key_card
 
@@ -862,15 +877,28 @@ def _final_key_gate() -> bool:
         return False
     if not entered:
         return present
-    if entered.lower() in ("q", "quit", "exit"):
+    # The launch card just taught n = no, so honor it here too; the input is
+    # hidden, and a typed refusal must never be stored as a credential.
+    if entered.lower() in ("q", "quit", "exit", "n", "no"):
         return False
-    if "\n" in entered or "\r" in entered or len(entered.encode("utf-8")) > 512:
+    entered = _normalize_pasted_key(entered)
+    if not entered or "\n" in entered or "\r" in entered or len(entered.encode("utf-8")) > 512:
         print("  That does not look like one single-line API key; launch cancelled.")
         return False
-    _store_key_material(entered)
+    try:
+        _store_key_material(entered)
+    except OSError as exc:
+        print(f"  Could not write the key file ({type(exc).__name__}); launch cancelled.")
+        return False
     os.environ["OPENAI_API_KEY"] = entered
     entered = ""
     print("  Key saved with hidden input - using it for this run.")
+    if source in ("environment", "file"):
+        variable = "OPENAI_API_KEY" if source == "environment" else "OPENAI_API_KEY_FILE"
+        print(
+            f"  Note: {variable} is set in this environment. If your shell profile"
+            f" exports it, NEW terminals will use that source, not the saved file."
+        )
     return True
 
 

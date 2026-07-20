@@ -19,7 +19,7 @@
   <img src="https://img.shields.io/badge/Evidence-read--only-dc2626.svg" alt="Read-only evidence">
   <img src="https://img.shields.io/badge/Proof-offline--verifiable-f59e0b.svg" alt="Offline-verifiable proof">
   <img src="https://img.shields.io/badge/OpenAI-GPT--5.6-111827.svg?logo=openai&logoColor=white" alt="OpenAI GPT-5.6">
-  <img src="https://img.shields.io/badge/tests-404%20passing-22c55e.svg" alt="404 tests passing">
+  <img src="https://img.shields.io/badge/tests-428%20passing-22c55e.svg" alt="428 tests passing">
   <img src="https://img.shields.io/badge/proof%20bundle-ships%20in%20this%20repo-8b5cf6.svg" alt="Proof bundle ships in this repo">
 </p>
 
@@ -85,7 +85,7 @@ local SHA-256 case card before any model is involved.
 | Field | Value |
 |---|---|
 | Track | **Developer Tools** — OpenAI Build Week |
-| Built with | **Codex** (implementation + adversarial review) and **GPT-5.6** (Sol investigator/reviewer, Luna canary) |
+| Built with | **Codex** (implementation + adversarial review) and **GPT-5.6** (Sol investigator/reviewer, Terra rehearsal/smoke) |
 | Codex Session ID | `019f61e5-5755-7a02-adb4-618d32baab27` — see [Built with Codex](#built-with-codex) |
 | Fastest no-key test | Two-command install, then `sentinel verify examples/public-run-complete` → **VALID**. A real GPT-5.6 Sol `COMPLETE` run, zero spend ([judge quickstart](JUDGE-QUICKSTART.md)) |
 | Shipped `COMPLETE` proof | [`examples/public-run-complete`](examples/public-run-complete) — an authentic GPT-5.6 **Sol** `COMPLETE` bundle **inside this repo**: real findings, judge verdicts, and a sealed report on the public DC01 case; passes strict `--require-complete --require-live-gpt56` (27 artifacts, 124 audit entries) |
@@ -108,7 +108,7 @@ local SHA-256 case card before any model is involved.
 | Item | Status |
 |---|---|
 | 🟢 Public MIT repo, Codex Session ID, provenance boundary | **Done** |
-| 🟢 404-test offline gate, ruff clean, hardened Docker | **Done** |
+| 🟢 428-test offline gate, ruff clean, hardened Docker | **Done** |
 | 🟢 Live GPT-5.6 Sol opening on real 2 GiB Windows memory | **Done** — retained, capped `PARTIAL` by design |
 | 🟢 Authentic GPT-5.6 bundle **ships in the repo** and verifies `VALID` offline | **Done** — [`examples/public-run-partial`](examples/public-run-partial): 14/14 typed tools, honest `PARTIAL` at the hard cap |
 | 🟢 Zero-key guided onboarding + colorful live run experience | **Done** — see the screen above |
@@ -164,7 +164,7 @@ key and no network.
 | Your machine | Lane | First result in | Spend | Verified state |
 |---|---|---|---|---|
 | 🪟 **Windows 10/11** | Native CPython 3.11 — the flagship forensic lane | ~5 min | $0 until you pick `1 = LAUNCH` on the launch card | ✅ Tested; the live Sol `COMPLETE` run happened here |
-| 🐧 **Linux (AMD64)** | Hardened Docker offline lane | ~3 min | $0 | ✅ Same 404-test suite in-container (a few Windows-only tests skip) |
+| 🐧 **Linux (AMD64)** | Hardened Docker offline lane | ~3 min | $0 | ✅ Same 428-test suite in-container (a few Windows-only tests skip) |
 | 🍎 **macOS** | Same Docker lane via Docker Desktop | ~3 min | $0 | ⚠️ Expected via Docker's `linux/amd64` emulation; not yet verified on Mac hardware |
 
 Every lane converges on the same experience: a colorful guided onboarding, a
@@ -230,7 +230,7 @@ Linux capability dropped, and honestly reports `logs-only`.
 > Mac hardware, and emulation makes large-image work slower — same container,
 > same commands, not yet a tested macOS forensic route.
 
-### 💡 Cheap live check: one GPT-5.6 Luna request
+### 💡 Cheap live check: one GPT-5.6 Terra request
 
 This canary tests only container → OpenAI authentication, the Responses API,
 returned model/request identity, usage accounting, and one forced strict typed
@@ -249,15 +249,14 @@ docker compose --profile live run --rm live-smoke
 
 The key is mounted as a Docker secret and read through
 `OPENAI_API_KEY_FILE`; it is not copied into the image or placed in ordinary
-container environment metadata. The command defaults to `gpt-5.6-luna`, one
+container environment metadata. The command defaults to `gpt-5.6-terra`, one
 request, low reasoning, low verbosity, a 128-output-token ceiling, `store=false`,
 and no retry layer.
 
 > The result is labeled `NONQUALIFYING_CONNECTIVITY_SMOKE`. It cannot satisfy
 > `--require-live-gpt56`, enter the Qwen benchmark, or stand in for a forensic
-> run. Luna is used here because OpenAI positions it for efficient,
-> high-volume work at lower cost; the proof-compatible investigation remains
-> Sol-specific. See OpenAI's [latest-model guide](https://developers.openai.com/api/docs/guides/latest-model)
+> run. Terra is used here as this project's cheaper GPT-5.6 rehearsal tier;
+> the proof-compatible investigation remains Sol-specific. See OpenAI's [latest-model guide](https://developers.openai.com/api/docs/guides/latest-model)
 > and [current pricing](https://developers.openai.com/api/docs/pricing).
 
 The first live canary has now been independently reported as one valid Luna
@@ -438,8 +437,8 @@ Read the full [architecture](docs/ARCHITECTURE.md) or the detailed
 | Capability | State |
 |---|---|
 | OpenAI-native controller and independent offline verifier | ✅ Verified offline |
-| Linux/AMD64 Docker build, 404-test suite, CLI, profile, and custody | ✅ Verified locally |
-| Cheap GPT-5.6 Luna typed-tool canary | ✅ Demonstrated live; second-reviewer-attested (project-affiliated) sanitized receipt |
+| Linux/AMD64 Docker build, 428-test suite, CLI, profile, and custody | ✅ Verified locally |
+| Cheap GPT-5.6 typed-tool canary (run live on Luna; the smoke lane now defaults to Terra) | ✅ Demonstrated live; second-reviewer-attested (project-affiliated) sanitized receipt |
 | Authentic GPT-5.6 Sol capped opening on real Windows memory | ✅ Sanitized receipt committed; `VALID` recorded at creation; terminal state intentionally `PARTIAL` |
 | Shipped verifiable GPT-5.6 bundle in this repo | ✅ [`examples/public-run-partial`](examples/public-run-partial): `gpt-5.6-luna`, 14/14 typed tools, custody match, verifies `VALID` on current code |
 | Authentic `COMPLETE` GPT-5.6 Sol evidence bundle | ✅ Shipped at [`examples/public-run-complete`](examples/public-run-complete): real findings, fresh judge, sealed report; strict `--require-complete --require-live-gpt56` VALID (27 artifacts, 124 audit entries) |
@@ -487,8 +486,8 @@ verification.
 | Downgrade-only fresh review | Finding-ID, status-lattice, span, and receipt tests |
 | Deterministic report and inert viewer | Independent rerender + exact-byte and positive HTML/CSP policy tests |
 | Independent strict verifier | Re-chained adversarial mutations across lifecycle, usage, retry, cost, and custody |
-| Linux Docker packaging | CPython 3.11 test target: the same 404-test suite (a few Windows-only tests skip on Linux), Ruff, format, and `pip check`; non-root runtime/profile gate |
-| Live GPT-5.6 Luna canary | Independently demonstrated; [attested sanitized projection](docs/runs/luna-canary-receipt.json), with no raw receipt available for bundle proof |
+| Linux Docker packaging | CPython 3.11 test target: the same 428-test suite (a few Windows-only tests skip on Linux), Ruff, format, and `pip check`; non-root runtime/profile gate |
+| Live GPT-5.6 canary (Luna at the time; the smoke lane now runs Terra) | Independently demonstrated; [attested sanitized projection](docs/runs/luna-canary-receipt.json), with no raw receipt available for bundle proof |
 | Authentic GPT-5.6 Sol opening on real memory | [Bundle-derived sanitized receipt](docs/runs/sol-capped-dc01-opening.json): 2 model responses, 6 successful opening tools, recorded custody match, `VALID` recorded at creation |
 | Shipped GPT-5.6 bundle in this repo | [`examples/public-run-partial`](examples/public-run-partial): 4 responses, 14 successful typed tools, custody match, verifies `VALID` on current code (20 artifacts, 62 audit entries) |
 | Authentic complete GPT-5.6 Sol case | ✅ [`examples/public-run-complete`](examples/public-run-complete): Sol + HEAVY `COMPLETE`, 3 findings, judge verdicts, sealed report, strict-VALID |
@@ -610,7 +609,7 @@ processors=6
 |---|---|
 | `doctor` says model/key missing | Run `sentinel key` to save your key (the model already defaults to `gpt-5.6`; `OPENAI_API_KEY`/`OPENAI_API_KEY_FILE` also work) |
 | Docker `doctor` exits `2` with no key | Expected for the offline/no-secret service; use `profile` or `--help` for the no-key gate |
-| Luna smoke cannot find its secret | Set host `OPENAI_API_KEY_FILE` to a readable one-line file and add `--profile live` |
+| Terra smoke cannot find its secret | Set host `OPENAI_API_KEY_FILE` to a readable one-line file and add `--profile live` |
 | Profile says mount unavailable | Use raw inspection or a properly configured native forensic host; do not add `--privileged` casually |
 | Multiple same-class images fail | Put each ready memory/disk image in a separate case folder |
 | `view` cannot open from Docker | Verify in the container, then open the bind-mounted `viewer.html` on the host |

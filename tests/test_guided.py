@@ -224,6 +224,66 @@ def test_final_key_gate_q_cancels_and_a_malformed_paste_never_saves(
     assert "single-line" in capsys.readouterr().out
 
 
+def test_final_key_gate_a_typed_refusal_is_never_stored_as_a_credential(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # The launch card just taught n = no; a hidden prompt must honor it too,
+    # never truncating a good saved key down to the two bytes "no".
+    monkeypatch.setattr(cli_module, "openai_api_key_status", lambda: (True, "default-key-file"))
+    monkeypatch.setattr(
+        cli_module,
+        "_store_key_material",
+        lambda *_a: (_ for _ in ()).throw(AssertionError("must not save")),
+    )
+
+    for refusal in ("n", "no", "N", "NO"):
+        monkeypatch.setattr("getpass.getpass", lambda _prompt="", _r=refusal: _r)
+        assert cli_module._final_key_gate() is False
+
+
+def test_final_key_gate_normalizes_env_style_and_quoted_pastes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    stored: list[str] = []
+    monkeypatch.setenv("OPENAI_API_KEY", "restored-by-monkeypatch")
+    monkeypatch.setattr(cli_module, "openai_api_key_status", lambda: (False, None))
+    monkeypatch.setattr(cli_module, "_store_key_material", stored.append)
+
+    monkeypatch.setattr("getpass.getpass", lambda _prompt="": '"sk0proj0AbCd1234EfGh5678IjKl"')
+    assert cli_module._final_key_gate() is True
+    monkeypatch.setattr(
+        "getpass.getpass", lambda _prompt="": "OPENAI_API_KEY=sk0proj0AbCd1234EfGh5678IjKl"
+    )
+    assert cli_module._final_key_gate() is True
+
+    assert stored == ["sk0proj0AbCd1234EfGh5678IjKl", "sk0proj0AbCd1234EfGh5678IjKl"]
+
+
+def test_normalize_pasted_key_strips_env_prefix_and_quotes_only() -> None:
+    normalize = cli_module._normalize_pasted_key
+    assert normalize('  "sk0token0AbCd1234"  ') == "sk0token0AbCd1234"
+    assert normalize("export OPENAI_API_KEY='sk0token0AbCd1234'") == "sk0token0AbCd1234"
+    assert normalize("openai_api_key = sk0token0AbCd1234") == "sk0token0AbCd1234"
+    # A bare key is untouched, even when it contains '=' later in the token.
+    assert normalize("sk0token0AbCd1234==") == "sk0token0AbCd1234=="
+
+
+def test_final_key_gate_reports_an_unwritable_key_file_and_cancels(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    monkeypatch.setattr(cli_module, "openai_api_key_status", lambda: (False, None))
+    monkeypatch.setattr("getpass.getpass", lambda _prompt="": "sk0proj0AbCd1234EfGh5678IjKl")
+    monkeypatch.setattr(
+        cli_module,
+        "_store_key_material",
+        lambda *_a: (_ for _ in ()).throw(PermissionError(13, "denied")),
+    )
+
+    assert cli_module._final_key_gate() is False
+    assert "Could not write the key file" in capsys.readouterr().out
+
+
 def test_guided_cancelled_launch_stays_offline(
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],

@@ -211,7 +211,7 @@ setting two variables before you run `sentinel`:
 
 ```powershell
 $env:UNCHAINED_ALLOW_TEST_MODEL = "1"
-$env:UNCHAINED_MODEL = "gpt-5.6-luna"
+$env:UNCHAINED_MODEL = "gpt-5.6-terra"
 sentinel
 ```
 

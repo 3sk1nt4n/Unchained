@@ -517,7 +517,7 @@ live-readiness check and correctly reports not ready in this offline/no-secret
 service. Expected fixture-profile facts include `logs-only`, evidence ID `E001`,
 `openai_called=false`, and matching custody.
 
-For the one-request GPT-5.6 Luna typed-tool canary, store the key in a readable
+For the one-request GPT-5.6 Terra typed-tool canary, store the key in a readable
 one-line file outside the repository and mount it as a Compose secret:
 
 ```powershell

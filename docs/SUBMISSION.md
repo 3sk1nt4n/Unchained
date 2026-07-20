@@ -84,7 +84,7 @@ owns interpretation and response.
 - Deterministically rendered findings, citations, report, inert viewer, manifest,
   usage/cost accounting, and independent offline lifecycle verification.
 - A non-root, read-only Docker runtime with a no-network evidence service and an
-  isolated one-request GPT-5.6 Luna connectivity service that has no evidence or
+  isolated one-request GPT-5.6 Terra connectivity service that has no evidence or
   proof-bundle mounts.
 
 ### Retained evidence
@@ -110,7 +110,7 @@ sentinel verify <bundle>
 sentinel view <bundle>
 ```
 
-The README gives three safe paths: no-key Docker profiling, a cheap Luna
+The README gives three safe paths: no-key Docker profiling, a cheap Terra
 connectivity check, and the real Sol proof path. Operators see route/readiness,
 public evidence IDs, selected opening tools, receipts, finding/reviewer
 transitions, the bundle path, and exact verify/view commands. Judges can inspect
