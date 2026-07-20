@@ -1,0 +1,61 @@
+{
+  "custody": {
+    "baseline_established": true,
+    "final_check_performed": true,
+    "match": true,
+    "mount_released": true
+  },
+  "investigation": {
+    "finding_count": 0,
+    "turns": 0,
+    "verdict_count": 0
+  },
+  "model": {
+    "provider_models": [
+      "gpt-5.6-luna"
+    ],
+    "request_ids_present": 4,
+    "requested_models": [
+      "gpt-5.6-luna"
+    ],
+    "response_ids_present": 4,
+    "responses": 4
+  },
+  "profile": {
+    "capability_label": "Windows tested path - memory ready",
+    "evidence_items": 1,
+    "os": "windows",
+    "shape": "memory-only"
+  },
+  "run_id": "20260720T013927Z-9f12ec6f",
+  "schema_version": 1,
+  "terminal": {
+    "cap": "MAX_TOOL_CALLS",
+    "exit_code": 3,
+    "reason": "MAX_TOOL_CALLS: reservation would reach 14 > 13",
+    "status": "PARTIAL"
+  },
+  "time": {
+    "ended_at_utc": "2026-07-20T01:40:23.259207+00:00",
+    "started_at_utc": "2026-07-20T01:39:27.717289+00:00",
+    "wall_ms": 55547
+  },
+  "tools": {
+    "completed": 14,
+    "started": 14,
+    "status_counts": {
+      "capped": 1,
+      "success": 13
+    }
+  },
+  "usage": {
+    "cache_write_tokens": 176859,
+    "cached_input_tokens": 1352,
+    "estimated_cost_usd": 1.15606475,
+    "input_tokens": 178699,
+    "output_tokens": 1586,
+    "provider_billed_cost_usd": null,
+    "provider_total_tokens": 180285,
+    "reasoning_tokens": 250
+  }
+}

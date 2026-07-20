@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unchained — OpenAI Build Week 2026</title>
+<style>
+  :root{
+    --bg:#07090c;
+    --panel:#0d1117;
+    --line:#1c232e;
+    --text:#e8eaee;
+    --dim:#8b93a1;
+    --faint:#5b6472;
+    --accent:#e8a33d;          /* single restrained accent: forensic amber */
+    --accent-soft:rgba(232,163,61,.08);
+    --model:#7d8794;           /* neutral gray = model judgment (kept to one accent) */
+    --mono:ui-monospace,"Cascadia Code",Consolas,"SF Mono",Menlo,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;background:var(--bg);overflow:hidden;
+    font-family:var(--sans);color:var(--text);
+    -webkit-font-smoothing:antialiased;user-select:none;cursor:default}
+
+  /* Fixed 1920x1080 stage scaled to fit the viewport — pixel sizes below are true 1080p sizes */
+  #stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;
+    transform:translate(-50%,-50%) scale(1);transform-origin:center center}
+
+  .slide{position:absolute;inset:0;padding:120px 150px 140px;
+    display:flex;flex-direction:column;justify-content:center;
+    opacity:0;visibility:hidden;transition:opacity .22s ease}
+  .slide.active{opacity:1;visibility:visible}
+
+  .kicker{font-family:var(--mono);font-size:24px;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--accent);margin-bottom:34px}
+  h1{font-size:168px;font-weight:750;letter-spacing:-.02em;line-height:1}
+  h2{font-size:70px;font-weight:700;letter-spacing:-.015em;line-height:1.12;margin-bottom:46px}
+  p,li{font-size:37px;line-height:1.5;color:var(--text)}
+  .dim{color:var(--dim)}
+  .faint{color:var(--faint)}
+  .accent{color:var(--accent)}
+  .mono{font-family:var(--mono)}
+
+  .rule{width:96px;height:4px;background:var(--accent);border-radius:2px;margin:0 0 44px}
+
+  ul.punch{list-style:none}
+  ul.punch li{padding-left:46px;position:relative;margin-bottom:30px}
+  ul.punch li::before{content:"▸";position:absolute;left:0;color:var(--accent);font-size:34px;top:3px}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:stretch}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:48px 52px}
+  .card.hot{border-color:rgba(232,163,61,.45);background:var(--accent-soft)}
+  .card h3{font-size:40px;font-weight:700;margin-bottom:28px}
+  .card ul{list-style:none}
+  .card li{font-size:32px;line-height:1.45;margin-bottom:18px;padding-left:36px;position:relative;color:var(--text)}
+  .card li::before{content:"—";position:absolute;left:0;color:var(--faint)}
+  .card.hot li::before{color:var(--accent)}
+
+  .code{font-family:var(--mono);background:#0a0e13;border:1px solid var(--line);
+    border-left:4px solid var(--accent);border-radius:10px;
+    padding:34px 42px;font-size:29px;line-height:1.75;color:#d7dce3;
+    white-space:pre;overflow:hidden;user-select:text}
+  .code .c{color:var(--faint)}
+  .code .a{color:var(--accent)}
+
+  .facts{display:grid;grid-template-columns:1fr 1fr;gap:18px 64px;margin-bottom:40px}
+  .fact{display:flex;justify-content:space-between;gap:30px;align-items:baseline;
+    border-bottom:1px solid var(--line);padding:14px 2px}
+  .fact .k{font-size:30px;color:var(--dim);white-space:nowrap}
+  .fact .v{font-size:30px;font-family:var(--mono);text-align:right;color:var(--text)}
+  .fact .v.hot{color:var(--accent)}
+
+  .foot-note{font-size:26px;color:var(--faint);line-height:1.5;margin-top:34px}
+
+  /* chrome */
+  #counter{position:absolute;right:64px;bottom:44px;font-family:var(--mono);
+    font-size:24px;color:var(--faint);letter-spacing:.12em}
+  #brand{position:absolute;left:64px;bottom:44px;font-family:var(--mono);
+    font-size:24px;color:var(--faint);letter-spacing:.24em}
+  #brand b{color:var(--accent);font-weight:600}
+
+  /* svg flow */
+  .flow{width:100%;margin-top:8px}
+  .legend{display:flex;gap:64px;margin-top:36px;align-items:center}
+  .legend span{font-size:28px;color:var(--dim);display:flex;gap:18px;align-items:center}
+  .sw{width:30px;height:30px;border-radius:7px;display:inline-block;flex:none}
+  .sw.code{border:3px solid var(--accent);background:var(--accent-soft)}
+  .sw.model{border:3px solid var(--model);background:rgba(255,255,255,.04)}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- 1 · TITLE -->
+  <section class="slide active">
+    <div class="kicker">OpenAI Build Week 2026 · Developer Tools</div>
+    <h1>Unchained</h1>
+    <p style="font-size:46px;line-height:1.4;margin-top:52px;max-width:1520px">
+      GPT&#8209;5.6 chooses where to look; <span class="accent">deterministic code</span> controls
+      what may run and verifies exactly what was executed and cited.
+    </p>
+    <p class="dim" style="font-size:33px;margin-top:44px">
+      A bounded autonomous DFIR investigator, built with Codex and GPT&#8209;5.6.
+      <span class="faint">&nbsp;·&nbsp; Judges can run it in about a minute, for $0, with no API key.</span>
+    </p>
+  </section>
+
+  <!-- 2 · PROBLEM -->
+  <section class="slide">
+    <div class="kicker">The problem</div>
+    <h2>A transcript is not an answer.</h2>
+    <div class="rule"></div>
+    <ul class="punch" style="max-width:1500px">
+      <li>Agents now touch real evidence — and DFIR conclusions go in front of regulators and opposing counsel.</li>
+      <li>A chat log cannot prove which tools actually ran, what output was retained, or what exact text a claim cites.</li>
+      <li>If the AI&rsquo;s work cannot be checked independently, it is not evidence. It is a story.</li>
+    </ul>
+  </section>
+
+  <!-- 3 · THE IDEA -->
+  <section class="slide">
+    <div class="kicker">The idea</div>
+    <h2>Split strategy from authority.</h2>
+    <div class="cols">
+      <div class="card">
+        <h3 style="color:var(--model)">GPT&#8209;5.6 decides</h3>
+        <ul>
+          <li>Where to look: an opening book of up to <b>twelve</b> typed forensic tools</li>
+          <li>One typed action per adaptive turn, against a visible ledger</li>
+          <li>How to interpret output; which findings to propose</li>
+        </ul>
+      </div>
+      <div class="card hot">
+        <h3 class="accent">Deterministic code owns</h3>
+        <ul>
+          <li>What may run: typed, route&#8209;eligible, read&#8209;only, all&#8209;or&#8209;none</li>
+          <li>SHA&#8209;256 custody and hard caps that fire before dispatch</li>
+          <li>Exact UTF&#8209;8 citation spans, the report, the sealed bundle, offline verification</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 · ARCHITECTURE -->
+  <section class="slide">
+    <div class="kicker">Architecture</div>
+    <h2 style="margin-bottom:30px">One bounded lifecycle, receipts at every step.</h2>
+    <svg class="flow" viewBox="0 0 1640 530" role="img" aria-label="Unchained lifecycle flow">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#5b6472"/>
+        </marker>
+      </defs>
+      <!-- row 1 : left to right -->
+      <g font-family="ui-monospace,Consolas,monospace" text-anchor="middle">
+        <rect x="0" y="30" width="350" height="130" rx="14" fill="rgba(232,163,61,.08)" stroke="#e8a33d" stroke-width="2.5"/>
+        <text x="175" y="85" font-size="27" fill="#e8eaee">Evidence folder</text>
+        <text x="175" y="122" font-size="23" fill="#8b93a1">read-only</text>
+
+        <line x1="358" y1="95" x2="422" y2="95" stroke="#5b6472" stroke-width="3" marker-end="url(#ar)"/>
+
+        <rect x="430" y="30" width="350" height="130" rx="14" fill="rgba(232,163,61,.08)" stroke="#e8a33d" stroke-width="2.5"/>
+        <text x="605" y="85" font-size="27" fill="#e8eaee">Profile · route</text>
+        <text x="605" y="122" font-size="23" fill="#8b93a1">initial SHA-256</text>
+
+        <line x1="788" y1="95" x2="852" y2="95" stroke="#5b6472" stroke-width="3" marker-end="url(#ar)"/>
+
+        <rect x="860" y="30" width="350" height="130" rx="14" fill="rgba(255,255,255,.04)" stroke="#7d8794" stroke-width="2.5"/>
+        <text x="1035" y="85" font-size="27" fill="#e8eaee">GPT-5.6 opening book</text>
+        <text x="1035" y="122" font-size="23" fill="#8b93a1">up to 12 typed tools</text>
+
+        <line x1="1218" y1="95" x2="1282" y2="95" stroke="#5b6472" stroke-width="3" marker-end="url(#ar)"/>
+
+        <rect x="1290" y="30" width="350" height="130" rx="14" fill="rgba(232,163,61,.08)" stroke="#e8a33d" stroke-width="2.5"/>
+        <text x="1465" y="85" font-size="27" fill="#e8eaee">All-or-none validation</text>
+        <text x="1465" y="122" font-size="23" fill="#8b93a1">parallel execution</text>
+      </g>
+
+      <!-- connector down -->
+      <line x1="1465" y1="168" x2="1465" y2="342" stroke="#5b6472" stroke-width="3" marker-end="url(#ar)"/>
+
+      <!-- row 2 : right to left -->
+      <g font-family="ui-monospace,Consolas,monospace" text-anchor="middle">
+        <rect x="1352" y="350" width="288" height="130" rx="14" fill="rgba(255,255,255,.04)" stroke="#7d8794" stroke-width="2.5"/>
+        <text x="1496" y="405" font-size="25" fill="#e8eaee">Adaptive loop</text>
+        <text x="1496" y="440" font-size="21" fill="#8b93a1">one typed action/turn</text>
+
+        <line x1="1346" y1="415" x2="1310" y2="415" stroke="#5b6472" stroke-width="3" marker-end="url(#ar)"/>
+
+        <rect x="1014" y="350" width="288" height="130" rx="14" fill="rgba(232,163,61,.08)" stroke="#e8a33d" stroke-width="2.5"/>
+        <text x="1158" y="405" font-size="25" fill="#e8eaee">Typed DONE</text>
+        <text x="1158" y="440" font-size="21" fill="#8b93a1">forced findings</text>
+
+        <line x1="1008" y1="415" x2="972" y2="415" stroke="#5b6472" stroke-width="3" marker-end="url(#ar)"/>
+
+        <rect x="676" y="350" width="288" height="130" rx="14" fill="rgba(255,255,255,.04)" stroke="#7d8794" stroke-width="2.5"/>
+        <text x="820" y="405" font-size="25" fill="#e8eaee">Fresh review</text>
+        <text x="820" y="440" font-size="21" fill="#8b93a1">downgrade-only</text>
+
+        <line x1="670" y1="415" x2="634" y2="415" stroke="#5b6472" stroke-width="3" marker-end="url(#ar)"/>
+
+        <rect x="338" y="350" width="288" height="130" rx="14" fill="rgba(232,163,61,.08)" stroke="#e8a33d" stroke-width="2.5"/>
+        <text x="482" y="405" font-size="25" fill="#e8eaee">Report · viewer</text>
+        <text x="482" y="440" font-size="21" fill="#8b93a1">sealed bundle</text>
+
+        <line x1="332" y1="415" x2="296" y2="415" stroke="#5b6472" stroke-width="3" marker-end="url(#ar)"/>
+
+        <rect x="0" y="350" width="288" height="130" rx="14" fill="rgba(232,163,61,.08)" stroke="#e8a33d" stroke-width="2.5"/>
+        <text x="144" y="405" font-size="25" fill="#e8eaee">Offline verifier</text>
+        <text x="144" y="440" font-size="21" fill="#8b93a1">byte-exact · custody</text>
+      </g>
+    </svg>
+    <div class="legend">
+      <span><i class="sw code"></i> deterministic code authority</span>
+      <span><i class="sw model"></i> GPT&#8209;5.6 judgment inside a bounded protocol</span>
+      <span class="faint" style="font-size:26px">4 fixed GPT&#8209;5.6 requests + one per adaptive action — never an unbounded loop</span>
+    </div>
+  </section>
+
+  <!-- 5 · PROOF -->
+  <section class="slide">
+    <div class="kicker">Proof, not promises</div>
+    <h2 style="margin-bottom:36px">A real GPT&#8209;5.6 run — shipped in the repo.</h2>
+    <div class="facts">
+      <div class="fact"><span class="k">Provider model recorded</span><span class="v hot">gpt-5.6-luna · 4 responses</span></div>
+      <div class="fact"><span class="k">Typed tool receipts</span><span class="v">14 executed · all success</span></div>
+      <div class="fact"><span class="k">Evidence</span><span class="v">Windows memory · 2,147,483,648 B</span></div>
+      <div class="fact"><span class="k">Custody</span><span class="v hot">SHA-256 initial == final</span></div>
+      <div class="fact"><span class="k">Spend</span><span class="v">180,285 tokens · 55.5 s · ~$1.16 est.</span></div>
+      <div class="fact"><span class="k">Terminal status</span><span class="v">PARTIAL · hard cap fired · labeled as such</span></div>
+      <div class="fact"><span class="k">Offline verification</span><span class="v hot">VALID · 20 artifacts · 62 audit entries</span></div>
+      <div class="fact"><span class="k">Ships in the repo</span><span class="v">examples/public-run-partial</span></div>
+    </div>
+    <div class="code">sentinel verify examples\public-run-partial
+sentinel view   examples\public-run-partial   <span class="c"># inert, no-JS viewer</span></div>
+    <p class="foot-note">A second sanitized receipt — the earlier gpt&#8209;5.6&#8209;sol capped opening (6/6 tools, VALID recorded at creation) —
+    is committed at <span class="mono">docs/runs/sol-capped-dc01-opening.json</span>.</p>
+  </section>
+
+  <!-- 6 · CODEX -->
+  <section class="slide">
+    <div class="kicker">Built with Codex</div>
+    <h2>Codex built the control plane.</h2>
+    <div class="rule"></div>
+    <ul class="punch" style="max-width:1560px">
+      <li>Primary implementation and <b>adversarial-review</b> collaborator for the Build Week codebase.</li>
+      <li>Evidence lifecycle, Responses API adapter, typed execution boundary, caps, typed&#8209;DONE&#8209;v2, forced serializer, exact evidence spans, downgrade&#8209;only review, renderers, offline verifier, CLI, Docker, tests.</li>
+      <li>Wrote adversarial tests, reproduced defects, and verified live rules against the official API.</li>
+      <li>Result: <span class="accent">404/404 tests passing in 25.11 s</span> across 24 files, ruff clean.</li>
+    </ul>
+    <p class="mono dim" style="font-size:28px;margin-top:34px">Codex Session ID&nbsp;&nbsp;019f61e5-5755-7a02-adb4-618d32baab27</p>
+    <p class="foot-note">Human decisions stayed human: product thesis, track, DFIR testbed, authority split, scope cuts, claim language, final submission.</p>
+  </section>
+
+  <!-- 7 · HONEST -->
+  <section class="slide">
+    <div class="kicker">Honest by design</div>
+    <h2>Fail closed. Label everything.</h2>
+    <div class="rule"></div>
+    <ul class="punch" style="max-width:1520px">
+      <li>Caps fire <b>before</b> dispatch; a capped run ends <span class="mono accent">PARTIAL</span> — never relabeled COMPLETE.</li>
+      <li>Receipts prove what ran and what was cited — not forensic truth. A human owns interpretation.</li>
+      <li>No COMPLETE GPT&#8209;5.6 bundle published yet, and no same&#8209;evidence benchmark — so no unmeasured claims, anywhere.</li>
+    </ul>
+  </section>
+
+  <!-- 8 · JUDGE LANE -->
+  <section class="slide">
+    <div class="kicker">Judge lane · $0 · no API key</div>
+    <h2 style="margin-bottom:36px">Run it yourself, right now.</h2>
+    <div class="code">git clone https://github.com/3sk1nt4n/Unchained.git; cd Unchained
+py -3.11 -m venv .judge; .judge\Scripts\python.exe -m pip install -q .
+.judge\Scripts\python.exe -m unchained onboard
+.judge\Scripts\python.exe -m unchained profile docker/fixtures --json</div>
+    <p class="foot-note" style="font-size:29px;color:var(--dim)">
+      The pip install is the only wait (~1&ndash;2 min). Every command after returns in well under a second
+      and <b>never contacts OpenAI</b>. Full isolation instead:
+      <span class="mono">docker compose run --rm offline profile /evidence --json</span></p>
+    <p class="foot-note">Paid runs are gated behind a saved key plus the exact interactive phrase <span class="mono">LAUNCH GPT-5.6 SOL</span>.</p>
+  </section>
+
+  <!-- 9 · CLOSE -->
+  <section class="slide">
+    <div class="kicker">Unchained</div>
+    <h2 style="max-width:1560px">Unchained is not an LLM pretending to be evidence.</h2>
+    <p style="font-size:40px;max-width:1500px;color:var(--dim);line-height:1.5">
+      It is GPT&#8209;5.6 directing a bounded investigation whose actions, citations, custody,
+      and final report can be checked independently.</p>
+    <p class="mono" style="font-size:33px;margin-top:64px">
+      <span class="accent">github.com/3sk1nt4n/Unchained</span>
+      <span class="faint">&nbsp;·&nbsp;</span>MIT
+      <span class="faint">&nbsp;·&nbsp;</span>Developer Tools · OpenAI Build Week 2026</p>
+    <p class="foot-note">Adil Eskintan · Codex Session 019f61e5-5755-7a02-adb4-618d32baab27 · demo video link: added on upload</p>
+  </section>
+
+  <div id="brand"><b>UNCHAINED</b>&nbsp;&nbsp;BUILD WEEK 2026</div>
+  <div id="counter">1 / 9</div>
+</div>
+
+<script>
+(function () {
+  var stage = document.getElementById('stage');
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var counter = document.getElementById('counter');
+  var i = 0;
+
+  function fit() {
+    var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    stage.style.transform = 'translate(-50%,-50%) scale(' + s + ')';
+  }
+  function show(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (sl, k) { sl.classList.toggle('active', k === i); });
+    counter.textContent = (i + 1) + ' / ' + slides.length;
+  }
+  window.addEventListener('resize', fit);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown' || e.key === 'Enter') { show(i + 1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { show(i - 1); e.preventDefault(); }
+    else if (e.key === 'Home') { show(0); }
+    else if (e.key === 'End') { show(slides.length - 1); }
+  });
+  document.addEventListener('click', function (e) {
+    if (e.shiftKey) { show(i - 1); } else { show(i + 1); }
+  });
+  fit();
+  show(0);
+})();
+</script>
+</body>
+</html>

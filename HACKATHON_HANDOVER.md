@@ -60,6 +60,46 @@ used literally.
   "up to six tools" (runtime now allows twelve) and lines 3-6/92-93 carry
   PENDING placeholders. VERIFIED.
 
+### A0.1 — ~02:00 ET addendum: bundle truth table and centerpiece switch (PROVEN)
+
+I ran `sentinel verify` on all 19 bundles with current code. Result:
+
+- **All seven 2026-07-19 bundles are INVALID on current code** with the same
+  error: `viewer.html is not the exact deterministic rendering of the proof
+  bundle`. The 07-19→07-20 UX commits changed the deterministic renderer (the
+  `active_model_label()` fix touched exactly this surface); the verifier is
+  doing its job — bundles verify against the code that produced them. These
+  bundles also carry `git_commit: null` (known backlog item 3), so the creating
+  commit is not recorded inside them. **Rule: never demo `verify` on a 07-19
+  bundle.** This includes the former centerpiece `ede6c445`.
+- **All seven 2026-07-20 bundles verify VALID on current code.** Four contain
+  substantial authentic GPT-5.6 work on real DC01 memory (all `gpt-5.6-luna`):
+
+| Bundle | Tools completed | Honest terminal reason |
+|---|---|---|
+| `20260720T012452Z-f76b1eb5` | **25** | 429 TPM at investigation-finalize (271,551 vs 200k) — the retained OpenAI error is itself proof of a real model |
+| `20260720T004618Z-ffdcb89c` | 19 | ledger-protocol stop |
+| `20260720T011946Z-794ede29` | 17 | MAX_TOTAL_TOKENS |
+| `20260720T013927Z-9f12ec6f` | 14 | MAX_TOOL_CALLS |
+
+**Centerpiece switch: the on-camera bundle is `9f12ec6f`** — its cap story
+matches the script's narrative shape (14/14 receipts, then `MAX_TOOL_CALLS:
+reservation would reach 14 > 13`), it verifies VALID today (20 artifacts, 62
+audit entries), and its terminal reason contains no org ID. `f76b1eb5` (25
+tools, honest 429 wall) stays the depth exemplar in the written docs. Because
+`unchained-runs/` is **gitignored, no bundle previously shipped to judges**; a
+privacy-scanned copy of `9f12ec6f` is now committed at
+`examples/public-run-partial/` (scan result: only victim-machine paths from
+DC01 itself, e.g. `C:\Users\ADMINI~1`, which are forensic evidence content —
+no runner-local paths, no org ID, no key material; the copy re-verifies VALID).
+Sol nuance: the only `gpt-5.6-sol` bundle is the 07-19 one; its sanitized
+receipt stays committed at `docs/runs/sol-capped-dc01-opening.json`, and a
+fresh capped Sol run on current code (W5a) is the cheap upgrade once the key
+lands.
+
+Also re-PROVEN at ~02:00 ET: the GitHub repo is live-public via unauthenticated
+API (`private: False`, MIT, default branch `main`, pushed today).
+
 ### A1. Independent judge simulation (equal-weight criteria, harsh)
 
 | Scenario | Tech | Design | Impact | Idea | Stage One |
@@ -85,7 +125,7 @@ video time for run retries.**
 | W4 | OpenAI billing: add credit, confirm real TPM tier | **HUMAN** | Mon 08:30–09:30 | Mon 12:00 | PENDING — ceiling path only |
 | W5 | Authentic COMPLETE run attempts on DC01 + strict verify (`--require-complete --require-live-gpt56`) | **HUMAN** key, agent drives | Mon 10:00–16:00 | **HARD ABANDON GATE Mon 16:00** | PENDING — optional ceiling |
 | W6 | Benchmark comparison vs open-weight baseline | agent | Mon 14:00–15:30 | Only if W5 COMPLETE by 14:00, else first cut | PENDING |
-| W7 | Record video, **strictly under 3:00**, audio names Codex + GPT-5.6 (AI narration allowed). Plan A: splice COMPLETE verify. Plan B: `ede6c445` authentic receipt → offline verify VALID → $0 no-key lane → Codex build story | **HUMAN** (voice) or AI narration; agent preps scenes | Mon 17:00–21:00 | Tue 08:00 (emergency slot) | PENDING — **the only mandatory gap** |
+| W7 | Record video, **strictly under 3:00**, audio names Codex + GPT-5.6 (AI narration allowed). Plan A: splice COMPLETE verify. Plan B: shipped bundle `examples/public-run-partial` (`9f12ec6f`) → offline verify VALID → $0 no-key lane → Codex build story | **HUMAN** (voice) or AI narration; agent preps scenes | Mon 17:00–21:00 | Tue 08:00 (emergency slot) | PENDING — **the only mandatory gap** |
 | W8 | YouTube upload public + incognito playback QA (<3:00 runtime, audio audible) | **HUMAN** | Mon 21:00–22:00 | Tue 11:30 | PENDING |
 | W9 | Final README/SUBMISSION sync with real artifact IDs, submission tag, push; re-verify repo is live-public (last checked 07-14) | agent | Mon 22:00–23:00 | Tue 09:00 | PENDING |
 | W10 | `/feedback` re-run from majority-core Codex thread; if new ID, update all 8 referencing files | **HUMAN** in Codex | Tue 07:00–07:30 | Tue 12:00 — fallback: existing ID stands | PENDING |

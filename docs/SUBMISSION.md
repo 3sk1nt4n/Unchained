@@ -5,6 +5,8 @@
 > Replace every `PENDING` field only from a retained artifact produced by the
 > frozen workflow.
 
+Paste-ready form blocks live in [submission/DEVPOST-FORM.md](../submission/DEVPOST-FORM.md).
+
 ## Submission identity
 
 | Field | Value |
@@ -13,9 +15,9 @@
 | Track | Developer Tools |
 | Repository | <https://github.com/3sk1nt4n/Unchained> |
 | License | MIT |
-| Submission commit/tag | `PENDING_FINAL_FREEZE` |
-| Public video under three minutes | `PENDING` |
-| Public authentic viewer/bundle | `PENDING_COMPLETE_RUN` |
+| Submission commit/tag | PENDING — filled at final submission (see submission/SUBMISSION-CHECKLIST.md) |
+| Public video under three minutes | PENDING — filled at final submission (see submission/SUBMISSION-CHECKLIST.md) |
+| Public authentic viewer/bundle | PENDING — filled at final submission (see submission/SUBMISSION-CHECKLIST.md) |
 | Majority-core `/feedback` Session ID | `019f61e5-5755-7a02-adb4-618d32baab27` — re-evaluate after final core work |
 | Docker/README follow-up thread | `019f76f3-a19f-71d1-81b2-eed6305857f6` — thread provenance, not a feedback receipt unless submitted successfully |
 
@@ -37,7 +39,7 @@ verifies exactly what was executed and cited.
 Unchained is a bounded autonomous Digital Forensics & Incident Response (DFIR)
 investigator built with Codex and GPT-5.6. It profiles an evidence folder without a model call, establishes
 SHA-256 custody, exposes only route-eligible typed read-only tools, and lets
-GPT-5.6 choose an opening of up to six tools that code validates all-or-none and
+GPT-5.6 choose an opening of up to twelve tools that code validates all-or-none and
 executes concurrently. Later turns carry a compact visible ledger and allow one
 typed action at a time. A strict typed `finish_investigation(status="DONE")`
 forces structured findings, a fresh-context
@@ -59,8 +61,10 @@ owns interpretation and response.
   tests, Docker path, documentation, and submission workflow.
 - A real GPT-5.6 Luna connectivity canary has been run with no evidence access.
 - A real GPT-5.6 Sol opening selected six typed Volatility tools and executed all
-  six against the public DC01 memory image; the next action was correctly capped,
-  producing a verified `PARTIAL` bundle rather than a false `COMPLETE` result.
+  six against the public DC01 memory image (under the earlier six-tool opening
+  cap; the opening now allows up to twelve); the next action was correctly
+  capped, producing a verified `PARTIAL` bundle rather than a false `COMPLETE`
+  result.
 - The authentic COMPLETE findings/judge/report bundle remains `PENDING`.
 
 ## 1. Technological Implementation
@@ -69,7 +73,7 @@ owns interpretation and response.
 
 - Deterministic evidence discovery, content classification, OS/shape routing,
   public evidence IDs, initial/final SHA-256 custody, and fail-closed inventory.
-- GPT-5.6 opening-book strategy with one-to-six strict typed calls; all-or-none
+- GPT-5.6 opening-book strategy with one-to-twelve strict typed calls; all-or-none
   validation, atomic cap reservation, and real concurrent execution.
 - Stateless adaptive packets with a visible case ledger and one typed action per
   later turn.
@@ -89,8 +93,8 @@ owns interpretation and response.
 - Authentic Luna receipt: `docs/runs/luna-canary-receipt.json`.
 - Authentic capped Sol opening receipt:
   `docs/runs/sol-capped-dc01-opening.json`.
-- Authentic COMPLETE Sol metrics: `PENDING_TASK_3`.
-- Frozen same-evidence comparison: `PENDING_TASK_4`.
+- Authentic COMPLETE Sol metrics: PENDING — filled at final submission (see submission/SUBMISSION-CHECKLIST.md).
+- Frozen same-evidence comparison: PENDING — filled at final submission (see submission/SUBMISSION-CHECKLIST.md).
 
 ## 2. Design
 
@@ -158,10 +162,11 @@ The concept is memorable in one sentence:
 > bounded investigation whose actions, citations, custody, and final report can
 > be checked independently.
 
-The honest comparison claim today is that Unchained has a stronger execution,
-custody, citation, report, and offline-verification contract than the reviewed
-Qwen direction. Faster, cheaper, and more accurate claims remain blocked until
-the frozen same-evidence table is published.
+No comparative claim is made today: the same-evidence Qwen benchmark was
+deliberately cut, and faster, cheaper, and more accurate claims remain blocked
+until the frozen same-evidence table is published. What Unchained offers now is
+an execution, custody, citation, report, and offline-verification contract that
+a judge can inspect directly.
 
 ## How Codex contributed
 
