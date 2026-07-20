@@ -26,7 +26,7 @@ docker compose run --rm offline profile /evidence --json
 
 | Criterion | Strongest evidence |
 |---|---|
-| Technological Implementation | Codex Session ID `019f61e5-5755-7a02-adb4-618d32baab27`; Codex-built control plane (evidence lifecycle, Responses API adapter, typed execution boundary, caps, typed-DONE-v2, forced serializer, exact spans, downgrade-only review, renderers, verifier, CLI, Docker, tests); 428/428 tests pass in 23.09s, ruff clean |
+| Technological Implementation | Codex Session ID `019f61e5-5755-7a02-adb4-618d32baab27`; Codex-built control plane (evidence lifecycle, Responses API adapter, typed execution boundary, caps, typed-DONE-v2, forced serializer, exact spans, downgrade-only review, renderers, verifier, CLI, Docker, tests); 432/432 tests pass in 24.91s, ruff clean |
 | Design | One-word self-driving `sentinel` front door; $0 no-key judge lane above; one launch card owning model + depth with an explicit `1 = LAUNCH` spend gate and hard cost ceilings; static inert no-JS `viewer.html`; honest PARTIAL/INVALID labeling |
 | Potential Impact | An IR consultancy must show a regulator or opposing counsel exactly what the AI did; the pattern (model picks bounded strategy, code executes typed authority and retains exact receipts) generalizes to security testing, compliance review, financial operations |
 | Quality of the Idea | The authority split: model chooses strategy; code owns evidence identity, legality, caps, execution, citation spans, verdict monotonicity, report rows, and verification — sealed in a content-addressed bundle verified offline |
@@ -39,7 +39,7 @@ docker compose run --rm offline profile /evidence --json
 |---|---|
 | Receipts prove what ran, what output was retained, and what exact text was cited | Forensic truth — a human still owns interpretation and response |
 | A published COMPLETE GPT-5.6 Sol bundle (findings, fresh judge, sealed report) that passes strict `--require-complete --require-live-gpt56` — `examples/public-run-complete` | That single public case is a measured benchmark (it is one case, not a comparison) |
-| 428 passing offline tests; byte-exact offline re-verification of the bundle | Any measured Qwen comparison (deliberately cut — no unmeasured claims) |
+| 432 passing offline tests; byte-exact offline re-verification of the bundle | Any measured Qwen comparison (deliberately cut — no unmeasured claims) |
 | Caps fire before dispatch, ending runs as honest PARTIAL instead of overspending | A complete OS sandbox, or that the fresh reviewer is independent ground truth |
 
 ## Links

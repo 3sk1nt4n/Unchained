@@ -19,7 +19,7 @@
   <img src="https://img.shields.io/badge/Evidence-read--only-dc2626.svg" alt="Read-only evidence">
   <img src="https://img.shields.io/badge/Proof-offline--verifiable-f59e0b.svg" alt="Offline-verifiable proof">
   <img src="https://img.shields.io/badge/OpenAI-GPT--5.6-111827.svg?logo=openai&logoColor=white" alt="OpenAI GPT-5.6">
-  <img src="https://img.shields.io/badge/tests-428%20passing-22c55e.svg" alt="428 tests passing">
+  <img src="https://img.shields.io/badge/tests-432%20passing-22c55e.svg" alt="432 tests passing">
   <img src="https://img.shields.io/badge/proof%20bundle-ships%20in%20this%20repo-8b5cf6.svg" alt="Proof bundle ships in this repo">
 </p>
 
@@ -108,7 +108,7 @@ local SHA-256 case card before any model is involved.
 | Item | Status |
 |---|---|
 | 🟢 Public MIT repo, Codex Session ID, provenance boundary | **Done** |
-| 🟢 428-test offline gate, ruff clean, hardened Docker | **Done** |
+| 🟢 432-test offline gate, ruff clean, hardened Docker | **Done** |
 | 🟢 Live GPT-5.6 Sol opening on real 2 GiB Windows memory | **Done** — retained, capped `PARTIAL` by design |
 | 🟢 Authentic GPT-5.6 bundle **ships in the repo** and verifies `VALID` offline | **Done** — [`examples/public-run-partial`](examples/public-run-partial): 14/14 typed tools, honest `PARTIAL` at the hard cap |
 | 🟢 Zero-key guided onboarding + colorful live run experience | **Done** — see the screen above |
@@ -164,7 +164,7 @@ key and no network.
 | Your machine | Lane | First result in | Spend | Verified state |
 |---|---|---|---|---|
 | 🪟 **Windows 10/11** | Native CPython 3.11 — the flagship forensic lane | ~5 min | $0 until you pick `1 = LAUNCH` on the launch card | ✅ Tested; the live Sol `COMPLETE` run happened here |
-| 🐧 **Linux (AMD64)** | Hardened Docker offline lane | ~3 min | $0 | ✅ Same 428-test suite in-container (a few Windows-only tests skip) |
+| 🐧 **Linux (AMD64)** | Hardened Docker offline lane | ~3 min | $0 | ✅ Same 432-test suite in-container (a few Windows-only tests skip) |
 | 🍎 **macOS** | Same Docker lane via Docker Desktop | ~3 min | $0 | ⚠️ Expected via Docker's `linux/amd64` emulation; not yet verified on Mac hardware |
 
 Every lane converges on the same experience: a colorful guided onboarding, a
@@ -315,8 +315,12 @@ cheaply first, run a harmless case on the rehearsal model before spending on Sol
    a fresh-context reviewer may preserve or downgrade, never upgrade, and each
    verdict prints as a green *preserved* or amber *downgraded* line with its
    rationale.
-5. **Proof handoff** — a final status badge prints the bundle path, terminal
-   status, the strict verification gates, and the exact verify/view commands.
+5. **Result tables and proof handoff** — the closing panel prints the
+   authoritative findings table (ID, severity, final judge status, title —
+   the same deterministic rows the sealed report renders), then direct paths
+   to every promised artifact (`viewer.html`, `audit.jsonl`, `tool-outputs/`
+   with its count, `summary.json`), the terminal status badge, the strict
+   verification gates, and the exact verify/view commands.
 
 The model never receives a shell, local evidence path, executable name,
 subprocess authority, or budget authority. Fixed private workers may invoke
@@ -437,7 +441,7 @@ Read the full [architecture](docs/ARCHITECTURE.md) or the detailed
 | Capability | State |
 |---|---|
 | OpenAI-native controller and independent offline verifier | ✅ Verified offline |
-| Linux/AMD64 Docker build, 428-test suite, CLI, profile, and custody | ✅ Verified locally |
+| Linux/AMD64 Docker build, 432-test suite, CLI, profile, and custody | ✅ Verified locally |
 | Cheap GPT-5.6 typed-tool canary (run live on Luna; the smoke lane now defaults to Terra) | ✅ Demonstrated live; second-reviewer-attested (project-affiliated) sanitized receipt |
 | Authentic GPT-5.6 Sol capped opening on real Windows memory | ✅ Sanitized receipt committed; `VALID` recorded at creation; terminal state intentionally `PARTIAL` |
 | Shipped verifiable GPT-5.6 bundle in this repo | ✅ [`examples/public-run-partial`](examples/public-run-partial): `gpt-5.6-luna`, 14/14 typed tools, custody match, verifies `VALID` on current code |
@@ -486,7 +490,7 @@ verification.
 | Downgrade-only fresh review | Finding-ID, status-lattice, span, and receipt tests |
 | Deterministic report and inert viewer | Independent rerender + exact-byte and positive HTML/CSP policy tests |
 | Independent strict verifier | Re-chained adversarial mutations across lifecycle, usage, retry, cost, and custody |
-| Linux Docker packaging | CPython 3.11 test target: the same 428-test suite (a few Windows-only tests skip on Linux), Ruff, format, and `pip check`; non-root runtime/profile gate |
+| Linux Docker packaging | CPython 3.11 test target: the same 432-test suite (a few Windows-only tests skip on Linux), Ruff, format, and `pip check`; non-root runtime/profile gate |
 | Live GPT-5.6 canary (Luna at the time; the smoke lane now runs Terra) | Independently demonstrated; [attested sanitized projection](docs/runs/luna-canary-receipt.json), with no raw receipt available for bundle proof |
 | Authentic GPT-5.6 Sol opening on real memory | [Bundle-derived sanitized receipt](docs/runs/sol-capped-dc01-opening.json): 2 model responses, 6 successful opening tools, recorded custody match, `VALID` recorded at creation |
 | Shipped GPT-5.6 bundle in this repo | [`examples/public-run-partial`](examples/public-run-partial): 4 responses, 14 successful typed tools, custody match, verifies `VALID` on current code (20 artifacts, 62 audit entries) |

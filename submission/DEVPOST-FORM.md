@@ -201,7 +201,7 @@ Honest, framed as engineering maturity: the failures are recorded, capped, and l
 ## Accomplishments that we're proud of
 
 ```
-- **428/428 tests pass in 23.09s** across 25 test files, ruff check + format clean, verified 2026-07-20 on CPython 3.11.9.
+- **432/432 tests pass in 24.91s** across 25 test files, ruff check + format clean, verified 2026-07-20 on CPython 3.11.9.
 - **Two authentic, retained GPT-5.6 runs on real evidence**: a judge-verifiable bundle shipped in the repo (`examples/public-run-partial`: `gpt-5.6-luna`, 14/14 model-selected typed Volatility tools on a 2 GiB DC01 Windows memory image, custody hash match) and a committed sanitized `gpt-5.6-sol` receipt (6 of 6 opening tools with provider request/response IDs, docs/runs/sol-capped-dc01-opening.json).
 - **Byte-exact offline verification**: the shipped bundle verifies VALID on current code — 20 artifacts and 62 hash-chained audit entries reconstructed and checked with no network and no key (proven 2026-07-20).
 - **Measured, capped spend**: shipped run 180,285 provider-reported tokens, 55.5 s, ~$1.16 local estimate; Sol opening 59,254 tokens, 43.702 s, $0.38789875 under a $1.00 cap.
@@ -319,7 +319,7 @@ Honest lane table; labels come straight from the repo's own assessment docs.
 ```
 | Platform | Lane | Honest status |
 | --- | --- | --- |
-| Windows 10/11 (AMD64, CPython 3.11.9) | Native install via setup.ps1 or get.ps1 | Validated flagship. 428/428 tests pass in 23.09s, ruff clean (run 2026-07-20). |
+| Windows 10/11 (AMD64, CPython 3.11.9) | Native install via setup.ps1 or get.ps1 | Validated flagship. 432/432 tests pass in 24.91s, ruff clean (run 2026-07-20). |
 | Linux | setup.sh / hardened Docker image | STATIC-ONLY: read and reasoned, not executed on a real host. README notes the same suite runs in the Linux container with a few Windows-only tests skipping. |
 | macOS | Docker lane only | Same hardened linux/amd64 image under Docker Desktop emulation; not yet verified on Mac hardware. |
 ```
@@ -368,7 +368,7 @@ Run this checklist against the pasted form before hitting Submit.
 
 - [ ] Opening tool count says **up to twelve** everywhere. The only permitted "six" is the historical note that the retained run executed 6/6 under the earlier six-tool cap.
 - [ ] Zero banned claims: no "faster/better than Qwen" (benchmark is unpublished), no "production-ready", no "should work", no invented numbers or URLs.
-- [ ] Numbers spot-check against the receipts and test run: 428/428 tests in 23.09s (25 files); shipped COMPLETE bundle `examples/public-run-complete` — Sol + HEAVY, 3 findings, judge verdicts, sealed report, strict `--require-complete --require-live-gpt56` VALID with 27 artifacts / 124 audit entries; shipped PARTIAL bundle `examples/public-run-partial` — 180,285 tokens, ~$1.16, 55.5 s, 14/14 tools, VALID with 20 artifacts / 62 audit entries; Sol receipt — 59,254 tokens, $0.38789875, 43.702 s, 3,961,843 vol_netscan bytes, 13 artifacts / 38 audit entries recorded at creation; 2,147,483,648 evidence bytes; SHA-256 starting `8079a745`; exit code 3 on a capped PARTIAL, 0 on a COMPLETE.
+- [ ] Numbers spot-check against the receipts and test run: 432/432 tests in 24.91s (25 files); shipped COMPLETE bundle `examples/public-run-complete` — Sol + HEAVY, 3 findings, judge verdicts, sealed report, strict `--require-complete --require-live-gpt56` VALID with 27 artifacts / 124 audit entries; shipped PARTIAL bundle `examples/public-run-partial` — 180,285 tokens, ~$1.16, 55.5 s, 14/14 tools, VALID with 20 artifacts / 62 audit entries; Sol receipt — 59,254 tokens, $0.38789875, 43.702 s, 3,961,843 vol_netscan bytes, 13 artifacts / 38 audit entries recorded at creation; 2,147,483,648 evidence bytes; SHA-256 starting `8079a745`; exit code 3 on a capped PARTIAL, 0 on a COMPLETE.
 - [ ] Only real URLs appear: github.com/3sk1nt4n/Unchained, openai.devpost.com/rules, github.com/3sk1nt4n/Sentinel-Ensemble-Qwen (pinned 9f309c61...), dfirmadness.com/the-stolen-szechuan-sauce/.
 - [ ] Codex Session ID pasted exactly: `019f61e5-5755-7a02-adb4-618d32baab27`.
 - [ ] Video URL no longer says ADDED-ON-UPLOAD. It is the one mandatory gap.

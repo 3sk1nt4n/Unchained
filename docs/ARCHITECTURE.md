@@ -224,7 +224,7 @@ prototype's guarantee.
 
 ## Current verified state
 
-- 2026-07-20: the offline suite passes 430 tests plus Ruff check and format
+- 2026-07-20: the offline suite passes 432 tests plus Ruff check and format
   check. The source tree is 19 modules, 16,133 physical source lines
   (14,728 nonblank).
 - An authentic `COMPLETE` GPT-5.6 Sol bundle **ships in this repository** at

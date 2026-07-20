@@ -54,7 +54,7 @@ bundle that ships in the repository.
 | 0:58-1:23 | Run verify on the shipped authentic bundle. As output prints, highlight fourteen typed tool receipts, all status success, and `gpt-5.6-luna` on the model line. On-screen caption: "Committed copy of run 20260720T013927Z-9f12ec6f — clone the repo and run this yourself." | `sentinel verify examples\public-run-partial` | Now the real thing. This bundle ships in the repository: an authentic GPT-5.6 run on that two-gigabyte memory image, provider-recorded gpt-5.6-luna across four responses. GPT-5.6 opened with a parallel batch of typed Volatility tools and kept investigating: fourteen tool receipts, every one successful, every byte of output retained. |
 | 1:23-1:43 | Same terminal. Highlight: terminal cap reason `MAX_TOOL_CALLS: reservation would reach 14 > 13`; result **VALID**; terminal status PARTIAL; 20 artifacts and 62 audit entries verified. **[SPLICE SLOT eligible, see below]** | (same command, output already on screen) | Then the hard tool budget ended the run as an honest PARTIAL before any overspend: about fifty-six seconds, one hundred eighty thousand provider tokens, a local cost estimate near a dollar sixteen. The offline verifier reconstructs 20 artifacts and 62 hash-chained audit entries and returns VALID. No network, no key. |
 | 1:43-2:06 | The inert viewer. Scroll: custody row (initial SHA-256 equals final), typed tool receipts, the honest hard-budget stop labeled plainly. | `sentinel view examples\public-run-partial` | The bundle ships an inert, no-JavaScript viewer. A judge needs no Python, no key, and no server. Custody intact: initial and final SHA-256 match. A receipt for every tool, and the cap stop labeled plainly. Receipts prove what ran and what was cited. Interpretation stays human. |
-| 2:06-2:26 | **Slide 2** (Built with Codex, Session ID on screen) | Slide 2 | Codex was the primary implementation and adversarial-review collaborator: the evidence lifecycle, the Responses API adapter, the typed execution boundary, caps, the forced serializer, exact evidence spans, the downgrade-only review, the renderers, the verifier, and the 428-test offline gate. The Codex session ID is on screen and committed in the repo. |
+| 2:06-2:26 | **Slide 2** (Built with Codex, Session ID on screen) | Slide 2 | Codex was the primary implementation and adversarial-review collaborator: the evidence lifecycle, the Responses API adapter, the typed execution boundary, caps, the forced serializer, exact evidence spans, the downgrade-only review, the renderers, the verifier, and the 432-test offline gate. The Codex session ID is on screen and committed in the repo. |
 | 2:26-2:45 | **Slide 3** (track, repo URL, verify-it-yourself commands) | Slide 3 | Unchained is not an LLM pretending to be evidence. It is GPT-5.6 directing a bounded investigation whose actions, citations, custody, and final report can be checked independently. Clone the repo and verify it yourself, for zero dollars. |
 
 Do not shorten the closing line to "code proves the incident."
@@ -131,7 +131,7 @@ caps · typed-DONE-v2 · forced serializer · exact evidence spans
 fresh-context downgrade-only review · report + inert viewer renderers
 independent offline verifier · CLI · Docker isolation · tests · docs
 
-428 passing tests across 25 test files · ruff clean
+432 passing tests across 25 test files · ruff clean
 Runs GPT-5.6 at runtime (Sol investigator/reviewer, Terra smoke canary)
 ```
 
@@ -186,7 +186,7 @@ cut. Section breaks match the scene table.
 7. Codex was the primary implementation and adversarial-review collaborator:
    the evidence lifecycle, the Responses API adapter, the typed execution
    boundary, caps, the forced serializer, exact evidence spans, the
-   downgrade-only review, the renderers, the verifier, and the 428-test offline
+   downgrade-only review, the renderers, the verifier, and the 432-test offline
    gate. The Codex session ID is on screen and committed in the repo.
 8. Unchained is not an LLM pretending to be evidence. It is GPT-5.6 directing a
    bounded investigation whose actions, citations, custody, and final report
