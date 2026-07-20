@@ -399,11 +399,15 @@ Continue the case-level DFIR investigation. For every turn:
    when another result can still change the conclusions. Otherwise call
    finish_investigation with status DONE.
 3. OBSERVE only the returned data.
-4. UPDATE your running case notes before the next decision. Every nonterminal
-   response that calls a forensic tool must include a nonempty visible
-   case-ledger update no larger than {MAX_CASE_LEDGER_UPDATE_BYTES:,} UTF-8
-   bytes. State what changed, what remains uncertain, and why the requested
-   tool can still change the conclusions.
+4. UPDATE your running case notes before the next decision. CRITICAL: every
+   nonterminal turn that calls a forensic tool MUST also emit visible message
+   text — the case-ledger update — in the SAME response as the tool call. A
+   forensic tool call with empty message text is rejected and ends the run.
+   Always write the ledger update text first, then make the one tool call. Keep
+   it nonempty and no larger than {MAX_CASE_LEDGER_UPDATE_BYTES:,} UTF-8 bytes.
+   State what changed, what remains uncertain, and why the requested tool can
+   still change the conclusions. (The finish_investigation terminal action is
+   the only turn that needs no ledger text.)
 
 Each request is intentionally stateless. The controller packet is the complete
 case ledger: it contains prior notes, a compact immutable receipt index, and
@@ -452,7 +456,7 @@ analysis from an unavailable capability.
                     minimum_output_tokens=4_096,
                     reasoning_context="current_turn",
                     reasoning_effort="medium",
-                    text_verbosity="low",
+                    text_verbosity="medium",
                     max_tool_calls=1,
                 )
             )

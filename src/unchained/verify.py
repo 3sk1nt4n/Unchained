@@ -2859,7 +2859,7 @@ class _Verifier:
         phase = payload.get("phase")
         policies: dict[str, tuple[Any, ...]] = {
             "opening": (True, "required", 4_096, "low", "low", _MAX_OPENING_TOOLS),
-            "investigate": (False, "required", 4_096, "medium", "low", 1),
+            "investigate": (False, "required", 4_096, "medium", "medium", 1),
             "investigation-finalize": (
                 False,
                 {"type": "function", "name": "submit_investigation"},

@@ -500,7 +500,7 @@ def _complete_events(
             "opening": ("low", "low", 4_096, True, "required"),
             "investigate": (
                 "medium",
-                "low",
+                "medium",
                 4_096,
                 False,
                 "required" if typed_done else "auto",

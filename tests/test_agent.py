@@ -402,7 +402,9 @@ def test_fresh_judge_downgrades_deliberately_unsupported_finding(tmp_path: Path)
     assert INVESTIGATION_FINISH_TOOL_NAME in tool_names(loop_request)
     assert "submit_investigation" not in tool_names(loop_request)
     loop_instructions = " ".join(loop_request.instructions.split())
-    assert "nonempty visible case-ledger update" in loop_instructions
+    assert "case-ledger update" in loop_instructions
+    assert "empty message text is rejected" in loop_instructions
+    assert loop_request.text_verbosity == "medium"
     assert "8,192 UTF-8 bytes" in loop_instructions
     finalizer_request = model.requests[2]
     assert finalizer_request.tool_choice == {
