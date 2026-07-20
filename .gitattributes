@@ -14,3 +14,11 @@
 *.jpeg binary
 *.gif binary
 *.zip binary
+
+# Shipped proof bundles are byte-exact: their manifest.sha256, viewer.html, and
+# audit chain are hashed at seal time, so ANY line-ending conversion on checkout
+# breaks offline verification (viewer.html byte/SHA mismatch, manifest.sha256 no
+# longer equals "<sha>  manifest.json\n"). Disable all EOL/text munging for the
+# example bundles so a fresh clone on any OS verifies VALID.
+examples/public-run-complete/** -text
+examples/public-run-partial/** -text
