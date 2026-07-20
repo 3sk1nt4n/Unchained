@@ -245,57 +245,46 @@ def _boxed(
     print(_paint(f"└{'─' * inner}┘", accent, color), file=stream)
 
 
-def render_depth_menu(caps_profile: str, *, stream: TextIO, no_color: bool = False) -> None:
-    """Render the colorful, non-spilling CHOOSE DEPTH card (the prompt follows it).
-
-    Content is routed through :func:`_boxed`, which wraps every line to the fixed
-    card width, so nothing can overrun the border on any console.
-    """
-
-    stream = _encoding_safe_stream(stream)
-    color = _supports_color(stream, no_color=no_color)
-    flagship = _preset_caps("default")
-    strict = _preset_caps("strict")
-    heavy_tag = "   [current]" if caps_profile == "default" else ""
-    light_tag = "   [current]" if caps_profile == "strict" else ""
-    lines = [
-        f"1) HEAVY{heavy_tag}",
-        f"   {flagship.max_tool_calls} tools / {flagship.max_total_tokens:,} tokens / "
-        f"{flagship.max_wall_seconds / 60:g} min / ${flagship.max_cost_usd:.2f} ceiling",
-        f"2) LIGHT{light_tag}",
-        f"   {strict.max_tool_calls} tools / {strict.max_total_tokens:,} tokens / "
-        f"{strict.max_wall_seconds / 60:g} min / ${strict.max_cost_usd:.2f} ceiling",
-        "",
-        f"Same model either way: {active_model_label()}",
-        "Ceilings are hard stops, not price quotes - the depth never changes the model.",
-    ]
-    _boxed("CHOOSE DEPTH - HEAVY OR LIGHT", lines, stream=stream, color=color, accent=_VIOLET)
-
-
 def render_launch_gate(
     caps_profile: str, caps: CapConfig, *, stream: TextIO, no_color: bool = False
 ) -> None:
-    """Render the colorful, non-spilling EXPLICIT PAID CLOUD LAUNCH card.
+    """Render THE one pre-spend card: model, depth, ceilings, and every choice.
 
-    Names the ACTUAL model for the run (so a cheap rehearsal never claims Sol)
-    and presents the launch/back/quit choices; the interactive prompt follows.
+    This is the single money menu - no separate depth card, no second model
+    question. It names the ACTUAL model for the run (so a cheap rehearsal never
+    claims Sol), states the chosen depth's hard ceilings, and shows exactly what
+    1/2/3/Q do; the interactive prompt follows. Content is routed through
+    :func:`_boxed`, which wraps to the fixed card width, so nothing can spill.
     """
+
+    from .model import cheap_model_opt_in
 
     stream = _encoding_safe_stream(stream)
     color = _supports_color(stream, no_color=no_color)
     depth_name = "HEAVY (FLAGSHIP)" if caps_profile == "default" else "LIGHT (CAUTIOUS)"
+    other_profile = "strict" if caps_profile == "default" else "default"
+    other = _preset_caps(other_profile)
+    other_name = "HEAVY" if other_profile == "default" else "LIGHT"
+    other_model = (
+        "GPT-5.6 Sol - the official, qualifying bundle (costs more)"
+        if cheap_model_opt_in()
+        else "gpt-5.6-luna - cheap rehearsal, clearly nonqualifying"
+    )
     lines = [
-        f"Model for this run: {active_model_label()}",
-        "It may receive the bounded profile and typed-tool observations; the original "
-        "evidence bytes stay local. This is no longer the $0 preview.",
-        f"{depth_name} ceiling: ${caps.max_cost_usd:.2f} estimated cost / "
-        f"{caps.max_total_tokens:,} tokens / {caps.max_tool_calls} tools.",
+        f"Model  {active_model_label()}",
+        f"Depth  {depth_name} - {caps.max_tool_calls} tools / "
+        f"{caps.max_total_tokens:,} tokens / {caps.max_wall_seconds / 60:g} min / "
+        f"${caps.max_cost_usd:.2f} hard ceiling",
+        "Evidence bytes stay local; the model sees only the bounded profile and "
+        "typed-tool observations. This is no longer the $0 preview.",
         "",
         "1) LAUNCH - start the paid run now (this spends real money)",
-        "B) Back - change the depth first",
-        "Q) Quit - cancel; nothing is sent, nothing is spent",
+        f"2) Depth  - switch to {other_name}: {other.max_tool_calls} tools / "
+        f"{other.max_total_tokens:,} tokens / ${other.max_cost_usd:.2f}",
+        f"3) Model  - switch to {other_model}",
+        "Q) Quit   - cancel; nothing is sent, nothing is spent",
     ]
-    _boxed("EXPLICIT PAID CLOUD LAUNCH", lines, stream=stream, color=color, accent=_AMBER)
+    _boxed("LAUNCH - EVERYTHING ON ONE CARD", lines, stream=stream, color=color, accent=_AMBER)
 
 
 def render_key_card(
@@ -335,7 +324,7 @@ def active_model_label() -> str:
 
     configured = os.getenv("UNCHAINED_MODEL", "").strip()
     if cheap_model_opt_in() and configured and "sol" not in configured.lower():
-        return f"{configured} (CHEAP TEST — nonqualifying rehearsal)"
+        return f"{configured} (CHEAP TEST - nonqualifying rehearsal)"
     return "GPT-5.6 Sol"
 
 
@@ -547,7 +536,7 @@ def render_welcome(
     line(
         _AMBER,
         "BOUNDARY",
-        "OpenAI calls 0 · paid run not started · a paid run needs the explicit launch menu.",
+        "OpenAI calls 0 · paid run not started · a paid run needs the one launch card.",
     )
 
 
@@ -719,12 +708,12 @@ def render_profile(
         )
     if guided:
         launch_line = (
-            "◆ NEXT (same command): pick the depth from the menu below - "
-            "the explicit launch menu follows."
+            "◆ NEXT (same command): the key card, then ONE launch card - "
+            "1 = LAUNCH, 2 = depth, 3 = model, Q = quit."
         )
     else:
         launch_line = (
             f"◆ LAUNCH: sentinel onboard <same-evidence> --launch --caps {caps_profile}  "
-            "→ then confirm from the explicit launch menu"
+            "→ then confirm from the one launch card"
         )
     print(_paint(launch_line, _CYAN + _BOLD, color), file=stream)

@@ -226,7 +226,7 @@ def test_human_case_card_is_junior_friendly_and_does_not_echo_child_paths(
     assert "CAUTIOUS [SELECTED]" in output
     assert "FLAGSHIP" in output
     assert "promises of result quality" in output
-    assert "explicit launch menu" in output
+    assert "one launch card" in output
     assert "never-print-host" not in output
     assert "C:/private" not in output
     assert "\x1b[" not in output
@@ -303,25 +303,27 @@ def test_legacy_windows_console_gets_a_clean_ascii_fallback(
 def test_paid_launch_menu_is_explicit_and_enter_never_launches(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    caps = CapConfig.from_env("strict")
+    monkeypatch.setenv("UNCHAINED_MODEL", "stale-model")
+    monkeypatch.setenv("UNCHAINED_ALLOW_TEST_MODEL", "0")
 
     def feed(*answers: str):
         pending = list(answers)
         monkeypatch.setattr("builtins.input", lambda _prompt: pending.pop(0))
 
     feed("1")
-    assert cli_module._confirm_paid_sol_launch("strict", caps) == "launch"
-    feed("b")
-    assert cli_module._confirm_paid_sol_launch("strict", caps) == "back"
+    assert cli_module._launch_menu("strict") == "strict"
     feed("q")
-    assert cli_module._confirm_paid_sol_launch("strict", caps) == "cancel"
+    assert cli_module._launch_menu("strict") is None
     # Enter alone must never start a paid run - it re-asks until an explicit
     # choice arrives.
     feed("", "", "q")
-    assert cli_module._confirm_paid_sol_launch("strict", caps) == "cancel"
+    assert cli_module._launch_menu("strict") is None
     # Gibberish re-asks instead of silently cancelling or launching.
     feed("wat", "1")
-    assert cli_module._confirm_paid_sol_launch("strict", caps) == "launch"
+    assert cli_module._launch_menu("strict") == "strict"
+    # 2 toggles the depth on the SAME card and launches from it.
+    feed("2", "1")
+    assert cli_module._launch_menu("default") == "strict"
 
 
 def test_launch_requires_interactive_terminal_before_evidence_is_read(
@@ -347,7 +349,8 @@ def test_declined_exact_confirmation_keeps_profile_offline(
 ) -> None:
     install_fake_session(monkeypatch, ready_profile())
     monkeypatch.setattr(cli_module, "_interactive_terminal", lambda: True)
-    monkeypatch.setattr(cli_module, "_confirm_paid_sol_launch", lambda *_args: "cancel")
+    monkeypatch.setattr(cli_module, "_ensure_key_for_launch", lambda: True)
+    monkeypatch.setattr(cli_module, "_launch_menu", lambda _profile: None)
     monkeypatch.setattr(
         cli_module,
         "run_cli",
@@ -363,7 +366,8 @@ def test_confirmed_launch_calls_existing_lifecycle_with_hidden_child_case_card(
 ) -> None:
     install_fake_session(monkeypatch, ready_profile())
     monkeypatch.setattr(cli_module, "_interactive_terminal", lambda: True)
-    monkeypatch.setattr(cli_module, "_confirm_paid_sol_launch", lambda *_args: "launch")
+    monkeypatch.setattr(cli_module, "_ensure_key_for_launch", lambda: True)
+    monkeypatch.setattr(cli_module, "_launch_menu", lambda profile: profile)
     captured: dict[str, object] = {}
 
     def fake_run(
@@ -372,12 +376,14 @@ def test_confirmed_launch_calls_existing_lifecycle_with_hidden_child_case_card(
         *,
         show_case_card: bool,
         mount_evidence: bool,
+        show_banner: bool,
     ) -> int:
         captured.update(
             evidence=evidence,
             caps_profile=caps_profile,
             show_case_card=show_case_card,
             mount_evidence=mount_evidence,
+            show_banner=show_banner,
         )
         return EXIT_PARTIAL
 
@@ -389,6 +395,7 @@ def test_confirmed_launch_calls_existing_lifecycle_with_hidden_child_case_card(
         "caps_profile": "default",
         "show_case_card": False,
         "mount_evidence": False,
+        "show_banner": False,
     }
 
 
@@ -400,7 +407,7 @@ def test_multiple_ready_memory_images_fail_closed_before_confirmation(
     monkeypatch.setattr(cli_module, "_interactive_terminal", lambda: True)
     monkeypatch.setattr(
         cli_module,
-        "_confirm_paid_sol_launch",
+        "_launch_menu",
         lambda *_args: (_ for _ in ()).throw(AssertionError("must not offer launch")),
     )
 

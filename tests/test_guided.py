@@ -1,6 +1,6 @@
 """The self-driving `sentinel` front door: welcome -> one question -> card ->
-depth -> key -> explicit launch, in a single command with no flags or env
-juggling. These tests pin that flow and its input guards."""
+key card -> ONE launch card (model + depth + confirm), in a single command with
+no flags or env juggling. These tests pin that flow and its input guards."""
 
 from __future__ import annotations
 
@@ -79,20 +79,19 @@ def test_bare_sentinel_self_drives_one_command_to_the_live_run(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     install_fake_session(monkeypatch, ready_profile())
-    monkeypatch.setenv("UNCHAINED_MODEL", "gpt-5.6")  # skip the auto-default branch
     monkeypatch.setattr(cli_module, "_interactive_terminal", lambda: True)
     monkeypatch.setattr(cli_module, "_prompt_evidence_path", lambda: Path("operator-case"))
-    monkeypatch.setattr(cli_module, "_choose_analysis_depth", lambda _selected: "default")
     monkeypatch.setattr(cli_module, "_ensure_key_for_launch", lambda: True)
-    monkeypatch.setattr(cli_module, "_confirm_paid_sol_launch", lambda *_a: "launch")
+    monkeypatch.setattr(cli_module, "_launch_menu", lambda _profile: "default")
     captured: dict[str, object] = {}
 
-    def fake_run(evidence, caps_profile, *, show_case_card, mount_evidence):
+    def fake_run(evidence, caps_profile, *, show_case_card, mount_evidence, show_banner):
         captured.update(
             evidence=evidence,
             caps_profile=caps_profile,
             show_case_card=show_case_card,
             mount_evidence=mount_evidence,
+            show_banner=show_banner,
         )
         return EXIT_PARTIAL
 
@@ -104,34 +103,57 @@ def test_bare_sentinel_self_drives_one_command_to_the_live_run(
         "caps_profile": "default",
         "show_case_card": False,
         "mount_evidence": False,
+        "show_banner": False,
     }
 
 
-def test_guided_defaults_the_model_so_no_env_juggling_is_needed(
+def test_launch_menu_defaults_to_the_cheap_rehearsal_and_owns_the_model(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    install_fake_session(monkeypatch, ready_profile())
-    monkeypatch.delenv("UNCHAINED_MODEL", raising=False)
-    monkeypatch.setattr(cli_module, "cheap_model_opt_in", lambda: False)
-    monkeypatch.setattr(cli_module, "_interactive_terminal", lambda: True)
-    monkeypatch.setattr(cli_module, "_prompt_evidence_path", lambda: Path("operator-case"))
-    monkeypatch.setattr(cli_module, "_choose_analysis_depth", lambda _selected: "strict")
-    monkeypatch.setattr(cli_module, "_ensure_key_for_launch", lambda: True)
-    seen: dict[str, object] = {}
+    # A stale environment variable can never silently preselect the expensive
+    # model: the card starts on the Luna rehearsal no matter what is inherited.
+    monkeypatch.setenv("UNCHAINED_MODEL", "gpt-5.6")
+    monkeypatch.setenv("UNCHAINED_ALLOW_TEST_MODEL", "0")
+    _script_input(monkeypatch, ["1"])
 
-    def fake_confirm(_profile, _caps):
-        seen["model"] = cli_module.os.getenv("UNCHAINED_MODEL")
-        return "cancel"  # cancel before any spend
+    assert cli_module._launch_menu("strict") == "strict"
+    assert cli_module.os.getenv("UNCHAINED_MODEL") == "gpt-5.6-luna"
+    assert cli_module.os.getenv("UNCHAINED_ALLOW_TEST_MODEL") == "1"
 
-    monkeypatch.setattr(cli_module, "_confirm_paid_sol_launch", fake_confirm)
-    monkeypatch.setattr(
-        cli_module,
-        "run_cli",
-        lambda *_a, **_k: (_ for _ in ()).throw(AssertionError("must not launch")),
-    )
 
-    assert main([]) == EXIT_COMPLETE
-    assert seen["model"] == "gpt-5.6"
+def test_launch_menu_3_switches_to_the_official_sol_model(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("UNCHAINED_MODEL", "stale-model")
+    monkeypatch.setenv("UNCHAINED_ALLOW_TEST_MODEL", "0")
+    _script_input(monkeypatch, ["3", "1"])
+
+    assert cli_module._launch_menu("strict") == "strict"
+    assert cli_module.os.getenv("UNCHAINED_MODEL") == "gpt-5.6"
+    assert cli_module.os.getenv("UNCHAINED_ALLOW_TEST_MODEL") is None
+
+
+def test_launch_menu_2_switches_the_depth_on_the_same_card(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    monkeypatch.setenv("UNCHAINED_MODEL", "stale-model")
+    monkeypatch.setenv("UNCHAINED_ALLOW_TEST_MODEL", "0")
+    _script_input(monkeypatch, ["2", "1"])
+
+    assert cli_module._launch_menu("strict") == "default"
+    # The card was redrawn for the new depth - same menu, never a second question.
+    assert capsys.readouterr().out.count("LAUNCH - EVERYTHING ON ONE CARD") == 2
+
+
+def test_launch_menu_enter_never_launches_and_q_cancels(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("UNCHAINED_MODEL", "stale-model")
+    monkeypatch.setenv("UNCHAINED_ALLOW_TEST_MODEL", "0")
+    _script_input(monkeypatch, ["", "q"])
+
+    assert cli_module._launch_menu("strict") is None
 
 
 def test_guided_cancelled_launch_stays_offline(
@@ -139,12 +161,10 @@ def test_guided_cancelled_launch_stays_offline(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     install_fake_session(monkeypatch, ready_profile())
-    monkeypatch.setenv("UNCHAINED_MODEL", "gpt-5.6")
     monkeypatch.setattr(cli_module, "_interactive_terminal", lambda: True)
     monkeypatch.setattr(cli_module, "_prompt_evidence_path", lambda: Path("operator-case"))
-    monkeypatch.setattr(cli_module, "_choose_analysis_depth", lambda _selected: "strict")
     monkeypatch.setattr(cli_module, "_ensure_key_for_launch", lambda: True)
-    monkeypatch.setattr(cli_module, "_confirm_paid_sol_launch", lambda *_a: "cancel")
+    monkeypatch.setattr(cli_module, "_launch_menu", lambda _profile: None)
     monkeypatch.setattr(
         cli_module,
         "run_cli",
@@ -165,7 +185,7 @@ def test_guided_not_ready_case_can_be_abandoned_without_launch(
     _script_input(monkeypatch, ["q"])  # decline "try another case?"
     monkeypatch.setattr(
         cli_module,
-        "_confirm_paid_sol_launch",
+        "_launch_menu",
         lambda *_a: (_ for _ in ()).throw(AssertionError("must not offer launch")),
     )
 

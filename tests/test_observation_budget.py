@@ -1,11 +1,10 @@
-"""The batched-observation byte budget that lets a large opening fit the token cap."""
+"""Bounded and raw-quotable model views over retained tool output."""
 
 from __future__ import annotations
 
 import json
 
-from unchained.agent import _per_observation_bytes
-from unchained.models import MODEL_TOOL_OUTPUT_MAX_BYTES, ToolResult
+from unchained.models import ToolResult
 
 
 def _result(output: str) -> ToolResult:
@@ -20,19 +19,6 @@ def _result(output: str) -> ToolResult:
         ended_at="2026-07-20T00:00:01Z",
         duration_ms=1,
     )
-
-
-def test_per_observation_bytes_shrinks_for_a_large_batch_and_caps_for_a_small_one() -> None:
-    # A whole 12-tool opening against a 100k-ish remaining budget must feed a
-    # small prefix each, well under the per-tool ceiling.
-    small = _per_observation_bytes(97_700, 12)
-    assert 2_048 <= small < MODEL_TOOL_OUTPUT_MAX_BYTES
-    assert small * 12 // 3 < 97_700  # observation tokens leave room for overhead
-    # A generous budget with few observations reaches the per-tool ceiling.
-    assert _per_observation_bytes(400_000, 6) == MODEL_TOOL_OUTPUT_MAX_BYTES
-    # Always floored so every tool shows something, even when nearly out.
-    assert _per_observation_bytes(1_000, 12) == 2_048
-    assert _per_observation_bytes(0, 4) == 2_048
 
 
 def test_model_output_respects_a_smaller_view_budget_and_keeps_full_output_on_disk() -> None:
@@ -52,3 +38,30 @@ def test_small_output_is_returned_whole_regardless_of_budget() -> None:
     result = _result("only 12 bytes")
     assert result.model_output(2_048) == "only 12 bytes"
     assert result.model_output() == "only 12 bytes"
+
+
+def test_quotable_view_is_a_raw_byte_exact_prefix_for_exact_span_resolution() -> None:
+    # Content with the exact characters that JSON-escaping would corrupt:
+    # quotes, backslashes (Windows paths), and newlines.
+    full = 'PID 4 System\nC:\\Windows\\System32 "lsass.exe"\n' + ("A" * 200_000)
+    result = _result(full)
+
+    view = result.quotable_view(4_000)
+    assert len(view.encode("utf-8")) <= 4_000
+    # The whole view is a byte-exact prefix of the full output, so any substring
+    # the model copies resolves to an exact byte range - no JSON escaping here.
+    assert full.encode("utf-8").startswith(view.encode("utf-8"))
+    assert 'C:\\Windows\\System32 "lsass.exe"' in view
+    assert '"delivery_receipt"' not in view  # never JSON-wrapped
+
+    # A short output is returned whole and unchanged.
+    assert _result("PID 4 System").quotable_view(2_048) == "PID 4 System"
+
+
+def test_quotable_view_never_splits_a_multibyte_character() -> None:
+    # A run of 3-byte glyphs; a naive byte cut would leave a partial sequence.
+    full = "中" * 5_000  # each is 3 UTF-8 bytes
+    view = _result(full).quotable_view(1_000)
+    assert view  # decodes cleanly
+    assert full.startswith(view)
+    assert view == "中" * (len(view))  # only whole glyphs survived

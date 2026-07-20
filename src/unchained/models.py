@@ -13,6 +13,17 @@ JsonValue: TypeAlias = None | bool | int | float | str | list["JsonValue"] | dic
 OsFamily: TypeAlias = Literal["windows", "linux", "macos", "unknown"]
 EvidenceShape: TypeAlias = Literal["memory-only", "disk-only", "both", "logs-only", "unknown"]
 MODEL_TOOL_OUTPUT_MAX_BYTES = 64 * 1024
+# Deterministic per-observation model view sizes. Both the agent (when building a
+# request) and the offline verifier (when reconstructing it) use these exact caps,
+# so every request stays byte-for-byte reproducible AND the whole lifecycle fits a
+# bounded token budget: a 12-tool opening at 64 KiB each would alone consume ~130k
+# tokens, busting even the HEAVY profile before the loop could finish. The full
+# tool outputs are always retained on disk as the citation source.
+#
+# INVESTIGATE uses the default (JSON) model_output view; FINALIZE uses the RAW
+# quotable view so each supporting quote resolves to an exact byte range.
+INVESTIGATE_OBSERVATION_VIEW_BYTES = 16 * 1024
+FINALIZE_OBSERVATION_VIEW_BYTES = 16 * 1024
 CASE_LEDGER_UPDATE_MAX_BYTES = 8_192
 INVESTIGATION_FINISH_TOOL_NAME = "finish_investigation"
 # Maximum high-value typed tools GPT-5.6 may fire in the all-or-none parallel
@@ -342,6 +353,31 @@ class ToolResult:
             else:
                 high = middle - 1
         return best
+
+    def quotable_view(self, max_bytes: int | None = None) -> str:
+        """Return a RAW UTF-8 prefix of the accepted output for exact quoting.
+
+        Unlike :meth:`model_output`, this never wraps the text in JSON, so any
+        substring the model copies from the view is a byte-exact substring of
+        the full retained output and resolves to an exact byte range. Used only
+        by the serialization phase, where the model mints supporting quotes;
+        the full output stays on disk as the custody source. The prefix is cut
+        on a UTF-8 character boundary so it never splits a multibyte glyph.
+        """
+
+        cap = MODEL_TOOL_OUTPUT_MAX_BYTES
+        if max_bytes is not None:
+            cap = max(256, min(int(max_bytes), MODEL_TOOL_OUTPUT_MAX_BYTES))
+        encoded = self.output.encode("utf-8")
+        if len(encoded) <= cap:
+            return self.output
+        clipped = encoded[:cap]
+        # Drop any trailing bytes of a partially cut multibyte character.
+        while clipped and (clipped[-1] & 0xC0) == 0x80:
+            clipped = clipped[:-1]
+        if clipped and clipped[-1] >= 0x80:
+            clipped = clipped[:-1]
+        return clipped.decode("utf-8", errors="ignore")
 
 
 @dataclass(frozen=True, slots=True)

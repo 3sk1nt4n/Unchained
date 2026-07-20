@@ -383,7 +383,8 @@ def test_fresh_judge_downgrades_deliberately_unsupported_finding(tmp_path: Path)
     judge_instructions = " ".join(judge_requests[0].instructions.split())
     assert "exact byte range" in judge_instructions
     assert "supplied span_id" in judge_instructions
-    assert "exact, nonempty substring of that span" in judge_instructions
+    assert "copied VERBATIM" in judge_instructions
+    assert "contiguous substring of that span" in judge_instructions
     assert "at most 1024 UTF-8 bytes" in judge_instructions
 
     phases = [request.phase for request in model.requests]

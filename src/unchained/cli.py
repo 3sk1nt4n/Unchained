@@ -510,61 +510,56 @@ def _interactive_terminal() -> bool:
     )
 
 
-def _choose_analysis_depth(selected: str) -> str | None:
-    """One compact HEAVY/LIGHT menu: 1 / 2 / Enter keeps / q quits.
+def _set_run_model(rehearsal: bool) -> None:
+    """Point THIS process at the chosen model, explicitly and unambiguously.
 
-    Both depths run the same investigator model - this chooses hard stop
-    ceilings, never a different model. Returns the chosen caps profile, or None
-    when the user quits. EOF or a closed stdin keeps the current selection so
-    noninteractive callers are unaffected.
+    The launch card is the only model authority for interactive runs, so a
+    stale environment variable from an older bootstrap can never silently pick
+    the expensive model. Process scope only - nothing is persisted.
     """
 
-    from .onboarding import render_depth_menu
-
-    current = "HEAVY" if selected == "default" else "LIGHT"
-    print()
-    render_depth_menu(selected, stream=sys.stdout)
-    while True:
-        try:
-            answer = input(f"  > Pick 1 or 2 [Enter = {current}] - q = quit: ").strip().lower()
-        except (EOFError, OSError):
-            return selected
-        if answer == "":
-            return selected
-        if answer == "1":
-            return "default"
-        if answer == "2":
-            return "strict"
-        if answer in ("q", "quit", "exit"):
-            return None
-        print("     (1 = HEAVY - 2 = LIGHT - Enter keeps the selection - q = quit)")
+    if rehearsal:
+        os.environ["UNCHAINED_ALLOW_TEST_MODEL"] = "1"
+        os.environ["UNCHAINED_MODEL"] = "gpt-5.6-luna"
+    else:
+        os.environ.pop("UNCHAINED_ALLOW_TEST_MODEL", None)
+        os.environ["UNCHAINED_MODEL"] = "gpt-5.6"
 
 
-def _confirm_paid_sol_launch(caps_profile: str, caps: CapConfig) -> str:
-    """Explicit menu gate before crossing the paid cloud boundary.
+def _launch_menu(caps_profile: str) -> str | None:
+    """THE one pre-spend menu: model, depth, ceilings, and confirmation on a
+    single card. 1 = LAUNCH, 2 = switch depth, 3 = switch model, Q = quit -
+    no question is ever asked twice, and each switch redraws the same card.
 
-    Returns ``"launch"``, ``"back"`` (change the depth), or ``"cancel"``. The
-    box names the ACTUAL model for this run (Sol for a real run, or the labeled
-    cheap model during a rehearsal) so a Luna rehearsal never claims "Sol".
-    Enter alone re-asks - an accidental keypress can never start a paid run.
+    Starts on the cheap Luna rehearsal (recommended first run); 3 flips to the
+    official Sol run. Returns the final caps profile on launch, or None on
+    cancel. Enter alone re-asks - an accidental keypress can never start a
+    paid run.
     """
 
     from .onboarding import render_launch_gate
 
-    print()
-    render_launch_gate(caps_profile, caps, stream=sys.stdout)
+    rehearsal = True
     while True:
+        _set_run_model(rehearsal)
+        caps = CapConfig.from_env(caps_profile)
+        print()
+        render_launch_gate(caps_profile, caps, stream=sys.stdout)
         try:
-            answer = input("  > Pick 1, B, or Q: ").strip().lower()
+            answer = input("  > Pick 1, 2, 3, or Q: ").strip().lower()
         except (EOFError, OSError):
-            return "cancel"
+            return None
         if answer in ("1", "launch", "l", "go", "y", "yes"):
-            return "launch"
-        if answer in ("b", "back"):
-            return "back"
+            return caps_profile
+        if answer == "2":
+            caps_profile = "default" if caps_profile == "strict" else "strict"
+            continue
+        if answer == "3":
+            rehearsal = not rehearsal
+            continue
         if answer in ("q", "quit", "cancel", "n", "no"):
-            return "cancel"
-        print("     (1 = LAUNCH - B = back - Q = quit)")
+            return None
+        print("     (1 = LAUNCH - 2 = switch depth - 3 = switch model - Q = quit)")
 
 
 def _onboard(
@@ -644,9 +639,9 @@ def _onboard(
             )
         )
     else:
-        # When a launch is happening, the depth pick and confirmation come next
-        # in THIS same command, so use the guided footer instead of printing a
-        # separate "sentinel onboard ... --launch" command that would read as a
+        # When a launch is happening, the key card and the one launch card come
+        # next in THIS same command, so use the guided footer instead of printing
+        # a separate "sentinel onboard ... --launch" command that would read as a
         # redundant, contradictory extra step.
         render_profile(
             profile,
@@ -665,32 +660,22 @@ def _onboard(
         return EXIT_INVALID
     if not launch:
         return EXIT_COMPLETE
-    while True:
-        chosen_profile = _choose_analysis_depth(caps_profile)
-        if chosen_profile is None:
-            print("Launch cancelled. The local profile remains valid; OpenAI calls: 0.")
-            return EXIT_COMPLETE
-        caps_profile = chosen_profile
-        caps = CapConfig.from_env(caps_profile)
-        depth_name = "HEAVY (FLAGSHIP)" if caps_profile == "default" else "LIGHT (CAUTIOUS)"
-        print(
-            f"Depth set: {depth_name} - ceilings {caps.max_tool_calls} tools / "
-            f"{caps.max_total_tokens:,} tokens / {caps.max_wall_seconds / 60:g} min / "
-            f"${caps.max_cost_usd:.2f} estimated cost"
-        )
-        decision = _confirm_paid_sol_launch(caps_profile, caps)
-        if decision == "back":
-            continue
-        if decision != "launch":
-            print("Launch cancelled. The local profile remains valid; OpenAI calls: 0.")
-            return EXIT_COMPLETE
-        break
+    # The key step is ALWAYS a visible card: a hidden paste when missing, a
+    # green KEY READY card when configured - never a silent skip.
+    if not _ensure_key_for_launch():
+        print("  No API key configured - cannot launch. Run 'sentinel key', then start again.")
+        return EXIT_INVALID
+    chosen_profile = _launch_menu(caps_profile)
+    if chosen_profile is None:
+        print("Launch cancelled. The local profile remains valid; OpenAI calls: 0.")
+        return EXIT_COMPLETE
     print("Confirmation accepted. Starting the bounded GPT-5.6 lifecycle...")
     return run_cli(
         evidence,
-        caps_profile,
+        chosen_profile,
         show_case_card=False,
         mount_evidence=mount,
+        show_banner=False,
     )
 
 
@@ -865,13 +850,13 @@ def _ensure_key_for_launch() -> bool:
 
 def _guided(*, mount: bool = False, caps_profile: str = "strict", no_color: bool = False) -> int:
     """The self-driving front door: one command from welcome to a live, verified
-    run. Welcome -> ask the case (one question) -> local $0 card -> depth ->
-    key -> explicit paid boundary -> live lifecycle -> verify/view commands.
+    run. Welcome -> ask the case (one question) -> local $0 card -> key card ->
+    ONE launch card -> live lifecycle -> verify/view commands.
 
-    No flags, no environment juggling: the model defaults to GPT-5.6 Sol (unless
-    a cheap rehearsal was opted in), the key is auto-found or set here, and the
-    depth pick sets only the hard ceilings. The paid-cloud confirmation phrase is
-    kept deliberately - it is the one honest boundary before money is spent.
+    No flags, no environment juggling: the key is auto-found or pasted on the
+    key card, and the launch card owns model AND depth on a single menu so no
+    question is ever asked twice. The explicit 1 = LAUNCH confirmation is kept
+    deliberately - it is the one honest boundary before money is spent.
     """
 
     caps = CapConfig.from_env(caps_profile)
@@ -941,37 +926,23 @@ def _guided(*, mount: bool = False, caps_profile: str = "strict", no_color: bool
         if again in ("q", "quit", "exit", "n", "no"):
             return EXIT_INVALID
 
-    # Step 3: default the model so a first-time user needs no $env: juggling and
-    # the run never dead-ends AFTER the paid gate on a missing model. A configured
-    # UNCHAINED_MODEL always wins; otherwise pick GPT-5.6 Sol, or the cheap Luna
-    # model when a rehearsal was opted in (so cheap mode without a model set does
-    # not crash post-confirmation).
-    if not os.getenv("UNCHAINED_MODEL"):
-        os.environ["UNCHAINED_MODEL"] = "gpt-5.6-luna" if cheap_model_opt_in() else "gpt-5.6"
-
-    # Step 4: key - auto-found, or set now with hidden input. Never dead-ends.
+    # Step 3: key - ALWAYS a visible card: hidden paste when missing, a green
+    # KEY READY card when configured. Never a silent skip, never a dead-end.
     if not _ensure_key_for_launch():
         print("  No API key configured - cannot launch. Run 'sentinel key', then start again.")
         return EXIT_INVALID
 
-    # Step 5-6: one depth menu, then the explicit launch menu. 'B' at the launch
-    # menu comes back here so a depth change never requires starting over.
-    while True:
-        chosen_profile = _choose_analysis_depth(caps_profile)
-        if chosen_profile is None:
-            print("Launch cancelled. The local profile remains valid; OpenAI calls: 0.")
-            return EXIT_COMPLETE
-        caps_profile = chosen_profile
-        caps = CapConfig.from_env(caps_profile)
-        decision = _confirm_paid_sol_launch(caps_profile, caps)
-        if decision == "back":
-            continue
-        if decision != "launch":
-            print("Launch cancelled. The local profile remains valid; OpenAI calls: 0.")
-            return EXIT_COMPLETE
-        break
+    # Step 4: ONE launch card - model, depth, ceilings, and confirmation on the
+    # same menu (1 = LAUNCH, 2 = depth, 3 = model, Q = quit). The card owns the
+    # model choice, so no earlier step ever asks the same question.
+    chosen_profile = _launch_menu(caps_profile)
+    if chosen_profile is None:
+        print("Launch cancelled. The local profile remains valid; OpenAI calls: 0.")
+        return EXIT_COMPLETE
     print("Confirmation accepted. Starting the bounded GPT-5.6 lifecycle...")
-    return run_cli(evidence, caps_profile, show_case_card=False, mount_evidence=mount)
+    return run_cli(
+        evidence, chosen_profile, show_case_card=False, mount_evidence=mount, show_banner=False
+    )
 
 
 _RUN_CLOCK: list[float] = []
@@ -1014,7 +985,7 @@ class _AuditNarrator:
     # Keys are the exact model-request phase strings emitted by the agent.
     _PHASE_LABELS = {
         "opening": "STEP 2  OPENING BOOK - GPT-5.6 selects up to 12 typed tools",
-        "investigate": "STEP 5  CASE LEDGER -> PLAN -> ACT -> OBSERVE -> UPDATE (GPT-5.6)",
+        "investigate": "STEP 5  ADAPTIVE LOOP - PLAN -> ACT -> OBSERVE -> UPDATE (GPT-5.6)",
         "investigation-finalize": "STEP 6  FORCED SERIALIZATION - strict findings, no tools",
         "judge": "STEP 8  FRESH JUDGE - preserve or downgrade, never promote",
         "report": "STEP 9  STRUCTURED REPORT DRAFT - GPT-5.6 narrative",
@@ -1059,6 +1030,10 @@ class _AuditNarrator:
                 self._console.ok(
                     f"opening book: {selected} selected - {executed} executed - "
                     f"{rejected} rejected - all-or-none validated"
+                )
+                self._console.phase(
+                    "STEP 4  CASE LEDGER - receipts + bounded typed observations "
+                    "become the case packet"
                 )
             elif event_type == "investigator.notes.updated" and isinstance(payload, dict):
                 turn = payload.get("turn")
@@ -1320,13 +1295,18 @@ def run_cli(
     *,
     show_case_card: bool = True,
     mount_evidence: bool = True,
+    show_banner: bool = True,
 ) -> int:
-    """Execute, close, manifest, and immediately verify one isolated run."""
+    """Execute, close, manifest, and immediately verify one isolated run.
+
+    ``show_banner=False`` is passed by the guided/onboard flows, which already
+    printed the UNCHAINED banner - so one screen never shows it twice.
+    """
 
     _RUN_CLOCK.clear()
     _RUN_CLOCK.append(time.monotonic())
     stderr_console = Console(sys.stderr)
-    if stderr_console.enabled:
+    if show_banner and stderr_console.enabled:
         stderr_console.banner("U N C H A I N E D", "Unchained reasoning. Chained evidence.")
         stderr_console.detail("GPT-5.6 chooses where to look; code proves what happened.")
     if cheap_model_opt_in():
@@ -1640,6 +1620,43 @@ def run_cli(
         return EXIT_FATAL
 
     _progress("content-addressed proof bundle verified")
+    # The closing panel answers the three questions every run ends on: what was
+    # found, where the report is, and what to do next. On PARTIAL it explains
+    # WHY honestly and never suggests a --require-complete verify that would
+    # fail against this very bundle.
+    complete = terminal_status is RunStatus.COMPLETE
+    findings_list = list(investigation.findings) if investigation is not None else []
+    verdict_list = list(investigation.verdicts) if investigation is not None else []
+    verdict_counts: dict[str, int] = {}
+    for verdict in verdict_list:
+        status_label = str(verdict.public_dict().get("status", "?"))
+        verdict_counts[status_label] = verdict_counts.get(status_label, 0) + 1
+    findings_line = f"{len(findings_list)} structured finding(s)"
+    if verdict_counts:
+        findings_line += " -> judge: " + " / ".join(
+            f"{count} {status}" for status, count in sorted(verdict_counts.items())
+        )
+    why_partial = ""
+    next_step = ""
+    if not complete:
+        if investigation is not None and investigation.cap is not None:
+            why_partial = (
+                f"hard cap {investigation.cap.kind.value} fired - ceilings are hard "
+                "stops, so the remaining phases were skipped"
+            )
+            next_step = (
+                "press 2 on the launch card next run (HEAVY ceilings) for the full "
+                "lifecycle, or raise MAX_TOTAL_TOKENS deliberately"
+            )
+        else:
+            reason = investigation.partial_reason if investigation is not None else None
+            why_partial = (reason or terminal_reason or "the run stopped early")[:160]
+            next_step = "re-run when the reported condition is resolved"
+    verify_hint = (
+        f'sentinel verify "{run_directory}" --require-complete'
+        if complete
+        else f'sentinel verify "{run_directory}"'
+    )
     stdout_console = Console(sys.stdout)
     if stdout_console.enabled:
         stdout_console.rule()
@@ -1647,20 +1664,30 @@ def run_cli(
             f"  {stdout_console.badge(terminal_status.value)}"
             f"  run {run_id}  -  wall {_elapsed() or '?'}"
         )
+        stdout_console.kv("Findings", findings_line)
+        stdout_console.kv("Report", str(run_directory / "report.md"))
         stdout_console.kv("Proof bundle", str(run_directory))
         stdout_console.kv("Verification", "PASS - report, viewer, custody, and audit chain")
         stdout_console.kv(
             "Strict gates",
             "packets - receipts - spans - usage - cost - report bytes - viewer bytes",
         )
-        stdout_console.kv("Verify again", f'sentinel verify "{run_directory}" --require-complete')
+        if why_partial:
+            stdout_console.kv("Why PARTIAL", why_partial)
+            stdout_console.kv("Next", next_step)
+        stdout_console.kv("Verify again", verify_hint)
         stdout_console.kv("Open viewer", f'sentinel view "{run_directory}"')
         stdout_console.rule()
     else:
         print(f"Run status: {terminal_status.value}")
+        print(f"Findings: {findings_line}")
+        print(f"Report: {run_directory / 'report.md'}")
         print(f"Proof bundle: {run_directory}")
         print("Bundle verification: PASS")
-        print(f'Verify again: sentinel verify "{run_directory}" --require-complete')
+        if why_partial:
+            print(f"Why PARTIAL: {why_partial}")
+            print(f"Next: {next_step}")
+        print(f"Verify again: {verify_hint}")
         print(f'Open viewer: sentinel view "{run_directory}"')
     return exit_code
 

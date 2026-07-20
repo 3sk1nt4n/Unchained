@@ -14,6 +14,8 @@ import pytest
 from unchained.artifacts import build_summary
 from unchained.caps import CapConfig, estimate_usage_cost
 from unchained.models import (
+    FINALIZE_OBSERVATION_VIEW_BYTES,
+    INVESTIGATE_OBSERVATION_VIEW_BYTES,
     INVESTIGATION_FINISH_TOOL_NAME,
     MAX_OPENING_TOOLS,
     EvidenceItem,
@@ -848,13 +850,13 @@ def _complete_events(
         )
         return [{key: receipt.get(key) for key in keys} for receipt in completed_before(before)]
 
-    def observation(call_id: str) -> list[dict[str, Any]]:
+    def observation(call_id: str, *, quotable: bool = False) -> list[dict[str, Any]]:
         receipt = next(
             payload
             for event_type, payload in payloads
             if event_type == "tool.completed" and payload.get("tool_call_id") == call_id
         )
-        model_output = ToolResult(
+        result = ToolResult(
             call_id=call_id,
             tool_name=str(receipt["tool_name"]),
             arguments=dict(receipt["arguments"]),
@@ -864,7 +866,12 @@ def _complete_events(
             started_at="",
             ended_at="",
             duration_ms=0,
-        ).model_output()
+        )
+        model_output = (
+            result.quotable_view(FINALIZE_OBSERVATION_VIEW_BYTES)
+            if quotable
+            else result.model_output(INVESTIGATE_OBSERVATION_VIEW_BYTES)
+        )
         encoded = model_output.encode("utf-8")
         return [
             {
@@ -972,8 +979,8 @@ def _complete_events(
                 "receipt_index": receipt_index(finalizer_index),
             }
         ),
-        *observation("t1"),
-        *observation("t2"),
+        *observation("t1", quotable=True),
+        *observation("t2", quotable=True),
     ]
     judge_index, judge_request = by_phase["judge"][0]
     judge_request["input"] = [

@@ -21,9 +21,10 @@ from .model import (
 )
 from .models import (
     CASE_LEDGER_UPDATE_MAX_BYTES,
+    FINALIZE_OBSERVATION_VIEW_BYTES,
+    INVESTIGATE_OBSERVATION_VIEW_BYTES,
     INVESTIGATION_FINISH_TOOL_NAME,
     MAX_OPENING_TOOLS,
-    MODEL_TOOL_OUTPUT_MAX_BYTES,
     EvidenceProfile,
     EvidenceQuote,
     EvidenceSpan,
@@ -54,11 +55,12 @@ class AgentProtocolError(RuntimeError):
 
 MAX_CASE_LEDGER_UPDATE_BYTES = CASE_LEDGER_UPDATE_MAX_BYTES
 
-# When the remaining total-token budget falls to this reserve, the adaptive loop
-# is forced to finish gracefully so the closing phases (forced serialization ->
-# exact spans -> fresh judge -> report) run within budget and the run reaches
-# COMPLETE. Sized to cover those phases (their bounded observation inputs plus
-# output ceilings) even on the LIGHT 100k-token profile.
+# When the remaining total-token budget falls to this level, the adaptive loop
+# appends a budget notice to the (non-exactness-checked) instructions asking the
+# model to finish now if more tools will not change the conclusions, so a long
+# investigation ends with a clean typed DONE (findings + report) instead of a
+# hard-cap PARTIAL. The deterministic controller packet and the immutable action
+# catalog never change, so the offline verifier still reproduces every request.
 _CLOSING_PHASE_RESERVE_TOKENS = 60_000
 
 
@@ -435,22 +437,24 @@ analysis from an unavailable capability.
 """.strip()
         while True:
             self.budget.check()
-            # Reserve budget for the closing phases (serialize -> judge -> report)
-            # so a long investigation never dies PARTIAL with zero findings. When
-            # the remaining budget falls to the reserve, force a graceful typed
-            # finish; the closing phases then run within the reserve and the run
-            # reaches COMPLETE with real findings and a full report.
+            # Budget-pressure guidance stays in the (non-exactness-checked)
+            # instructions so the deterministic controller packet and the
+            # immutable action catalog never change: when little budget remains,
+            # ask the model to finish now if more tools will not change the
+            # conclusions, so a long investigation ends with a clean typed DONE
+            # (findings + report) instead of a hard-cap PARTIAL.
             remaining_now = self.budget.remaining_total_tokens()
-            force_finish = remaining_now <= _CLOSING_PHASE_RESERVE_TOKENS
-            turn_tools = (investigation_finish_schema(),) if force_finish else available
-            turn_tool_choice: object = (
-                {"type": "function", "name": INVESTIGATION_FINISH_TOOL_NAME}
-                if force_finish
-                else "required"
-            )
-            if force_finish:
+            low_budget = remaining_now <= _CLOSING_PHASE_RESERVE_TOKENS
+            turn_instructions = instructions
+            if low_budget:
+                turn_instructions = (
+                    instructions + "\n\nBUDGET NOTICE: the remaining token budget is nearly spent. "
+                    "If another forensic tool would not change the conclusions, call "
+                    "finish_investigation with status DONE this turn so the report is "
+                    "produced within budget."
+                )
                 self.audit.append(
-                    "investigator.budget_finish",
+                    "investigator.budget_notice",
                     {"turn": state.turns + 1, "remaining_total_tokens": remaining_now},
                     actor="runner",
                 )
@@ -466,29 +470,25 @@ analysis from an unavailable capability.
                 "budget": self.budget.snapshot().public_dict(),
                 "latest_observation_call_ids": [result.call_id for result in observations],
             }
-            # Bound the combined observation payload so the first turn - which
-            # carries the whole opening book - fits the remaining token cap
-            # instead of firing MAX_TOTAL_TOKENS before the model can run. Full
-            # outputs stay retained on disk for exact-span citations.
-            per_observation_bytes = _per_observation_bytes(
-                self.budget.remaining_total_tokens(), len(observations)
-            )
+            # Observations are fed at the deterministic investigate view cap (the
+            # exact form the offline verifier reconstructs). The full output is
+            # always retained on disk as the citation source.
             current_input = [
                 *_user_input(packet),
                 *(
                     item
                     for result in observations
-                    for item in _observation_input(result, per_observation_bytes)
+                    for item in _observation_input(result, INVESTIGATE_OBSERVATION_VIEW_BYTES)
                 ),
             ]
             response = self.model.create(
                 ModelRequest(
                     phase="investigate",
-                    instructions=instructions,
+                    instructions=turn_instructions,
                     input_items=current_input,
-                    tools=turn_tools,
+                    tools=available,
                     parallel_tool_calls=False,
-                    tool_choice=turn_tool_choice,
+                    tool_choice="required",
                     previous_response_id=None,
                     max_output_tokens=4_096,
                     minimum_output_tokens=4_096,
@@ -617,19 +617,27 @@ forensic tool. Serialize only the
 hypotheses, dead ends, limitations, and findings already supported or
 contradicted by this run into submit_investigation. Every factual finding
 summary must cite each supporting tool-call id inline in square brackets.
-For every cited tool call, include at least one exact supporting_quotes passage
-from the supplied retained observation. The controller will resolve each quote
-to a content-addressed artifact and exact byte range before the judge sees it.
-CONFIRMED requires affirmative cited output; use NEEDS-REVIEW or UNSUPPORTED
-when corroboration is absent or contradictory.
+The case_notes string MUST itself contain, in square brackets, every
+tool_call_id cited by any finding - the controller validates this closure and
+rejects the whole submission when even one is missing from the notes.
+For every cited tool call, include at least one supporting_quotes passage that
+is copied VERBATIM - a byte-exact, contiguous substring - from that call's
+supplied observation text. Do not paraphrase, reformat, add ellipses, fix
+spacing, or merge lines. Copy at most a few hundred characters that appear
+exactly in the observation. The observation may be a truncated prefix; quote
+only text you can actually see in it. The controller resolves each quote to a
+content-addressed artifact and exact byte range, and REJECTS any quote that is
+not found verbatim in the full output. CONFIRMED requires affirmative cited
+output; use NEEDS-REVIEW or UNSUPPORTED when corroboration is absent or
+contradictory.
 
 {HOSTILE_DATA_RULE}
 """.strip()
-        # Bound the batched observations so serializing a large opening fits the
-        # remaining token cap; the full retained outputs remain the span source.
-        finalize_observation_bytes = _per_observation_bytes(
-            self.budget.remaining_total_tokens(), len(self._tool_results)
-        )
+        # Feed the retained outputs as RAW quotable prefixes at the deterministic
+        # finalize view cap (mirrored byte-for-byte by the offline verifier), so
+        # every supporting quote the model copies is a byte-exact substring of the
+        # full output and resolves to an exact byte range. The full outputs stay
+        # retained on disk as the citation source.
         serialization_input = [
             *_user_input(
                 {
@@ -642,7 +650,9 @@ when corroboration is absent or contradictory.
             *(
                 item
                 for result in self._tool_results.values()
-                for item in _observation_input(result, finalize_observation_bytes)
+                for item in _observation_input(
+                    result, FINALIZE_OBSERVATION_VIEW_BYTES, quotable=True
+                )
             ),
         ]
         response = self.model.create(
@@ -709,9 +719,13 @@ deterministically resolved to an exact byte range in a content-addressed full
 tool output. Return exactly one verdict for every existing finding: CONFIRMED,
 NEEDS-REVIEW, or UNSUPPORTED. Cite only tool_call_ids present in the receipts.
 For every cited call, include at least one quoted_spans object naming the
-supplied span_id; its text must be an exact, nonempty substring of that span and
-at most 1024 UTF-8 bytes. Quote only what you can actually see and explain the
-proof or gap.
+supplied span_id. Its text MUST be copied VERBATIM - a byte-exact, contiguous
+substring of that span's supplied text, at most 1024 UTF-8 bytes. Do not
+paraphrase, normalize whitespace, fix casing, add ellipses, or merge lines:
+copy characters that appear exactly in the span text you were shown. A quote
+that is not found verbatim in the named span is rejected and ends the run, so
+prefer a short exact run of characters over a long approximate one. Explain the
+proof or gap in the rationale, not by altering the quote.
 You may keep or downgrade a proposed status and annotate it; never upgrade it
 and never add a finding. A parser success, a zero-record result, or a tool error
 is not affirmative proof by itself. If both healthy memory and disk evidence
@@ -922,14 +936,17 @@ def _user_input(packet: dict[str, Any]) -> list[dict[str, JsonValue]]:
 
 
 def _observation_input(
-    result: ToolResult, max_bytes: int | None = None
+    result: ToolResult, max_bytes: int | None = None, *, quotable: bool = False
 ) -> tuple[dict[str, JsonValue], ...]:
     """Pair one local call with its output without replaying provider state.
 
     ``max_bytes`` bounds the retained-output view for THIS request so a batch of
     large observations fits the total-token cap; the full output stays retained.
+    ``quotable`` feeds a RAW UTF-8 prefix (not a JSON-wrapped view) so quotes the
+    model copies resolve to exact byte ranges; used by the serialization phase.
     """
 
+    view = result.quotable_view(max_bytes) if quotable else result.model_output(max_bytes)
     return (
         {
             "type": "function_call",
@@ -937,25 +954,8 @@ def _observation_input(
             "name": result.tool_name,
             "arguments": canonical_json(result.arguments),
         },
-        function_output(result.call_id, result.model_output(max_bytes)),
+        function_output(result.call_id, view),
     )
-
-
-def _per_observation_bytes(remaining_tokens: int, count: int) -> int:
-    """Bytes to feed per observation so a batch fits the remaining token cap.
-
-    Reserves half the remaining budget for the fixed request overhead
-    (instructions, tool schemas, the case-ledger packet, and the response),
-    spends the other half on observations at a conservative ~3 UTF-8 bytes per
-    token, and splits it across the batch. Floored so each tool always shows
-    something, and never above the per-tool model-view cap.
-    """
-
-    if count <= 0:
-        return MODEL_TOOL_OUTPUT_MAX_BYTES
-    observation_tokens = max(0, remaining_tokens) // 2
-    per_observation = (observation_tokens * 3) // count
-    return max(2_048, min(MODEL_TOOL_OUTPUT_MAX_BYTES, per_observation))
 
 
 def _receipt_index(receipts: list[dict[str, JsonValue]]) -> list[dict[str, JsonValue]]:

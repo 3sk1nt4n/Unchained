@@ -25,6 +25,8 @@ from .caps import CapConfig, estimate_usage_cost
 from .models import (
     CASE_LEDGER_UPDATE_MAX_BYTES,
     EVIDENCE_ROUTE_WARNINGS,
+    FINALIZE_OBSERVATION_VIEW_BYTES,
+    INVESTIGATE_OBSERVATION_VIEW_BYTES,
     INVESTIGATION_FINISH_TOOL_NAME,
     EvidenceItem,
     EvidenceProfile,
@@ -3562,6 +3564,7 @@ class _Verifier:
                 tuple(all_call_ids),
                 receipts,
                 label="investigation-finalize request",
+                quotable=True,
             )
 
         investigator = self._event_payload(entries, "investigator.finished")
@@ -3613,6 +3616,7 @@ class _Verifier:
         receipts: dict[str, _ToolReceipt],
         *,
         label: str,
+        quotable: bool = False,
     ) -> None:
         expected: list[dict[str, Any]] = [
             {
@@ -3620,7 +3624,9 @@ class _Verifier:
                 "content": [{"type": "input_text", "text": _canonical_json(packet)}],
             }
         ]
-        expected.extend(self._verified_observation_items(observation_call_ids, receipts))
+        expected.extend(
+            self._verified_observation_items(observation_call_ids, receipts, quotable=quotable)
+        )
         payload = request.get("payload")
         actual = payload.get("input") if isinstance(payload, dict) else None
         if actual != expected:
@@ -3630,6 +3636,8 @@ class _Verifier:
         self,
         call_ids: tuple[str, ...],
         receipts: dict[str, _ToolReceipt],
+        *,
+        quotable: bool = False,
     ) -> list[dict[str, Any]]:
         items: list[dict[str, Any]] = []
         for call_id in call_ids:
@@ -3648,7 +3656,7 @@ class _Verifier:
             except UnicodeDecodeError:
                 self.error(f"tool observation output is not UTF-8: {call_id}")
                 continue
-            model_output = ToolResult(
+            result = ToolResult(
                 call_id=receipt.call_id,
                 tool_name=receipt.tool_name,
                 arguments=receipt.arguments,
@@ -3658,7 +3666,16 @@ class _Verifier:
                 started_at="",
                 ended_at="",
                 duration_ms=0,
-            ).model_output()
+            )
+            # The serialization phase feeds RAW quotable prefixes at the finalize
+            # view cap; the investigate loop feeds the JSON model_output view at
+            # the investigate cap. Reconstruct the exact form so the request stays
+            # byte-for-byte reproducible.
+            model_output = (
+                result.quotable_view(FINALIZE_OBSERVATION_VIEW_BYTES)
+                if quotable
+                else result.model_output(INVESTIGATE_OBSERVATION_VIEW_BYTES)
+            )
             encoded = model_output.encode("utf-8", errors="replace")
             prefix = encoded[:MAX_EXCERPT_BYTES].decode("utf-8", errors="ignore")
             items.extend(

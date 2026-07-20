@@ -216,51 +216,25 @@ while (-not ($keyStatus -match "Key configured via")) {
         break
     }
     & $sentinelExe key
-    [Environment]::SetEnvironmentVariable("UNCHAINED_MODEL", "gpt-5.6", "User")
-    $env:UNCHAINED_MODEL = "gpt-5.6"
     $keyStatus = & $sentinelExe key --status 2>$null | Out-String
 }
 if ($keyStatus -match "Key configured via") { Write-Skip "key configured; every command finds it" }
 
-# 4/4 - pick the model, then the live run. onboard --launch shows the card,
-# asks LIGHT/HEAVY (spending ceilings), takes the exact phrase, and runs live.
-Write-Step "4/4" "Choose your model, then launch"
+# 4/4 - the live run. onboard --launch shows the verified case card, the key
+# card, then ONE launch card that owns model AND depth (1 = LAUNCH, 2 = depth,
+# 3 = model, Q = quit). No model question here - the card is the only model
+# authority, so nothing is ever asked twice.
+Write-Step "4/4" "Launch - one card asks model, depth, and confirmation"
+# An older bootstrap persisted UNCHAINED_MODEL at User scope; clear it so a
+# stale variable can never silently preselect the expensive model.
+if ([Environment]::GetEnvironmentVariable("UNCHAINED_MODEL", "User")) {
+    [Environment]::SetEnvironmentVariable("UNCHAINED_MODEL", $null, "User")
+}
+$env:UNCHAINED_MODEL = $null
+$env:UNCHAINED_ALLOW_TEST_MODEL = $null
 if ($keyStatus -match "Key configured via") {
-    Write-Host ""
-    # Title rule only (fixed width, always aligns). The option lines below carry
-    # double-width emoji, so they deliberately have NO right border - that avoids
-    # the spill you get when emoji width pushes a fixed-width box out of line.
-    Write-Host "   ┌─ HOW DO YOU WANT TO RUN? ──────────────────────────────────┐" -ForegroundColor DarkCyan
-    Write-Host "   └────────────────────────────────────────────────────────────┘" -ForegroundColor DarkCyan
-    Write-Host ""
-    Write-Host "     1) " -ForegroundColor DarkCyan -NoNewline
-    Write-Host "💚 REHEARSE  " -ForegroundColor Green -NoNewline
-    Write-Host "gpt-5.6-luna" -ForegroundColor White -NoNewline
-    Write-Host "   ~cents · practice, non-official" -ForegroundColor Gray
-    Write-Host "     2) " -ForegroundColor DarkCyan -NoNewline
-    Write-Host "⚡ REAL RUN  " -ForegroundColor Magenta -NoNewline
-    Write-Host "gpt-5.6 Sol " -ForegroundColor White -NoNewline
-    Write-Host "   costs more · official bundle" -ForegroundColor Gray
-    Write-Host ""
-    $modelPick = (Read-Host "   Pick 1 (rehearse - recommended first) or 2 (real Sol)").Trim()
-    # No blanket cap override here: LIGHT stays an honest $2.50 / 100k-token
-    # ceiling and HEAVY an honest $10 / 400k, so the case card never advertises
-    # one ceiling and then enforces another. If a full lifecycle needs more, the
-    # depth pick (HEAVY) or a deliberate MAX_TOTAL_TOKENS raise is the honest lever.
-    if ($modelPick -eq "2") {
-        [Environment]::SetEnvironmentVariable("UNCHAINED_ALLOW_TEST_MODEL", $null, "Process")
-        $env:UNCHAINED_ALLOW_TEST_MODEL = $null
-        $env:UNCHAINED_MODEL = "gpt-5.6"
-        Write-Host "   ⚡ REAL Sol run selected - this produces your official bundle." -ForegroundColor Magenta
-    } else {
-        $env:UNCHAINED_ALLOW_TEST_MODEL = "1"
-        $env:UNCHAINED_MODEL = "gpt-5.6-luna"
-        Write-Host "   💚 REHEARSAL on Luna selected - cheap and clearly non-official." -ForegroundColor Green
-    }
-    Write-Host "   Next: the case card, a 1/2 depth pick, then confirm the spend" -ForegroundColor Gray
-    Write-Host "   from the explicit " -ForegroundColor Gray -NoNewline
-    Write-Host "1 = LAUNCH" -ForegroundColor Yellow -NoNewline
-    Write-Host " menu (B = back, Q = quit)." -ForegroundColor Gray
+    Write-Host "      Next: the verified case card, the key card, then the one launch card:" -ForegroundColor Gray
+    Write-Host "      1 = LAUNCH  -  2 = depth  -  3 = model  -  Q = quit" -ForegroundColor Yellow
     Write-Host ""
     & $sentinelExe onboard $chosenCase --launch --caps strict
 } else {
