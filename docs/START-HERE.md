@@ -1,33 +1,76 @@
 # Start here: your first Unchained case
 
-> **The safe default**
->
-> Point Unchained at one case. It profiles, classifies, and hashes the evidence
-> locally first. No API key is required, OpenAI is not called, and no paid run
-> starts unless you explicitly request one and type the exact confirmation.
+New to this? You're in the right place. This is the gentle, one-step-at-a-time
+walkthrough — from a fresh Windows machine to a verified proof bundle you can
+open in your browser.
+
+> **You can't break anything.** Everything is local and free until the very
+> last step, and even then nothing spends money until you type an exact
+> confirmation phrase. If a step ever errors, nothing bad happened — just read
+> the message and try again.
 
 ```text
 ╔════════════════════════════════════════════════════════════════════╗
-║                             UNCHAINED                             ║
+║                             UNCHAINED                              ║
 ║  "Point me at one case. I will profile it before any model call." ║
 ╚════════════════════════════════════════════════════════════════════╝
-   $0 LOCAL PREVIEW  →  CASE CARD  →  EXPLICIT SOL  →  VERIFY  →  VIEW
+   $0 LOCAL PREVIEW  →  CASE CARD  →  DEPTH  →  LAUNCH  →  VERIFY  →  VIEW
 ```
 
-## The five-step path
+## The journey at a glance
 
-| Step | You do | Unchained does |
-|---:|---|---|
-| **1** | Install once | Creates an isolated CPython 3.11 environment and runs the local quality gate |
-| **2** | Open the welcome | Explains one-case scope, privacy, mounts, cloud boundary, and hard ceilings |
-| **3** | Point at evidence | Probes content, assigns public IDs, hashes custody, and shows a case card—locally |
-| **4** | Choose whether to launch | Requires an interactive, exact confirmation before a paid GPT-5.6 Sol run |
-| **5** | Verify and view | Checks the retained proof bundle before opening the inert report viewer |
+| Step | What you do | What happens | Costs? |
+|---:|---|---|---|
+| **0** | Keep your key safe | You revoke any exposed key and make a fresh one | Free |
+| **1** | Install (one line) | Tools install; `sentinel` becomes a one-word command | Free |
+| **2** | Save your key (hidden) | `sentinel key` stores it privately, found automatically | Free |
+| **3** | Point at a case | You see a **case card** with a `PROFILE READY` status | Free ($0) |
+| **4** | Pick a depth | LIGHT or HEAVY — sets spending limits only | Free to choose |
+| **5** | Launch and watch | You type a phrase; the live investigation runs on screen | A few cents+ |
+| **6** | Verify and view | An offline checker says **VALID**; the proof viewer opens | Free |
 
-## 1. Install once
+After Step 1, every command is one word: `sentinel ...`. (Setup adds it to your
+PATH. If a new terminal says "not found," open a fresh PowerShell window, or use
+the full path shown at the bottom of this page.)
 
-Use Windows 10/11 AMD64, Git, PowerShell, and official CPython **3.11.9
-AMD64** for the primary Windows-memory path.
+---
+
+## Step 0 — Keep your OpenAI key safe
+
+You'll need an OpenAI key for the paid run (Step 5), but never paste a key into
+a chat, screenshot, or shared terminal.
+
+1. Open <https://platform.openai.com/api-keys>.
+2. **Revoke** any key that has ever appeared somewhere public.
+3. **Create new secret key** and keep it in a private note for a moment.
+
+> New OpenAI accounts have a low rate limit (~200,000 tokens/minute). A full
+> investigation needs more than that in one burst, so add a little credit and
+> complete any verification under **Settings → Billing** to raise the limit
+> before your real run. This is the single most common reason a run stops early.
+
+---
+
+## Step 1 — Install Unchained (one line)
+
+Open **PowerShell** (Start → type "PowerShell" → Enter), then paste:
+
+```powershell
+irm https://raw.githubusercontent.com/3sk1nt4n/Unchained/main/get.ps1 | iex
+```
+
+This clones the project, installs a private, pinned Python 3.11 toolchain, and
+walks you in. **It reads no evidence and calls OpenAI zero times.** "OK already
+done" just means it is safe to re-run.
+
+Missing Git or Python? Install these, reopen PowerShell, and paste the line
+again:
+
+- Git for Windows: <https://git-scm.com/download/win>
+- CPython **3.11.9 AMD64**: <https://www.python.org/downloads/release/python-3119/>
+  (tick **"Add python.exe to PATH"** during install)
+
+Prefer the manual path instead of the one-liner? It does the same thing:
 
 ```powershell
 git clone https://github.com/3sk1nt4n/Unchained.git
@@ -35,184 +78,208 @@ Set-Location .\Unchained
 powershell -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1
 ```
 
-The setup script creates the environment outside the repository, installs the
-pinned dependencies, and runs the no-key checks. It does **not** read evidence,
-ask for an API key, or call OpenAI.
+---
 
-Keep this shortcut for the remaining commands:
+## Step 2 — Save your key the safe way (hidden, once)
 
 ```powershell
-$sentinel = "$env:LOCALAPPDATA\venvs\sentinel-unchained-py311\Scripts\sentinel.exe"
+sentinel key
 ```
 
-## 2. Open the welcome—still no key
+The prompt is **hidden** — you won't see the characters as you paste. That's on
+purpose. Paste your fresh key, press Enter. It's saved to a private, owner-only
+file and every command finds it automatically from now on. You never type it
+again. Confirm it worked:
 
 ```powershell
-& $sentinel onboard
+sentinel key --status
 ```
 
-This performs no evidence I/O and no provider request. It shows the supported
-case shape, the local/cloud boundary, the optional Luna connectivity canary,
-and both Sol cap profiles.
+You want to see **"Key configured."** (Automation can use `OPENAI_API_KEY` or
+`OPENAI_API_KEY_FILE` instead; those always take precedence.)
 
-For machine-readable output or a terminal without color:
+---
+
+## Step 3 — Look at a case (still $0, no OpenAI)
+
+First, meet the friendly welcome — no evidence, no key, no cost:
 
 ```powershell
-& $sentinel onboard --json
-& $sentinel onboard --no-color
+sentinel onboard
 ```
 
-`NO_COLOR` is also honored. Older Windows consoles automatically receive an
-ASCII card instead of unsupported box-drawing characters.
-
-## 3. Prepare and profile one case
-
-> **One folder = one case**
->
-> The current typed-tool router accepts at most **one ready memory image** and
-> **one ready disk image** in a case. Memory-only and disk-only cases are fine
-> when a route-valid forensic tool family is ready. Multiple ready images of
-> the same class fail closed; split them into separate case folders.
-
-Common inputs include:
-
-| Kind | Common containers | Treatment |
-|---|---|---|
-| Memory | `.raw`, `.img`, `.mem`, `.vmem`, `.dmp` | Bounded content/readiness probes; eligible read-only Volatility tools |
-| Disk | `.E01`, `.dd`, `.raw`, `.img` | Bounded content/filesystem probes; raw inspection or an explicitly requested read-only mount |
-| Documents and other unsupported files | Notes, PDFs, spreadsheets, miscellaneous files | Hashed and listed, then set aside from forensic analysis |
-| Archives | `.zip`, `.7z`, and similar | **Not unpacked**; prepare permitted contents outside Unchained first |
-
-Extensions are hints, not authority. Unchained uses bounded content probes and
-deterministic forensic metadata to decide the evidence kind.
-
-Run the safe preview:
+Then point it at one case folder to get a **case card**:
 
 ```powershell
-& $sentinel onboard "C:\Evidence\CASE-A"
+sentinel onboard "C:\Evidence\CASE-A"
 ```
 
-What this default does:
+**What you'll see:** a colorful card. The line that matters is
+**`Status: PROFILE READY`** — that means it's good to investigate. You'll also
+see the OS, the evidence's SHA-256 custody hash (proof it hasn't changed), and
+which forensic tools are ready.
 
-- enumerates regular files safely;
-- assigns path-free public IDs such as `E001`;
-- computes SHA-256 before and after profiling;
-- derives OS, evidence shape, health, symbols, filesystems, and eligible tool
-  families;
-- prints a junior-friendly case card and precise blockers;
+What this safe preview does, in plain terms:
+
+- looks at every file and decides memory vs disk vs document by **probing the
+  contents**, not the filename;
+- gives each item a path-free public ID like `E001`;
+- takes a SHA-256 fingerprint before and after (chain of custody);
 - makes **zero OpenAI calls** and starts **no paid run**;
-- does not print child evidence paths, mountpoints, or secrets.
+- never prints your file paths, mountpoints, or secrets.
 
-Optional variants:
+> **One folder = one case.** Put at most one ready memory image and one ready
+> disk image in a folder. Two of the same kind fail closed — split them into
+> separate folders. Archives (`.zip`, `.7z`) are **not** unpacked; extract
+> permitted contents yourself first.
+
+Optional extras:
 
 ```powershell
-# Request only a contained read-only mount attempt; the card reports the outcome.
-& $sentinel onboard "C:\Evidence\CASE-A" --mount
-
-# Path-free JSON for automation. It can never launch a paid run.
-& $sentinel onboard "C:\Evidence\CASE-A" --json
+sentinel onboard "C:\Evidence\CASE-A" --mount   # attempt a read-only disk mount
+sentinel onboard "C:\Evidence\CASE-A" --json    # machine-readable; can never launch
 ```
 
-Mount wording is literal: the result distinguishes `not-requested`, no ready
-disk, requested-but-unavailable/raw-only, and verified-read-only-and-released.
+If the card says **ACTION NEEDED** instead of READY, read the "FIX BEFORE
+LAUNCH" list — usually the evidence kind isn't supported yet, or an archive
+still needs extracting. No paid run is offered until it's READY.
 
-## 4. Choose the cloud boundary and hard ceilings
+---
 
-First check local live-run readiness without reading evidence or printing the
-key:
+## Step 4 — Choose a depth (LIGHT or HEAVY)
+
+When you launch you'll pick one. Both use the **same GPT-5.6 Sol investigator** —
+the depth only sets **spending limits**, not quality.
+
+| Choice | Option | Hard ceilings (not a price quote) |
+|---|---|---|
+| **LIGHT** — recommended first case | `--caps strict` | 20 tools · 100,000 tokens · 10 min · $2.50 est. |
+| **HEAVY** — deeper run | `--caps default` | 60 tools · 400,000 tokens · 30 min · $10 est. |
+
+Ceilings are **stop limits**, not the price you'll pay. Real spend is usually
+far lower. Check your live-run readiness any time (no evidence, no key printed):
 
 ```powershell
 $env:UNCHAINED_MODEL = "gpt-5.6"
-& $sentinel doctor
+sentinel doctor
 ```
 
-If desired, run the one-request Luna connectivity canary before a forensic
-case:
+You want **READY**. If it says a cap or model is missing, follow the one-line
+hint it prints.
+
+---
+
+## Step 5 — The smart way: rehearse cheap, then run for real
+
+### 5a. Practice on the cheapest model first (a few cents)
+
+This validates the whole pipeline before you spend on the flagship. Paste the
+block:
 
 ```powershell
-& $sentinel smoke-openai
+$env:UNCHAINED_ALLOW_TEST_MODEL = "1"
+$env:UNCHAINED_MODEL = "gpt-5.6-luna"
+$env:MAX_TOTAL_TOKENS = "3000000"
+$env:MAX_COST_USD = "30"
+sentinel onboard "C:\Evidence\CASE-A" --launch --caps strict
 ```
 
-The Luna command is a paid but tightly bounded connectivity test. It reads no
-evidence, creates no proof bundle, and is explicitly **not** a qualifying
-forensic result.
+Then, in order:
 
-For a Sol investigation, choose a hard-cap profile:
+1. It shows the case card again.
+2. It asks your depth — press **Enter** for LIGHT.
+3. It asks you to confirm spending. Type **exactly**: `LAUNCH GPT-5.6 SOL`
+4. **Watch it live**: opening tools with timings, the model's reasoning each
+   turn, findings, the reviewer keeping or downgrading them, and a sealed bundle.
 
-| Choice | Command option | Default hard ceilings |
+The banner will warn **"TEST MODEL MODE"** — that's correct. A test run is a
+cheap rehearsal, clearly labeled **nonqualifying**; it can never masquerade as
+the official Sol result. Why the generous ceilings and higher-tier account? The
+full lifecycle on a real memory image can otherwise stop early on token or
+rate limits — see [When a run stops early](#when-a-run-stops-early).
+
+### 5b. The official run (GPT-5.6 Sol)
+
+Once the rehearsal completes cleanly, open a **fresh PowerShell** (to clear the
+test settings) and do the real one:
+
+```powershell
+$env:UNCHAINED_MODEL = "gpt-5.6"
+$env:MAX_TOTAL_TOKENS = "3000000"
+$env:MAX_COST_USD = "30"
+sentinel onboard "C:\Evidence\CASE-A" --launch --caps strict
+```
+
+Type `LAUNCH GPT-5.6 SOL` to confirm. This one uses the real Sol model (costs a
+bit more) and produces your official bundle. Original evidence bytes stay local;
+OpenAI only receives the bounded public profile and bounded typed-tool outputs.
+
+---
+
+## Step 6 — Verify and view the proof (free, no key)
+
+The run prints the exact **bundle folder path** at the end. Use it:
+
+```powershell
+sentinel verify "C:\path\to\bundle"
+sentinel view   "C:\path\to\bundle"
+```
+
+- `verify` should say **VALID** — an independent, offline checker rebuilt the
+  report and confirmed nothing was tampered with.
+- `view` opens a self-contained **proof viewer** in your browser (findings,
+  citations, custody, receipts) — no server, no JavaScript, no internet.
+
+For the qualifying Sol bundle, verify strictly:
+
+```powershell
+sentinel verify "C:\path\to\bundle" --require-complete --require-live-gpt56
+```
+
+🎉 **VALID with those flags is submission-grade proof.**
+
+> Verification proves the lifecycle, custody, citations, report, and viewer are
+> internally consistent. It does **not** prove a model's forensic
+> interpretation is true, and it does not authenticate OpenAI. A human analyst
+> owns the final judgment.
+
+---
+
+## When a run stops early
+
+A run can end `PARTIAL` — that's honest, not a failure of you. Read
+`summary.json` and the last audit lines. Common causes and fixes:
+
+| You see | What it means | What to do |
 |---|---|---|
-| **CAUTIOUS** — recommended first case | `--caps strict` | 20 forensic calls · 100,000 tokens · 10 minutes · $2.50 estimated cost |
-| **FLAGSHIP** — larger permitted run | `--caps default` | 60 forensic calls · 400,000 tokens · 30 minutes · $10 estimated cost |
+| `429 Request too large ... TPM` | Your account's per-minute token limit is too low for the serializer packet | Add credit / verify to tier up (Step 0), so your TPM exceeds the request size |
+| `MAX_TOTAL_TOKENS` before the report | The full lifecycle exceeded the token cap | Raise it: `MAX_TOTAL_TOKENS=3000000 MAX_COST_USD=30` |
+| `MAX_TOOL_CALLS` | The tool budget was too small for the investigation | Use `--caps default`, or raise `MAX_TOOL_CALLS` |
+| `ACTION NEEDED` card, no launch offered | Evidence isn't route-ready | Fix the card's "FIX BEFORE LAUNCH" blockers, then re-profile |
 
-Both choices use the same GPT-5.6 Sol controller and phase policies. They are
-stop ceilings—not price quotes, model-quality promises, or separate reasoning
-depths. Environment overrides can change the effective values; the onboarding
-card always prints the effective selected ceilings.
+Exit codes, if you script this:
 
-Store the authorized OpenAI project key outside Git. The helper accepts it
-without echoing it and keeps it only in the current PowerShell process:
+| Exit | Meaning | Junior action |
+|---:|---|---|
+| `0` | Completed within policy | Read the reported status; not an accuracy guarantee |
+| `1` | Fatal runtime/provider/verification/custody failure | Preserve output; don't rely on the result |
+| `2` | Invalid input/config or no ready route | Fix the case-card blocker; don't force a launch |
+| `3` | `PARTIAL` — a cap or phase stopped safely | Preserve the bundle; report it as partial, never as complete |
 
-> **Credential safety:** never reuse a key that appeared in chat, a recording,
-> a shell transcript, or a committed file. Revoke it at the provider first,
-> then create a fresh project-scoped key with an explicit spend limit.
+---
 
-```powershell
-.\scripts\set-openai-key.ps1
-```
+## No key? No evidence? You can still explore
 
-Then explicitly request the paid path:
-
-```powershell
-& $sentinel onboard "C:\Evidence\CASE-A" --launch --caps strict
-```
-
-Unchained profiles and verifies the case before offering launch. It then shows
-the cloud/cost card and requires this exact phrase:
-
-```text
-LAUNCH GPT-5.6 SOL
-```
-
-Anything else cancels. `--launch` is refused in JSON or noninteractive mode.
-If confirmed, OpenAI receives the bounded public profile and bounded typed-tool
-observations. Original evidence bytes and runner-local evidence paths remain
-local. Add `--mount` only when the case needs an attempted read-only disk mount.
-
-## 5. Verify and view the result
-
-The completed CLI prints the exact bundle path and next commands. Preserve the
-actual terminal status: `PARTIAL` or `INVALID` is not `COMPLETE`.
+A judge or curious newcomer can inspect the experience and verify a supplied
+bundle without any key or evidence:
 
 ```powershell
-& $sentinel verify "C:\path\to\bundle"
-& $sentinel verify "C:\path\to\bundle" --require-complete --require-live-gpt56
-& $sentinel view "C:\path\to\bundle"
+sentinel onboard                              # the guided welcome
+sentinel verify "C:\path\to\supplied-bundle"  # check a bundle offline
+sentinel view   "C:\path\to\supplied-bundle"  # open its proof viewer
 ```
 
-- Ordinary `verify` checks the retained bundle in its claimed state.
-- The strict command additionally requires a complete live GPT-5.6 lifecycle.
-- `view` verifies before opening `viewer.html`; a bundle claiming `COMPLETE`
-  automatically receives strict lifecycle verification.
-- The viewer is self-contained, contains no JavaScript or external resources,
-  and needs no report server.
-
-Verification establishes lifecycle, custody, receipt, citation, report, and
-viewer consistency. It does not prove that a model's forensic interpretation is
-true or independently authenticate OpenAI. A human analyst owns the final
-forensic judgment.
-
-## Judge/no-key lane
-
-If you have no evidence or API key, you can still inspect the UX and verify a
-supplied bundle without rebuilding it:
-
-```powershell
-& $sentinel onboard
-& $sentinel verify "C:\path\to\supplied-bundle"
-& $sentinel view "C:\path\to\supplied-bundle"
-```
-
-For the containerized no-network front door:
+Or the fully isolated container front door (no network, no key):
 
 ```powershell
 docker compose build
@@ -220,22 +287,31 @@ docker compose run --rm offline
 docker compose run --rm offline profile /evidence --json
 ```
 
-The offline service defaults to `onboard --json`, exits `0`, reads no evidence,
-uses no key, and has no network. The committed Docker fixture is a synthetic
-standalone log. Profiling it proves classification and custody; it correctly
-does not pretend that a forensic tool route or authentic investigation is
-ready. Run `docker compose run --rm offline doctor --json` only as an explicit
-live-readiness check; without a Sol model/key it correctly reports not ready.
+The offline container profiles a committed synthetic log fixture with zero
+OpenAI calls — it proves classification and custody, and honestly says a real
+forensic route isn't ready for that toy fixture.
 
-## When something stops
+---
 
-| Exit | Meaning | Junior-analyst action |
-|---:|---|---|
-| `0` | Command completed within policy | Read the reported status; this is not an accuracy guarantee |
-| `1` | Fatal runtime, provider, verification, or custody invariant | Preserve the output and do not rely on the result |
-| `2` | Invalid input/configuration or no ready route | Fix the case-card blocker; do not force a launch |
-| `3` | `PARTIAL` because a cap or mandatory phase stopped safely | Preserve the bundle and report it as partial |
+## A tiny cheat sheet to keep
 
-Next references: [judge quickstart](../JUDGE-QUICKSTART.md),
-[architecture](ARCHITECTURE.md), and
-[release handoff](OPENAI_VNEXT_RELEASE_HANDOFF.md).
+| I want to… | Command |
+|---|---|
+| See the welcome | `sentinel onboard` |
+| Confirm my key | `sentinel key --status` |
+| Look at a case ($0) | `sentinel onboard "<folder>"` |
+| Rehearse cheap | set `UNCHAINED_ALLOW_TEST_MODEL=1` + `UNCHAINED_MODEL=gpt-5.6-luna`, then `... --launch` |
+| Real Sol run | `UNCHAINED_MODEL=gpt-5.6`, then `... --launch` |
+| Check a bundle | `sentinel verify "<bundle>"` |
+| Open the viewer | `sentinel view "<bundle>"` |
+
+**If `sentinel` isn't found** (rare — usually just open a new terminal), the
+full path always works:
+
+```powershell
+& "$env:LOCALAPPDATA\venvs\sentinel-unchained-py311\Scripts\sentinel.exe" onboard
+```
+
+Next: [judge quickstart](../JUDGE-QUICKSTART.md) ·
+[architecture](ARCHITECTURE.md) ·
+[release handoff](OPENAI_VNEXT_RELEASE_HANDOFF.md)
