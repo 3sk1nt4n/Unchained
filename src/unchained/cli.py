@@ -575,7 +575,9 @@ def _launch_menu(caps_profile: str) -> str | None:
             continue
         if answer in ("q", "quit", "cancel", "n", "no"):
             return None
-        print("     (1 = LAUNCH - 2 = switch depth - 3 = switch model - Q = quit)")
+        guard = Console(sys.stdout)
+        message = "That was not an option: 1 = LAUNCH, 2 = depth, 3 = model, Q = quit."
+        guard.warn(message) if guard.enabled else print(f"     ! {message}")
 
 
 def _onboard(

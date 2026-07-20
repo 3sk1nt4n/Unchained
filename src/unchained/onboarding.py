@@ -42,6 +42,7 @@ _ASCII_FALLBACK = str.maketrans(
         "╝": "+",
         "◆": "*",
         "○": "-",
+        "●": "*",
         "✓": "OK",
     }
 )
@@ -261,28 +262,35 @@ def render_launch_gate(
 
     stream = _encoding_safe_stream(stream)
     color = _supports_color(stream, no_color=no_color)
-    depth_name = "HEAVY (FLAGSHIP)" if caps_profile == "default" else "LIGHT (CAUTIOUS)"
-    other_profile = "strict" if caps_profile == "default" else "default"
-    other = _preset_caps(other_profile)
-    other_name = "HEAVY" if other_profile == "default" else "LIGHT"
-    other_model = (
-        "GPT-5.6 Sol - the official, qualifying bundle (costs more)"
-        if cheap_model_opt_in()
-        else "gpt-5.6-terra - cheaper rehearsal, nonqualifying (Sol is the seal)"
-    )
+    sol_selected = not cheap_model_opt_in()
+    heavy_selected = caps_profile == "default"
+    light_caps = caps if not heavy_selected else _preset_caps("strict")
+    heavy_caps = caps if heavy_selected else _preset_caps("default")
+
+    # Both choices stay visible in FIXED positions; only the marker moves, so
+    # a toggle press is always a visible state change, never a mystery.
+    def row(selected: bool, text: str) -> str:
+        return f" {'●' if selected else '○'} {text}{'   [SELECTED]' if selected else ''}"
+
+    def ceilings(c: CapConfig) -> str:
+        return (
+            f"{c.max_tool_calls} tools / {c.max_total_tokens:,} tokens / "
+            f"{c.max_wall_seconds / 60:g} min / ${c.max_cost_usd:.2f}"
+        )
+
     lines = [
-        f"Model  {active_model_label()}",
-        f"Depth  {depth_name} - {caps.max_tool_calls} tools / "
-        f"{caps.max_total_tokens:,} tokens / {caps.max_wall_seconds / 60:g} min / "
-        f"${caps.max_cost_usd:.2f} hard ceiling",
+        "MODEL - press 3 to move the marker:",
+        row(not sol_selected, "gpt-5.6-terra - cheap rehearsal, nonqualifying"),
+        row(sol_selected, "GPT-5.6 Sol - the official qualifying seal (costs more)"),
+        "DEPTH - hard stop ceilings, press 2 to move the marker:",
+        row(not heavy_selected, f"LIGHT (CAUTIOUS) - {ceilings(light_caps)}"),
+        row(heavy_selected, f"HEAVY (FLAGSHIP) - {ceilings(heavy_caps)}"),
+        "",
         "Evidence bytes stay local; the model sees only the bounded profile and "
         "typed-tool observations. This is no longer the $0 preview.",
         "",
-        "1) LAUNCH - start the paid run now (this spends real money)",
-        f"2) Depth  - switch to {other_name}: {other.max_tool_calls} tools / "
-        f"{other.max_total_tokens:,} tokens / ${other.max_cost_usd:.2f}",
-        f"3) Model  - switch to {other_model}",
-        "Q) Quit   - cancel; nothing is sent, nothing is spent",
+        "1) LAUNCH with the [SELECTED] model and depth (this spends real money)",
+        "2) Switch depth  -  3) Switch model  -  Q) Quit (nothing is spent)",
     ]
     _boxed("LAUNCH - EVERYTHING ON ONE CARD", lines, stream=stream, color=color, accent=_AMBER)
 
