@@ -107,7 +107,7 @@ cap-blocked — matching this formula at the point the cap fired.
 The model cannot access a shell, choose an arbitrary path or binary, change the
 evidence, write the audit, modify a cap, add a judge finding, promote a verdict,
 or control authoritative report rows. An opening response containing an unknown,
-duplicate, malformed, or seventh tool call rejects the whole opening batch; no
+duplicate, malformed, or thirteenth tool call rejects the whole opening batch; no
 valid subset is executed. Adaptive termination is equally strict: empty text,
 whitespace, punctuation, Markdown, and narrative prose have no terminal
 authority. Only the closed non-forensic
@@ -126,8 +126,8 @@ full transcript or the old 2,048-byte audit prefixes.
 
 | Phase | Reasoning effort | Text verbosity | Max output tokens | Max calls exposed |
 |---|---|---|---:|---:|
-| Opening | low | low | 2,048 | 6 typed forensic calls |
-| Adaptive turn | medium | low | 4,096 (also the request-allocation minimum) | 1 typed action: forensic or finish |
+| Opening | low | low | 4,096 | 12 typed forensic calls |
+| Adaptive turn | medium | medium | 4,096 (also the request-allocation minimum) | 1 typed action: forensic or finish |
 | Finalization | medium | low | 12,288 (4,096 minimum allocation) | 1 strict schema call |
 | Judge | high | low | 12,288 (4,096 minimum allocation) | 1 strict schema call |
 | Report | low | medium | 8,192 | 1 strict schema call |
@@ -224,19 +224,22 @@ prototype's guarantee.
 
 ## Current verified state
 
-- Both reviewed local repositories matched their upstream heads at the start of
-  the 2026-07-18 review.
-- The original Unchained baseline passed 129 tests; the vNext working tree passes
-  267 offline tests plus Ruff check and format check.
-- The current tree contains 17 source modules and 32 Python files, with 13,383
-  physical source lines and 12,259 nonblank source lines.
-- The prior DC01 rehearsal remains `PARTIAL`; it stopped before judge/report and
-  its old custody receipt namespace fails the corrected verifier.
-- No authentic completed GPT-5.6 vNext evidence bundle exists yet.
-- No live same-evidence latency benchmark has been run, and automated in-app
-  browser visual QA could not start because the browser runtime lacked required
-  sandbox-policy metadata. Parser-based inertness tests passed, but human
-  visual/cross-browser QA remains pending.
+- 2026-07-20: the offline suite passes 430 tests plus Ruff check and format
+  check. The source tree is 19 modules, 16,133 physical source lines
+  (14,728 nonblank).
+- An authentic `COMPLETE` GPT-5.6 Sol bundle **ships in this repository** at
+  [`examples/public-run-complete`](../examples/public-run-complete): 3 findings,
+  fresh-judge verdicts, and a sealed report on the public DC01 case; strict
+  `--require-complete --require-live-gpt56` verifies `VALID` (27 artifacts,
+  124 audit entries). A second authentic `gpt-5.6-luna` `PARTIAL` bundle ships
+  at [`examples/public-run-partial`](../examples/public-run-partial) (14/14
+  typed tools, honest hard-cap stop, `VALID`: 20 artifacts, 62 audit entries).
+- Every pipeline stage in the diagram above has executed live end to end in the
+  shipped `COMPLETE` bundle: opening book, adaptive turns, forced serialization,
+  exact span resolution, fresh judge, report draft, deterministic renderer,
+  final custody, sealing, and offline verification.
+- No live same-evidence latency benchmark has been run; human visual and
+  cross-browser viewer QA remains pending (parser-based inertness tests pass).
 - OS-enforced parser sandboxing, stable evidence handles/immutable snapshots,
   multi-image scheduling, resource-aware heavy-tool scheduling, and signed or
   externally timestamped proof remain production work.

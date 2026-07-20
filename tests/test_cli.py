@@ -14,6 +14,61 @@ from unchained.models import FunctionCall, ModelResponse, ModelUsage
 from unchained.verify import VerificationResult
 
 
+def test_findings_table_shows_judge_status_and_severity_per_row() -> None:
+    from unchained.models import Finding, FindingStatus, JudgeVerdict
+
+    findings = [
+        Finding(
+            finding_id="F-001",
+            title="Private executable payload regions in Print Spooler",
+            summary="s",
+            proposed_status=FindingStatus.CONFIRMED,
+            severity="critical",
+            tool_call_ids=("call_a",),
+        ),
+        Finding(
+            finding_id="F-002",
+            title="Privileged short-lived process is a candidate precursor",
+            summary="s",
+            proposed_status=FindingStatus.CONFIRMED,
+            severity="high",
+            tool_call_ids=("call_b",),
+        ),
+    ]
+    verdicts = [
+        JudgeVerdict(
+            finding_id="F-002",
+            status=FindingStatus.NEEDS_REVIEW,
+            rationale="capability alone is not attribution",
+            cited_tool_call_ids=("call_b",),
+            quoted_spans=(),
+        )
+    ]
+
+    rows = cli_module._findings_table_lines(findings, verdicts)
+
+    assert len(rows) == 2
+    assert "F-001" in rows[0] and "CRITICAL" in rows[0] and "CONFIRMED" in rows[0]
+    # The judge's downgrade is the final word on the row, never the proposal.
+    assert "F-002" in rows[1] and "NEEDS-REVIEW" in rows[1]
+    assert cli_module._findings_table_lines([], []) == []
+
+
+def test_bundle_artifact_rows_list_only_artifacts_that_exist(tmp_path: Path) -> None:
+    (tmp_path / "viewer.html").write_text("v")
+    (tmp_path / "audit.jsonl").write_text("a")
+    (tmp_path / "tool-outputs").mkdir()
+    (tmp_path / "tool-outputs" / "aa.json").write_text("t")
+    (tmp_path / "summary.json").write_text("s")
+
+    rows = cli_module._bundle_artifact_rows(tmp_path)
+
+    assert [label for label, _ in rows] == ["Viewer", "Audit chain", "Tool outputs", "Summary"]
+    assert "1 sanitized" in dict(rows)["Tool outputs"]
+    # A missing bundle promises nothing.
+    assert cli_module._bundle_artifact_rows(tmp_path / "missing") == []
+
+
 def test_partial_next_step_names_billing_when_quota_is_exhausted() -> None:
     # The provider code sits past the panel's 160-character Why truncation, so
     # the decision must read the full reason text, not the display slice.

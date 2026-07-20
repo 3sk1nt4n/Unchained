@@ -15,6 +15,7 @@ from collections.abc import Sequence
 from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 from .agent import AgentRun, UnchainedAgent, defang_untrusted_inline
 from .artifacts import (
@@ -1041,6 +1042,48 @@ def _elapsed() -> str | None:
     return f"{int(seconds // 60):02d}:{seconds % 60:04.1f}"
 
 
+def _findings_table_lines(findings: list[Any], verdicts: list[Any]) -> list[str]:
+    """The authoritative findings table for the terminal closing panel: one
+    row per finding with ID, severity, final (judge) status, and title - the
+    same deterministic data the sealed report renders, never model prose."""
+
+    status_by_id: dict[str, str] = {}
+    for verdict in verdicts:
+        data = verdict.public_dict()
+        status_by_id[str(data.get("finding_id"))] = str(data.get("status", "?"))
+    lines: list[str] = []
+    for finding in findings:
+        final_status = status_by_id.get(finding.finding_id, finding.proposed_status.value)
+        lines.append(
+            f"    ● {finding.finding_id:<6} {str(finding.severity).upper():<9} "
+            f"{final_status:<13} {finding.title[:52]}"
+        )
+    return lines
+
+
+def _bundle_artifact_rows(run_directory: Path) -> list[tuple[str, str]]:
+    """Direct paths to the promised bundle artifacts, printed right after the
+    pipeline so 'What you get' is delivered on-screen, not just documented.
+    Only artifacts that actually exist are listed - never a promised path that
+    is not there."""
+
+    rows: list[tuple[str, str]] = []
+    viewer = run_directory / "viewer.html"
+    if viewer.is_file():
+        rows.append(("Viewer", f"{viewer}  (no-JS proof viewer - double-click to open)"))
+    audit = run_directory / "audit.jsonl"
+    if audit.is_file():
+        rows.append(("Audit chain", str(audit)))
+    tool_dir = run_directory / "tool-outputs"
+    if tool_dir.is_dir():
+        outputs = sum(1 for item in tool_dir.iterdir() if item.is_file())
+        rows.append(("Tool outputs", f"{tool_dir}  ({outputs} sanitized, content-addressed)"))
+    summary = run_directory / "summary.json"
+    if summary.is_file():
+        rows.append(("Summary", str(summary)))
+    return rows
+
+
 def _partial_next_step(reason: str) -> str:
     """Honest next action for a PARTIAL run, keyed off the full failure text.
 
@@ -1768,6 +1811,8 @@ def run_cli(
         if complete
         else f'sentinel verify "{run_directory}"'
     )
+    finding_rows = _findings_table_lines(findings_list, verdict_list)
+    artifact_rows = _bundle_artifact_rows(run_directory)
     stdout_console = Console(sys.stdout)
     if stdout_console.enabled:
         stdout_console.rule()
@@ -1776,8 +1821,12 @@ def run_cli(
             f"  run {run_id}  -  wall {_elapsed() or '?'}"
         )
         stdout_console.kv("Findings", findings_line)
+        for row in finding_rows:
+            stdout_console.line(row)
         stdout_console.kv("Report", str(run_directory / "report.md"))
         stdout_console.kv("Proof bundle", str(run_directory))
+        for label, value in artifact_rows:
+            stdout_console.kv(label, value)
         stdout_console.kv("Verification", "PASS - report, viewer, custody, and audit chain")
         stdout_console.kv(
             "Strict gates",
@@ -1792,8 +1841,12 @@ def run_cli(
     else:
         print(f"Run status: {terminal_status.value}")
         print(f"Findings: {findings_line}")
+        for row in finding_rows:
+            print(row)
         print(f"Report: {run_directory / 'report.md'}")
         print(f"Proof bundle: {run_directory}")
+        for label, value in artifact_rows:
+            print(f"{label}: {value}")
         print("Bundle verification: PASS")
         if why_partial:
             print(f"Why PARTIAL: {why_partial}")
