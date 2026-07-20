@@ -221,24 +221,26 @@ if ($keyStatus -match "Key configured") { Write-Skip "key configured; every comm
 Write-Step "4/4" "Choose your model, then launch"
 if ($keyStatus -match "Key configured") {
     Write-Host ""
-    Write-Host "   ╭───────────────── HOW DO YOU WANT TO RUN? ─────────────────╮" -ForegroundColor DarkCyan
-    Write-Host "   │                                                           │" -ForegroundColor DarkCyan
-    Write-Host "   │  " -ForegroundColor DarkCyan -NoNewline
-    Write-Host "1) 💚 REHEARSE " -ForegroundColor Green -NoNewline
-    Write-Host "gpt-5.6-luna " -ForegroundColor White -NoNewline
-    Write-Host "· ~cents · practice, non-official" -ForegroundColor Gray -NoNewline
-    Write-Host "   │" -ForegroundColor DarkCyan
-    Write-Host "   │  " -ForegroundColor DarkCyan -NoNewline
-    Write-Host "2) ⚡ REAL RUN " -ForegroundColor Magenta -NoNewline
-    Write-Host "gpt-5.6 Sol  " -ForegroundColor White -NoNewline
-    Write-Host "· costs more · official bundle" -ForegroundColor Gray -NoNewline
-    Write-Host "  │" -ForegroundColor DarkCyan
-    Write-Host "   │                                                           │" -ForegroundColor DarkCyan
-    Write-Host "   ╰───────────────────────────────────────────────────────────╯" -ForegroundColor DarkCyan
+    # Title rule only (fixed width, always aligns). The option lines below carry
+    # double-width emoji, so they deliberately have NO right border - that avoids
+    # the spill you get when emoji width pushes a fixed-width box out of line.
+    Write-Host "   ┌─ HOW DO YOU WANT TO RUN? ──────────────────────────────────┐" -ForegroundColor DarkCyan
+    Write-Host "   └────────────────────────────────────────────────────────────┘" -ForegroundColor DarkCyan
+    Write-Host ""
+    Write-Host "     1) " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "💚 REHEARSE  " -ForegroundColor Green -NoNewline
+    Write-Host "gpt-5.6-luna" -ForegroundColor White -NoNewline
+    Write-Host "   ~cents · practice, non-official" -ForegroundColor Gray
+    Write-Host "     2) " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "⚡ REAL RUN  " -ForegroundColor Magenta -NoNewline
+    Write-Host "gpt-5.6 Sol " -ForegroundColor White -NoNewline
+    Write-Host "   costs more · official bundle" -ForegroundColor Gray
+    Write-Host ""
     $modelPick = (Read-Host "   Pick 1 (rehearse - recommended first) or 2 (real Sol)").Trim()
-    # Headroom learned from live testing: the full lifecycle can exceed default caps.
-    $env:MAX_TOTAL_TOKENS = "3000000"
-    $env:MAX_COST_USD = "30"
+    # No blanket cap override here: LIGHT stays an honest $2.50 / 100k-token
+    # ceiling and HEAVY an honest $10 / 400k, so the case card never advertises
+    # one ceiling and then enforces another. If a full lifecycle needs more, the
+    # depth pick (HEAVY) or a deliberate MAX_TOTAL_TOKENS raise is the honest lever.
     if ($modelPick -eq "2") {
         [Environment]::SetEnvironmentVariable("UNCHAINED_ALLOW_TEST_MODEL", $null, "Process")
         $env:UNCHAINED_ALLOW_TEST_MODEL = $null

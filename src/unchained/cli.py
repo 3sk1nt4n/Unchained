@@ -537,15 +537,24 @@ def _choose_analysis_depth(selected: str) -> str:
 
 
 def _confirm_paid_sol_launch(caps_profile: str, caps: CapConfig) -> bool:
-    """Require a high-friction, exact phrase before crossing the cloud boundary."""
+    """Require a high-friction, exact phrase before crossing the cloud boundary.
 
+    The confirmation names the ACTUAL model for this run (Sol for a real run, or
+    the labeled cheap model during a rehearsal) so a Luna rehearsal never claims
+    "Sol". The typed phrase stays the fixed ``LAUNCH GPT-5.6 SOL`` safety ritual.
+    """
+
+    from .onboarding import active_model_label
+
+    model_label = active_model_label()
     print()
     print("+-- EXPLICIT PAID CLOUD LAUNCH --------------------------------------------+")
-    print("| GPT-5.6 Sol may receive the bounded profile and typed-tool observations. |")
-    print("| Original evidence bytes stay local. This is no longer the $0 preview.   |")
+    print(f"|  Model for this run: {model_label}")
+    print("|  It may receive the bounded profile and typed-tool observations; the")
+    print("|  original evidence bytes stay local. This is no longer the $0 preview.")
     print(
-        f"| {caps_profile.upper()} hard ceiling: ${caps.max_cost_usd:.2f} estimated cost; "
-        f"{caps.max_total_tokens:,} tokens.{' ' * 11}|"
+        f"|  {caps_profile.upper()} hard ceiling: ${caps.max_cost_usd:.2f} estimated cost "
+        f"· {caps.max_total_tokens:,} tokens · {caps.max_tool_calls} tools."
     )
     print("+--------------------------------------------------------------------------+")
     try:
@@ -634,6 +643,10 @@ def _onboard(
             )
         )
     else:
+        # When a launch is happening, the depth pick and confirmation come next
+        # in THIS same command, so use the guided footer instead of printing a
+        # separate "sentinel onboard ... --launch" command that would read as a
+        # redundant, contradictory extra step.
         render_profile(
             profile,
             assessment,
@@ -644,6 +657,7 @@ def _onboard(
             mount_released=mount_released,
             stream=sys.stdout,
             no_color=no_color,
+            guided=launch,
         )
 
     if not assessment.profile_ready:
