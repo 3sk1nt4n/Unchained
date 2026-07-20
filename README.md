@@ -52,11 +52,11 @@
   offline verifier that rebuilds the report and viewer byte-for-byte. If one
   byte changes, verification fails.
 
-**This is the real first screen** — `sentinel onboard`, no key, no evidence,
-zero OpenAI calls:
+**This is the real first screen** — just `sentinel`, no key, no evidence, zero
+OpenAI calls:
 
 <p align="center">
-  <img src="docs/assets/cli-welcome.svg" alt="The real sentinel onboard welcome: guided cards, budget choice, and an explicit cloud/cost boundary" width="760">
+  <img src="docs/assets/cli-welcome.svg" alt="The real sentinel welcome: guided cards, budget choice, and an explicit cloud/cost boundary" width="760">
 </p>
 
 > **What “proves” means here:** code verifies what ran, what bytes were retained,
@@ -64,12 +64,13 @@ zero OpenAI calls:
 > prove that a model's forensic interpretation is true. A human analyst still
 > owns that judgment.
 
-> **New analyst? Start with one safe command:** `sentinel onboard`
+> **New analyst? There is exactly one command:** `sentinel`
 >
-> It opens the welcome without evidence, a key, or an OpenAI call. Add one
-> evidence folder to get a local SHA-256 case card. A paid Sol run requires
-> `--launch` **and** the exact interactive phrase `LAUNCH GPT-5.6 SOL`.
-> Follow the card-by-card [first-case guide](docs/START-HERE.md).
+> It opens the welcome, asks one thing (where the evidence is), prints a local
+> SHA-256 case card, asks the depth, and only then stops for the exact
+> interactive phrase `LAUNCH GPT-5.6 SOL` before any spend. No flags, no
+> environment variables. Follow the card-by-card
+> [first-case guide](docs/START-HERE.md).
 
 ## For judges — the submission at a glance
 
@@ -87,7 +88,7 @@ zero OpenAI calls:
 | Criterion | Look at |
 |---|---|
 | Technological Implementation | [How it works](#how-it-works) · typed opening book, stateless loop, typed `DONE` v2, byte-exact offline verifier |
-| Design | `sentinel onboard` guided front door · live investigation narration · static inert proof viewer |
+| Design | one-word `sentinel` self-driving front door · live investigation narration · static inert proof viewer |
 | Potential Impact | [Why Unchained is different](#why-unchained-is-different) — inspectable autonomy for any high-consequence agent, not just DFIR |
 | Quality of the Idea | The authority split: the model chooses strategy; code owns evidence, execution, citations, custody, and the report |
 
@@ -152,9 +153,10 @@ key with hidden input, and land in the guided onboarding:
 irm https://raw.githubusercontent.com/3sk1nt4n/Unchained/main/get.ps1 | iex
 ```
 
-Prefer to see every step? The manual path is identical:
+Prefer the manual path? It is the same **two commands**:
 
-**Step 1 — install (reads no evidence, asks for no key, makes no OpenAI call):**
+**1 — install + verify everything** (reads no evidence, asks for no key, makes
+no OpenAI call):
 
 ```powershell
 git clone https://github.com/3sk1nt4n/Unchained.git
@@ -162,108 +164,59 @@ cd Unchained
 powershell -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1
 ```
 
-**Step 2 — meet the analyst-friendly front door.** The installer makes
-`sentinel` a one-word command (open a new terminal if it is not found yet):
+**2 — run one word. It walks you through the rest.**
 
 ```powershell
-sentinel onboard
+sentinel
 ```
 
-A full-color welcome walks you through preparing one case, what the safe
-preview does, and exactly what a paid run would cost — before anything is read.
+That single command shows a full-color welcome, asks **one thing** (where the
+evidence is), prints a SHA-256 verified case card locally (`$0`, no key, no
+OpenAI), asks the depth (`1` = HEAVY, `2` = LIGHT), finds your key or asks once
+at a hidden prompt, and only then stops for the exact phrase `LAUNCH GPT-5.6 SOL`
+before running live and verifying the sealed bundle. No flags, no environment
+variables. (`.\unchained.ps1` does the same if you like a launcher; re-verify
+anytime with `.\setup.ps1 -Check`.)
 
-**Step 3 — profile one case and get the verified case card:**
+Depth sets only hard stop ceilings — the same GPT-5.6 Sol investigator either way:
 
-```powershell
-sentinel onboard "C:\Evidence\CASE-A"
-```
-
-This classifies by bounded content probes, assigns public evidence IDs, and
-performs a full pre/post SHA-256 custody check — locally, with no key and no
-paid run. Archives are not unpacked; unsupported documents are hashed, listed,
-and set aside. The router accepts at most one ready memory image and one ready
-disk image per case; same-class multiples fail closed.
-
-**Step 4 — choose a hard ceiling (not a different model, not a quality promise):**
-
-| Choice | Option | Default hard ceilings |
-|---|---|---|
-| **CAUTIOUS** | `--caps strict` | 20 tools · 100,000 tokens · 10 min · $2.50 estimated cost |
-| **FLAGSHIP** | `--caps default` | 60 tools · 400,000 tokens · 30 min · $10 estimated cost |
-
-Both use GPT-5.6 Sol. Environment overrides can change the effective ceilings,
-which the case card prints.
-
-**Step 5 — launch, deliberately.** A paid run starts only interactively, and
-only after you type the exact phrase `LAUNCH GPT-5.6 SOL`:
-
-```powershell
-sentinel onboard "C:\Evidence\CASE-A" --launch --caps strict
-```
-
-You then watch the investigation live: the opening book, each typed tool with
-retained bytes and timing, cap and custody checkpoints, and a final status
-badge with the exact `verify` and `view` commands.
+| Depth | Hard ceilings (not a price quote) |
+|---|---|
+| **LIGHT** — first case | 20 tools · 100,000 tokens · 10 min · $2.50 estimated cost |
+| **HEAVY** — deeper run | 60 tools · 400,000 tokens · 30 min · $10 estimated cost |
 
 Read the concise [Start Here guide](docs/START-HERE.md) for evidence formats,
 mount outcomes, cloud boundaries, and the post-run verify/view steps.
 
-### 🐧 Linux — the hardened container lane
+### 🐧 Linux / 🍎 macOS — the same one command
 
-Requirements: Git, Docker Engine + Compose (or Docker Desktop).
-
-**The one-liner** — clone, build the hardened image, optionally store a key
-with hidden input for the live canary, and open the onboarding:
+Requirements: Git, Python 3.11 (native) or Docker (isolated). Native gives you
+the identical self-driving flow:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/3sk1nt4n/Unchained/main/get.sh | bash
+./setup.sh        # install + verify everything (one command)
+./unchained.sh    # start a whole case — it walks you through the rest
 ```
 
-Or step by step:
+`./unchained.sh` behaves exactly like `sentinel` on Windows: one question, a
+verified card, the depth pick, and the explicit `LAUNCH GPT-5.6 SOL` gate.
+Re-verify anytime with `./setup.sh --check`.
+
+Zero-install and fully isolated? The hardened container reads no evidence, takes
+no key, and has **no network**:
 
 ```bash
-git clone https://github.com/3sk1nt4n/Unchained.git
-cd Unchained
-docker compose build
 docker compose run --rm offline
-docker compose run --rm offline profile /evidence --json
 ```
 
-The first run command uses the container's friendly `onboard --json` default:
-no key, no evidence read, no network, exit `0`. The last command profiles the
-committed synthetic fixture with **no network**, **no API key**, and **zero
-OpenAI calls** — it should report `logs-only`, public evidence ID `E001`, and
-matching custody. The service runs non-root with a read-only filesystem and
-every Linux capability dropped.
+It profiles a committed synthetic fixture with zero OpenAI calls (public
+evidence ID `E001`, matching custody), runs non-root with a read-only filesystem
+and every Linux capability dropped, and honestly reports `logs-only`.
 
-Profile your own folder read-only:
-
-```bash
-SENTINEL_EVIDENCE_PATH=/cases/CASE-A docker compose run --rm offline profile /evidence --json
-```
-
-`docker compose run --rm offline doctor --json` is an explicit live-readiness
-check; it correctly reports not ready when the offline service has no
-key/model. That is the isolation working, not an installation failure.
-
-### 🍎 macOS — same container lane, honestly labeled
-
-The identical Compose commands above run under Docker Desktop for Mac. On
-Apple Silicon, Docker executes the `linux/amd64` image through emulation.
-
-```bash
-git clone https://github.com/3sk1nt4n/Unchained.git
-cd Unchained
-docker compose build
-docker compose run --rm offline profile /evidence --json
-```
-
-The `get.sh` one-liner above works here too.
-
-> **Honest label:** this lane is expected to work because it is the same
-> hardened Linux/AMD64 image, but it has not yet been verified on macOS
-> hardware, and emulation makes large-image work slower. The claim here is
-> "same container, same commands" — not a tested macOS forensic route.
+> **Honest macOS label:** the container is the same hardened `linux/amd64` image
+> running under Docker Desktop through emulation. It has not been verified on
+> Mac hardware, and emulation makes large-image work slower — same container,
+> same commands, not yet a tested macOS forensic route.
 
 ### 💡 Cheap live check: one GPT-5.6 Luna request
 
@@ -314,26 +267,18 @@ docker compose --profile live run --rm live-smoke
 ### 🔬 Real investigation: the GPT-5.6 Sol proof path
 
 The flagship path is native Windows + CPython 3.11 for Windows memory evidence.
-Use an authorized project key and the public `gpt-5.6` alias, which currently
-routes to Sol.
+After `setup.ps1`, it is the **same one command** — `sentinel` defaults to the
+public `gpt-5.6` alias (Sol) automatically, so there is nothing to configure:
 
 ```powershell
-py -3.11 -m venv C:\venvs\sentinel-unchained
-& C:\venvs\sentinel-unchained\Scripts\Activate.ps1
-python -m pip install .
-
-$env:UNCHAINED_MODEL = "gpt-5.6"
-sentinel key    # one-time hidden paste — saved privately, found automatically
-
-sentinel doctor
-sentinel onboard C:\Evidence\CASE-A
-sentinel onboard C:\Evidence\CASE-A --launch --caps strict
+sentinel
 ```
 
-At completion, the CLI prints the exact next `verify` and `view` commands.
-The onboarding path requires the exact interactive paid-launch phrase. Advanced
-automation may still invoke `sentinel run` directly when authorization is
-established outside the CLI.
+It profiles the case, asks the depth, saves your key at a one-time hidden prompt
+if you have not already (`sentinel key`), and stops for the exact interactive
+phrase `LAUNCH GPT-5.6 SOL` before spending. At completion it prints the exact
+next `verify` and `view` commands. Advanced automation may still invoke
+`sentinel run` directly when authorization is established outside the CLI.
 
 The live Sol opening/tool route is now demonstrated on real memory. Before the
 flagship `COMPLETE` run, use a harmless case to exercise the still-pending live
@@ -578,16 +523,20 @@ WSL2 ext4 storage. A cloud-synced bind can dominate runtime.
 ## CLI at a glance
 
 ```text
-sentinel onboard [<evidence>] [--mount] [--json]
-sentinel onboard <evidence> --launch --caps strict
+sentinel                              # the one command: self-drives a whole case
+sentinel onboard [<evidence>] [--mount] [--json]   # $0 preview / scripting surface
 sentinel key [--status | --remove]
 sentinel doctor
 sentinel profile <evidence> --json
 sentinel smoke-openai --json
-sentinel run <evidence> --caps strict
+sentinel run <evidence> --caps strict              # advanced non-interactive entry
 sentinel verify <bundle> --require-complete --require-live-gpt56
 sentinel view <bundle>
 ```
+
+Bare `sentinel` on a terminal walks you through everything (welcome → one
+question → verified card → depth → explicit launch). The subcommands above
+remain for `$0` previews, scripting, and advanced non-interactive runs.
 
 | Exit | Meaning |
 |---:|---|

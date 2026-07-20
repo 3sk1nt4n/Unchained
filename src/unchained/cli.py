@@ -7,6 +7,7 @@ import contextlib
 import importlib.util
 import json
 import os
+import re
 import sys
 import time
 import uuid
@@ -579,6 +580,11 @@ def _onboard(
         )
 
     if evidence is None:
+        # On a real terminal, the welcome is just the FIRST screen of one
+        # self-driving flow: welcome -> ask the case -> card -> depth -> launch.
+        # Non-interactive callers (JSON, pipes, CI) still get the static welcome.
+        if not json_output and _interactive_terminal():
+            return _guided(mount=mount, caps_profile=caps_profile, no_color=no_color)
         if json_output:
             print(json.dumps(welcome_payload(caps_profile, caps), indent=2, sort_keys=True))
         else:
@@ -664,6 +670,167 @@ def _onboard(
         show_case_card=False,
         mount_evidence=mount,
     )
+
+
+_SECRET_LIKE = re.compile(r"^[A-Za-z0-9_\-]{20,}$")
+
+
+def _looks_like_pasted_secret(text: str) -> bool:
+    """True when a long, high-entropy, separator-free token is pasted where a
+    path or menu answer is expected — almost certainly an API key. Shape-based
+    and vendor-agnostic; real paths carry separators and menu answers are short.
+    """
+
+    token = (text or "").strip()
+    if len(token) < 20 or not _SECRET_LIKE.match(token):
+        return False
+    return any(char.isalpha() for char in token) and any(char.isdigit() for char in token)
+
+
+def _prompt_evidence_path() -> Path | None:
+    """Ask the one question a run needs — where the evidence is — and return a
+    resolved path, or None to quit. Re-asks on a bad path; a pasted key is
+    discarded, never used, so a fat-fingered credential can't leak into a path.
+    """
+
+    while True:
+        try:
+            raw = input("  Where is the evidence for ONE case? (file/folder, or q to quit): ")
+        except (EOFError, OSError):
+            return None
+        answer = (raw or "").strip().strip('"').strip("'").strip()
+        if answer.lower() in ("q", "quit", "exit"):
+            return None
+        if not answer:
+            print("  Type the path to one case folder (or q to quit).")
+            continue
+        if _looks_like_pasted_secret(answer):
+            print(
+                "  That looked like an API key pasted at the path prompt — discarded "
+                "(never used, stored, or logged). Paste keys only at the hidden key "
+                "step, and revoke it if it was real."
+            )
+            continue
+        candidate = Path(answer).expanduser()
+        if not candidate.exists():
+            print(f"  Not found: {answer}. Check the path and try again (or q to quit).")
+            continue
+        return candidate
+
+
+def _ensure_key_for_launch() -> bool:
+    """A run needs a key. If one is already configured (env, secret file, or the
+    saved sentinel key), use it silently; otherwise run the one-time hidden setup
+    right here so the flow never dead-ends on a missing key."""
+
+    present, _source = openai_api_key_status()
+    if present:
+        return True
+    console = Console(sys.stdout)
+    message = "No OpenAI key found yet — saving one now (hidden input, owner-only file)."
+    console.step(message) if console.enabled else print(f"  {message}")
+    if _key_command(status=False, remove=False) != EXIT_COMPLETE:
+        return False
+    present, _source = openai_api_key_status()
+    return present
+
+
+def _guided(*, mount: bool = False, caps_profile: str = "strict", no_color: bool = False) -> int:
+    """The self-driving front door: one command from welcome to a live, verified
+    run. Welcome -> ask the case (one question) -> local $0 card -> depth ->
+    key -> explicit paid boundary -> live lifecycle -> verify/view commands.
+
+    No flags, no environment juggling: the model defaults to GPT-5.6 Sol (unless
+    a cheap rehearsal was opted in), the key is auto-found or set here, and the
+    depth pick sets only the hard ceilings. The paid-cloud confirmation phrase is
+    kept deliberately — it is the one honest boundary before money is spent.
+    """
+
+    caps = CapConfig.from_env(caps_profile)
+    if not _interactive_terminal():
+        render_welcome(caps_profile=caps_profile, caps=caps, stream=sys.stdout, no_color=no_color)
+        return EXIT_COMPLETE
+
+    render_welcome(caps_profile=caps_profile, caps=caps, stream=sys.stdout, no_color=no_color)
+
+    # Step 1-2: one question, then the local verified case card (no key, $0).
+    while True:
+        evidence = _prompt_evidence_path()
+        if evidence is None:
+            print("No case selected. Nothing was read; OpenAI calls: 0.")
+            return EXIT_COMPLETE
+
+        console = Console(sys.stdout)
+        if console.enabled:
+            console.phase("LOCAL PROFILE")
+            console.step("bounded content probes · SHA-256 custody · zero OpenAI calls")
+        else:
+            print("Profiling this case locally (zero OpenAI calls)...", flush=True)
+
+        try:
+            session = EvidenceSession(evidence, mount=mount, case_card_stream=None)
+            with session:
+                profile = session.profile()
+                final_hashes = session.verify_custody()
+            mount_released = session.close()
+        except (EvidenceError, OSError, ValueError) as exc:
+            print(f"  Could not profile that case: {type(exc).__name__}. Pick another path.")
+            continue
+        if not mount_released:
+            raise CustodyError("read-only mount release could not be positively verified")
+        if final_hashes != profile.hashes:
+            raise CustodyError("profile custody receipts changed namespace or content")
+
+        assessment = assess_profile(profile)
+        render_profile(
+            profile,
+            assessment,
+            caps_profile=caps_profile,
+            caps=caps,
+            custody_match=True,
+            mount_requested=mount,
+            mount_released=mount_released,
+            stream=sys.stdout,
+            no_color=no_color,
+            guided=True,
+        )
+        if assessment.profile_ready:
+            break
+        print("  This case is not route-ready yet — fix the blockers above, or pick another.")
+        try:
+            again = input("  Try another case? [Enter = yes · q = quit]: ").strip().lower()
+        except (EOFError, OSError):
+            return EXIT_INVALID
+        if again in ("q", "quit", "exit", "n", "no"):
+            return EXIT_INVALID
+
+    # Step 3: depth — hard ceilings only, same investigator model either way.
+    caps_profile = _choose_analysis_depth(caps_profile)
+    caps = CapConfig.from_env(caps_profile)
+    depth_name = "HEAVY (FLAGSHIP)" if caps_profile == "default" else "LIGHT (CAUTIOUS)"
+    print(
+        f"  Depth: {depth_name} — ceilings {caps.max_tool_calls} tools / "
+        f"{caps.max_total_tokens:,} tokens / {caps.max_wall_seconds / 60:g} min / "
+        f"${caps.max_cost_usd:.2f} estimated cost"
+    )
+
+    # Step 4: default the model so a first-time user needs no $env: juggling.
+    # A cheap rehearsal (installer sets UNCHAINED_ALLOW_TEST_MODEL + a Luna model)
+    # is respected; otherwise the real GPT-5.6 Sol investigator is the default.
+    if not os.getenv("UNCHAINED_MODEL") and not cheap_model_opt_in():
+        os.environ["UNCHAINED_MODEL"] = "gpt-5.6"
+
+    # Step 5: key — auto-found, or set now with hidden input. Never dead-ends.
+    if not _ensure_key_for_launch():
+        print("  No API key configured — cannot launch. Run 'sentinel key', then start again.")
+        return EXIT_INVALID
+
+    # Step 6: the one deliberate boundary before any spend.
+    if not _confirm_paid_sol_launch(caps_profile, caps):
+        print("Launch cancelled. The local profile remains valid; OpenAI calls: 0.")
+        return EXIT_COMPLETE
+    print("Confirmation accepted. Starting the bounded GPT-5.6 lifecycle...")
+    return run_cli(evidence, caps_profile, show_case_card=False, mount_evidence=mount)
 
 
 _RUN_CLOCK: list[float] = []
@@ -1328,7 +1495,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     """Parse arguments and return a stable process exit code."""
 
     raw_arguments = list(sys.argv[1:] if argv is None else argv)
-    if not raw_arguments or raw_arguments[:1] in (["-h"], ["--help"]):
+    if raw_arguments[:1] in (["-h"], ["--help"]):
+        build_root_parser().print_help()
+        return EXIT_COMPLETE
+    if not raw_arguments:
+        # Bare `sentinel` on a real terminal self-drives the whole case, start to
+        # finish. Non-interactive shells (pipes, CI) get the command overview.
+        if _interactive_terminal():
+            try:
+                return _guided()
+            except KeyboardInterrupt:
+                print("Unchained onboarding interrupted; nothing launched.", file=sys.stderr)
+                return EXIT_FATAL
         build_root_parser().print_help()
         return EXIT_COMPLETE
     if raw_arguments[:1] in (["verify-run"], ["verify"]):

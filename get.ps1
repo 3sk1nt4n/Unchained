@@ -195,9 +195,9 @@ while (-not $chosenCase) {
 }
 if (-not $chosenCase) {
     Write-Host ""
-    Write-Host "  No case picked. Whenever you're ready (one word, any terminal):" -ForegroundColor Cyan
-    Write-Host "    sentinel onboard <case> --launch --caps strict     LIGHT run" -ForegroundColor White
-    Write-Host "    sentinel onboard <case> --launch --caps default    HEAVY run" -ForegroundColor White
+    Write-Host "  No case picked. Whenever you're ready, one word does everything:" -ForegroundColor Cyan
+    Write-Host "    sentinel" -ForegroundColor White
+    Write-Host "    (it asks for the case, the depth, and the launch phrase for you)" -ForegroundColor Gray
     return
 }
 
@@ -256,7 +256,7 @@ if ($keyStatus -match "Key configured") {
     Write-Host ""
     & $sentinelExe onboard $chosenCase --launch --caps strict
 } else {
-    Write-Host "      Ready once you add a key:" -ForegroundColor Cyan
+    Write-Host "      Ready once you add a key. Then one word does everything:" -ForegroundColor Cyan
     Write-Host "        sentinel key" -ForegroundColor White
-    Write-Host "        sentinel onboard `"$chosenCase`" --launch --caps strict" -ForegroundColor White
+    Write-Host "        sentinel" -ForegroundColor White
 }

@@ -14,8 +14,12 @@ def test_setup_is_fail_closed_and_hands_off_to_guided_onboarding() -> None:
     assert "function Assert-NativeSuccess" in script
     assert script.count("Assert-NativeSuccess") >= 8
     assert "It does not read evidence, ask for an API key, or call OpenAI." in script
-    assert "-m unchained onboard" in script
-    assert "stops for an explicit choice before any funded GPT-5.6 Sol run" in script
+    # The installer hands off to the one-word, self-driving `sentinel` flow; the
+    # PATH-restricted fallback still exposes the package module form.
+    assert "-m unchained" in script
+    assert "  sentinel" in script
+    # The explicit paid-launch gate must still be promised before any spend.
+    assert "your explicit launch phrase" in script
     assert "OPENAI_API_KEY" not in script
     assert "platform.python_implementation()" in script
     assert 'struct.calcsize("P") * 8' in script

@@ -41,46 +41,43 @@ There are two separate judge paths:
 
 Never present a fake-model test or replay as an authentic GPT-5.6 run.
 
-## Judge's first screen
+## Judge's first screen — one word does everything
 
-After installation, `sentinel` is a one-word command (setup adds a tiny shim
-folder to your user PATH; open a new terminal if it is not found). Start
-here—not with a funded run:
-
-```powershell
-sentinel onboard
-```
-
-The welcome needs no evidence and no key, reads nothing, and makes zero OpenAI
-calls. To produce the first deterministic case card:
+After installation, `sentinel` is a one-word, self-driving command (setup adds a
+tiny shim folder to your user PATH; open a new terminal if it is not found).
+Just run:
 
 ```powershell
-sentinel onboard "C:\Evidence\sentinel\dc01"
+sentinel
 ```
+
+It opens a zero-key welcome (reads nothing, zero OpenAI calls), asks **one
+thing** — where the evidence is — then profiles content and rechecks SHA-256
+custody locally to print a deterministic case card. Archives are not unpacked;
+unsupported documents are hashed/listed and set aside. The router accepts at
+most one ready memory image and one ready disk image per case; same-class
+multiples fail closed. It then asks the depth, finds your key (or asks once at a
+hidden prompt), and stops for the explicit launch phrase — no flags, no
+environment variables.
 
 If PATH changes are restricted, the full form always works:
 
 ```powershell
-& "$env:LOCALAPPDATA\venvs\sentinel-unchained-py311\Scripts\sentinel.exe" onboard
+& "$env:LOCALAPPDATA\venvs\sentinel-unchained-py311\Scripts\sentinel.exe"
 ```
 
-That default profiles content and rechecks SHA-256 custody locally. Archives
-are not unpacked; unsupported documents are hashed/listed and set aside. The
-router accepts at most one ready memory image and one ready disk image per case.
-Same-class multiples fail closed.
+The depth prompt sets one of two stop-ceiling profiles — the same GPT-5.6 Sol
+model either way:
 
-The paid path uses the same GPT-5.6 Sol model with one of two stop-ceiling
-profiles:
+| Depth | Hard ceilings (not a price quote) |
+|---|---|
+| **LIGHT** | 20 tools · 100,000 tokens · 10 min · $2.50 estimated cost |
+| **HEAVY** | 60 tools · 400,000 tokens · 30 min · $10 estimated cost |
 
-| Choice | Option | Default hard ceilings |
-|---|---|---|
-| **CAUTIOUS** | `--caps strict` | 20 tools · 100,000 tokens · 10 min · $2.50 estimated cost |
-| **FLAGSHIP** | `--caps default` | 60 tools · 400,000 tokens · 30 min · $10 estimated cost |
-
-These are hard ceilings, not price quotes, reasoning-depth modes, or promises
-of finding quality. The effective values appear in the onboarding card. A paid
-run requires `--launch` in an interactive terminal and the exact phrase
-`LAUNCH GPT-5.6 SOL`; JSON and noninteractive onboarding cannot launch.
+These are hard ceilings, not price quotes, reasoning-depth modes, or promises of
+finding quality. The effective values appear in the case card. A paid run starts
+only in an interactive terminal after the exact phrase `LAUNCH GPT-5.6 SOL`;
+JSON and noninteractive runs cannot launch.
 
 The full junior-analyst walkthrough is [Start Here](docs/START-HERE.md).
 
@@ -150,10 +147,10 @@ Expected final line:
 No broken requirements found.
 ```
 
-Open the guided, zero-key welcome (one word after setup):
+Start the whole self-driving flow (one word after setup):
 
 ```powershell
-sentinel onboard
+sentinel
 ```
 
 ## 3. Run the no-key quality gate
@@ -242,14 +239,17 @@ Never paste the key into chat, Git, a screenshot, or a command saved in
 history. For automation, `OPENAI_API_KEY` or `OPENAI_API_KEY_FILE` still work
 and always take precedence over the saved file.
 
-Set the requested model and hard caps:
+**You do not need to set anything else.** `sentinel` defaults to the public
+`gpt-5.6` alias (Sol), and the depth prompt sets the hard caps for you. The
+variables below are optional overrides for automation or a custom ceiling:
 
 ```powershell
-$env:UNCHAINED_MODEL = "gpt-5.6"
-$env:MAX_TOOL_CALLS = "60"
-$env:MAX_TOTAL_TOKENS = "400000"
-$env:MAX_WALL_SECONDS = "1800"
-$env:MAX_COST_USD = "10"
+# optional - only to override the built-in defaults
+$env:UNCHAINED_MODEL   = "gpt-5.6"     # already the default
+$env:MAX_TOOL_CALLS    = "60"
+$env:MAX_TOTAL_TOKENS  = "400000"
+$env:MAX_WALL_SECONDS  = "1800"
+$env:MAX_COST_USD      = "10"
 ```
 
 Codex build credits and API runtime billing are separate. Runtime calls use the
@@ -301,14 +301,14 @@ and hard-cap boundary, and then stops at the explicit confirmation gate:
 > policy before sending sensitive derived content.
 
 ```powershell
-& "$venv\Scripts\sentinel.exe" onboard C:\Evidence\sentinel\dc01 `
-    --launch --caps default
+sentinel
 ```
 
-Type exactly `LAUNCH GPT-5.6 SOL` only after checking the case and cap cards.
-Anything else cancels with no investigation request. Add `--mount` only when an
-attempted contained read-only disk mount is needed; otherwise the onboarding
-path keeps disk handling raw-only.
+You point it at `C:\Evidence\sentinel\dc01` when it asks, pick the depth, and
+type exactly `LAUNCH GPT-5.6 SOL` only after checking the case and cap cards.
+Anything else cancels with no investigation request. (Prefer a launcher?
+`.\unchained.ps1` is identical.) The onboarding path keeps disk handling
+raw-only unless you later opt into a contained read-only mount.
 
 The explicit PowerShell wrapper remains available for an operator who wants it
 to set the selected cap variables and prompt for the key invisibly:

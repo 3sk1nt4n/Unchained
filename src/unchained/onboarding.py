@@ -472,8 +472,14 @@ def render_profile(
     mount_released: bool,
     stream: TextIO,
     no_color: bool,
+    guided: bool = False,
 ) -> None:
-    """Render a concise case card without file names or local child paths."""
+    """Render a concise case card without file names or local child paths.
+
+    In ``guided`` mode the footer reflects the self-driving flow (depth and the
+    launch confirmation come next in the same command) instead of printing a
+    separate manual re-run command, which would read as a redundant extra step.
+    """
 
     stream = _encoding_safe_stream(stream)
     color = _supports_color(stream, no_color=no_color)
@@ -607,12 +613,14 @@ def render_profile(
         ),
         file=stream,
     )
-    print(
-        _paint(
+    if guided:
+        launch_line = (
+            "◆ NEXT (same command): choose depth below, then type the exact "
+            "confirmation phrase LAUNCH GPT-5.6 SOL to start."
+        )
+    else:
+        launch_line = (
             f"◆ LAUNCH: sentinel onboard <same-evidence> --launch --caps {caps_profile}  "
-            "→ then type the exact confirmation phrase LAUNCH GPT-5.6 SOL",
-            _CYAN + _BOLD,
-            color,
-        ),
-        file=stream,
-    )
+            "→ then type the exact confirmation phrase LAUNCH GPT-5.6 SOL"
+        )
+    print(_paint(launch_line, _CYAN + _BOLD, color), file=stream)

@@ -6,6 +6,7 @@ import copy
 import hashlib
 import io
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -30,13 +31,27 @@ def _write_json(path: Path, value: object) -> None:
     )
 
 
-def _git(repo: Path, *args: str) -> str:
+# The candidate records below start at 2026-07-20T00:0X; the freeze tag must be
+# dated strictly before them, and it must NOT float to the wall clock (otherwise
+# the fixture "expires" the moment real time passes the candidate timestamps).
+_FIXTURE_FREEZE_DATE = "2026-07-19T00:00:00+0000"
+
+
+def _git(repo: Path, *args: str, committer_date: str | None = None) -> str:
+    env = None
+    if committer_date is not None:
+        env = {
+            **os.environ,
+            "GIT_AUTHOR_DATE": committer_date,
+            "GIT_COMMITTER_DATE": committer_date,
+        }
     result = subprocess.run(
         ["git", "-C", str(repo), *args],
         check=True,
         capture_output=True,
         text=True,
         timeout=30,
+        env=env,
     )
     return result.stdout.strip()
 
@@ -103,8 +118,22 @@ def _ready_contract(tmp_path: Path) -> tuple[dict[str, Any], Path]:
     )
     _write_json(repo / "docs" / "QWEN-COMPARISON.v1.json", contract)
     _git(repo, "add", ".")
-    _git(repo, "commit", "-m", "Commit reachable freeze controller")
-    _git(repo, "tag", "-a", "experiment-freeze-v1", "-m", "Freeze comparison v1")
+    _git(
+        repo,
+        "commit",
+        "-m",
+        "Commit reachable freeze controller",
+        committer_date=_FIXTURE_FREEZE_DATE,
+    )
+    _git(
+        repo,
+        "tag",
+        "-a",
+        "experiment-freeze-v1",
+        "-m",
+        "Freeze comparison v1",
+        committer_date=_FIXTURE_FREEZE_DATE,
+    )
     return contract, repo
 
 

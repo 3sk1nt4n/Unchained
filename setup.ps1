@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
-    [switch]$SkipTests
+    [switch]$SkipTests,
+    [switch]$Check
 )
 
 Set-StrictMode -Version Latest
@@ -40,7 +41,55 @@ function Assert-NativeSuccess {
     }
 }
 
+function Test-DockerPresent {
+    # Docker is OPTIONAL on Windows (the native venv path is primary) but it is
+    # the reliable Linux/macOS route, so we report it either way - never install
+    # it silently. Returns $true when a docker CLI is on PATH.
+    return [bool](Get-Command docker -ErrorAction SilentlyContinue)
+}
+
+function Report-DockerStatus {
+    if (Test-DockerPresent) {
+        Write-Host "      Docker detected - the isolated container path is available too:" -ForegroundColor Green
+        Write-Host "        docker compose run --rm offline        (no key, no evidence, offline)" -ForegroundColor DarkGray
+    }
+    else {
+        Write-Host "      Docker not found - not required on Windows (the native path above is primary)." -ForegroundColor DarkGray
+        Write-Host "        For Linux/macOS or full isolation, install Docker Desktop: https://www.docker.com/products/docker-desktop/" -ForegroundColor DarkGray
+    }
+}
+
 Write-SetupBanner
+
+if ($Check) {
+    # Fast, non-mutating re-verify (mirrors the Qwen './setup.sh --check' habit):
+    # confirm the isolated toolchain is healthy WITHOUT reinstalling or testing.
+    Write-Host "[check] Verifying the existing isolated environment (no install, no tests)" -ForegroundColor Cyan
+    $problems = @()
+    if (-not (Get-Command py -ErrorAction SilentlyContinue)) {
+        $problems += "Python Launcher 'py' is missing - install official CPython $ExpectedPythonVersion AMD64."
+    }
+    if (-not (Test-Path $python)) {
+        $problems += "Isolated environment is missing at $venv - run setup.ps1 (no -Check) once."
+    }
+    else {
+        & $python -m pip check 2>$null
+        if ($LASTEXITCODE -ne 0) { $problems += "Dependency integrity check failed - run setup.ps1 to repair." }
+        & $python -c "import unchained" 2>$null
+        if ($LASTEXITCODE -ne 0) { $problems += "The 'unchained' package does not import - run setup.ps1 to repair." }
+    }
+    Report-DockerStatus
+    if ($problems.Count -gt 0) {
+        Write-Host ""
+        Write-Host "NOT READY" -ForegroundColor Yellow
+        foreach ($p in $problems) { Write-Host "  - $p" -ForegroundColor Yellow }
+        exit 1
+    }
+    Write-Host ""
+    Write-Host "READY - toolchain healthy. Start the whole case with one command:" -ForegroundColor Green
+    Write-Host "  sentinel" -ForegroundColor White
+    exit 0
+}
 
 if (-not (Get-Command py -ErrorAction SilentlyContinue)) {
     throw "Python Launcher was not found. Install official CPython 3.11 AMD64, then reopen PowerShell."
@@ -125,18 +174,22 @@ if (($env:Path -split ";") -notcontains $shimDirectory) {
 }
 
 Write-Host ""
+Report-DockerStatus
+Write-Host ""
 Write-Host "READY" -ForegroundColor Green
 Write-Host ""
-Write-Host "+-- YOUR NEXT SAFE STEP -------------------------------------------------+" -ForegroundColor Cyan
-Write-Host "| Start the guided case wizard. Profiling is local and costs `$0.        |" -ForegroundColor White
+Write-Host "+-- ONE COMMAND. IT WALKS YOU THROUGH THE REST. -------------------------+" -ForegroundColor Cyan
+Write-Host "| Just run the word below. It profiles one case locally (`$0, no key, no  |" -ForegroundColor White
+Write-Host "| OpenAI), shows a verified card, asks the depth, and only then stops for |" -ForegroundColor White
+Write-Host "| your explicit launch phrase. No flags, no environment variables.       |" -ForegroundColor White
 Write-Host "+------------------------------------------------------------------------+" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "  sentinel onboard" -ForegroundColor White
+Write-Host "  sentinel" -ForegroundColor White
 Write-Host ""
-Write-Host "From now on, every command is one word from any terminal:" -ForegroundColor Gray
-Write-Host "  sentinel key - sentinel onboard <case> - sentinel doctor - sentinel view <bundle>" -ForegroundColor Gray
+Write-Host "Or, if you like typing a launcher:  .\unchained.ps1  (does the same thing)." -ForegroundColor Gray
+Write-Host "Re-verify anytime without reinstalling:  .\setup.ps1 -Check" -ForegroundColor Gray
+Write-Host "Every command is one word from any terminal:" -ForegroundColor Gray
+Write-Host "  sentinel  -  sentinel key  -  sentinel doctor  -  sentinel view <bundle>" -ForegroundColor Gray
 Write-Host "PATH-restricted environment? The full form always works:" -ForegroundColor DarkGray
-Write-Host "  & `"$python`" -m unchained onboard" -ForegroundColor DarkGray
-Write-Host "The wizard explains what belongs in one case, profiles and hashes it first," -ForegroundColor Gray
-Write-Host "then stops for an explicit choice before any funded GPT-5.6 Sol run." -ForegroundColor Gray
+Write-Host "  & `"$python`" -m unchained" -ForegroundColor DarkGray
 Write-Host "Validated Python: $python" -ForegroundColor DarkGray
