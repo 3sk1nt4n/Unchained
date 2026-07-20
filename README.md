@@ -74,8 +74,8 @@ local SHA-256 case card before any model is involved.
 > **New analyst? There is exactly one command:** `sentinel`
 >
 > It opens the welcome, asks one thing (where the evidence is), prints a local
-> SHA-256 case card, asks the depth, and only then stops for the exact
-> interactive launch menu (`1 = LAUNCH - B = back - Q = quit`) before any spend. No flags, no
+> SHA-256 case card and a key card, and only then stops at one launch card
+> (`1 = LAUNCH · 2 = depth · 3 = model · Q = quit`) before any spend. No flags, no
 > environment variables. Follow the card-by-card
 > [first-case guide](docs/START-HERE.md).
 
@@ -86,11 +86,12 @@ local SHA-256 case card before any model is involved.
 | Track | **Developer Tools** — OpenAI Build Week |
 | Built with | **Codex** (implementation + adversarial review) and **GPT-5.6** (Sol investigator/reviewer, Luna canary) |
 | Codex Session ID | `019f61e5-5755-7a02-adb4-618d32baab27` — see [Built with Codex](#built-with-codex) |
-| Fastest no-key test | Two-command install, then `sentinel verify examples/public-run-partial` → **VALID**. A real GPT-5.6 run, zero spend ([judge quickstart](JUDGE-QUICKSTART.md)) |
-| Shipped live proof | [`examples/public-run-partial`](examples/public-run-partial) — an authentic GPT-5.6 bundle **inside this repo**: 14/14 typed tools on real memory, verifies `VALID` offline |
+| Fastest no-key test | Two-command install, then `sentinel verify examples/public-run-complete` → **VALID**. A real GPT-5.6 Sol `COMPLETE` run, zero spend ([judge quickstart](JUDGE-QUICKSTART.md)) |
+| Shipped `COMPLETE` proof | [`examples/public-run-complete`](examples/public-run-complete) — an authentic GPT-5.6 **Sol** `COMPLETE` bundle **inside this repo**: real findings, judge verdicts, and a sealed report on the public DC01 case; passes strict `--require-complete --require-live-gpt56` (27 artifacts, 124 audit entries) |
+| Also shipped | [`examples/public-run-partial`](examples/public-run-partial) — a `gpt-5.6-luna` bundle: 14/14 typed tools on real memory, honest `PARTIAL` at the hard cap |
 | Live receipts | [Sol capped opening receipt](docs/runs/sol-capped-dc01-opening.json) · [Luna canary](docs/runs/luna-canary-receipt.json) |
 | One-page judge brief | [submission/JUDGE-ONE-PAGER.md](submission/JUDGE-ONE-PAGER.md) |
-| Honest gaps | `COMPLETE` bundle, benchmark, and video are pending; the [proof status](#proof-status) table never overstates |
+| Honest gaps | The frozen benchmark comparison and the demo video are still pending; the [proof status](#proof-status) table never overstates |
 
 **Where each judging criterion lives:**
 
@@ -110,7 +111,7 @@ local SHA-256 case card before any model is involved.
 | 🟢 Live GPT-5.6 Sol opening on real 2 GiB Windows memory | **Done** — retained, capped `PARTIAL` by design |
 | 🟢 Authentic GPT-5.6 bundle **ships in the repo** and verifies `VALID` offline | **Done** — [`examples/public-run-partial`](examples/public-run-partial): 14/14 typed tools, honest `PARTIAL` at the hard cap |
 | 🟢 Zero-key guided onboarding + colorful live run experience | **Done** — see the screen above |
-| 🟡 Authentic `COMPLETE` proof bundle | **In progress** — the final live run |
+| 🟢 Authentic `COMPLETE` proof bundle **ships in the repo** and passes strict verify | **Done** — [`examples/public-run-complete`](examples/public-run-complete): Sol, real findings + judge + report, `--require-complete --require-live-gpt56` VALID (27 artifacts, 124 audit entries) |
 | 🟡 Public sub-3-minute video | **In progress** — recorded against the real bundle |
 | ⚪ Same-evidence Qwen benchmark | **Deliberately cut** — no unmeasured claims |
 
@@ -141,28 +142,32 @@ amber `ACTION NEEDED` card, not a fake green light.
 
 ### 🧾 Verify a real GPT-5.6 investigation in your first minute
 
-An authentic retained GPT-5.6 bundle **ships in this repository**. After
+Two authentic retained GPT-5.6 bundles **ship in this repository**. After
 either install above, run:
 
 ```powershell
-sentinel verify examples\public-run-partial   # → VALID · 20 artifacts · 62 audit entries
-sentinel view   examples\public-run-partial   # inert, no-JS proof viewer
+sentinel verify examples\public-run-complete   # → VALID · 27 artifacts · 124 audit entries (COMPLETE)
+sentinel view   examples\public-run-complete   # inert, no-JS proof viewer
+sentinel verify examples\public-run-partial    # → VALID · 20 artifacts · 62 audit entries (PARTIAL)
 ```
 
-That is a real `gpt-5.6-luna` investigation on a real 2 GiB Windows memory
-image — 14 typed tool receipts, custody intact, sealed, and re-checked on
-**your** machine with no key and no network.
+`public-run-complete` is a real GPT-5.6 **Sol** investigation of the public DC01
+case: real findings, a fresh-judge pass, and a sealed report, verifying under the
+strict `--require-complete --require-live-gpt56` gate. `public-run-partial` is a
+`gpt-5.6-luna` opening on a real 2 GiB Windows memory image, honestly `PARTIAL` at
+the hard cap. Both are custody-checked and re-verified on **your** machine with no
+key and no network.
 
 **Pick your machine. Every lane starts with zero keys and zero spend.**
 
 | Your machine | Lane | First result in | Spend | Verified state |
 |---|---|---|---|---|
-| 🪟 **Windows 10/11** | Native CPython 3.11 — the flagship forensic lane | ~5 min | $0 until you pick LAUNCH at the explicit menu | ✅ Tested; the live Sol run happened here |
+| 🪟 **Windows 10/11** | Native CPython 3.11 — the flagship forensic lane | ~5 min | $0 until you pick `1 = LAUNCH` on the launch card | ✅ Tested; the live Sol `COMPLETE` run happened here |
 | 🐧 **Linux (AMD64)** | Hardened Docker offline lane | ~3 min | $0 | ✅ Same 404-test suite in-container (a few Windows-only tests skip) |
 | 🍎 **macOS** | Same Docker lane via Docker Desktop | ~3 min | $0 | ⚠️ Expected via Docker's `linux/amd64` emulation; not yet verified on Mac hardware |
 
 Every lane converges on the same experience: a colorful guided onboarding, a
-SHA-256 case card, an explicit launch menu, and — after a run — an
+SHA-256 case card, one launch card, and after a run an
 offline-verifiable proof bundle.
 
 ### Two commands. Any OS.
@@ -191,12 +196,12 @@ git clone https://github.com/3sk1nt4n/Unchained.git && cd Unchained
 
 **What the second command does** (identical on every OS): a full-color welcome,
 **one question** (where the evidence is), a SHA-256 verified case card computed
-locally (`$0`, no key, no OpenAI), a depth pick, automatic key resolution (or one
-hidden prompt), and only then a stop at the explicit launch menu
-(`1 = LAUNCH - B = back - Q = quit`)
+locally (`$0`, no key, no OpenAI), an always-shown key card (auto-resolved or one
+hidden prompt), and then one launch card
+(`1 = LAUNCH · 2 = depth · 3 = model · Q = quit`)
 before it runs live and verifies the sealed bundle. No flags, no environment
-variables. Depth sets only hard stop ceilings — the same GPT-5.6 Sol
-investigator either way:
+variables. Depth (option 2) sets only hard stop ceilings; the same GPT-5.6 Sol
+investigator runs either way:
 
 | Depth | Hard ceilings (not a price quote) |
 |---|---|
@@ -279,16 +284,19 @@ public `gpt-5.6` alias (Sol) automatically, so there is nothing to configure:
 sentinel
 ```
 
-It profiles the case, asks the depth, saves your key at a one-time hidden prompt
-if you have not already (`sentinel key`), and stops for the exact interactive
-launch menu (`1 = LAUNCH`) before spending. At completion it prints the exact
-next `verify` and `view` commands. Advanced automation may still invoke
-`sentinel run` directly when authorization is established outside the CLI.
+It profiles the case, shows a key card (saving your key at a one-time hidden
+prompt if you have not already, `sentinel key`), and stops at one launch card
+(`1 = LAUNCH · 2 = depth · 3 = model · Q = quit`) before spending. At completion
+it prints the exact next `verify` and `view` commands. Advanced automation may
+still invoke `sentinel run` directly when authorization is established outside
+the CLI.
 
-The live Sol opening/tool route is now demonstrated on real memory. Before the
-flagship `COMPLETE` run, use a harmless case to exercise the still-pending live
-typed `finish_investigation({"status":"DONE"})` → serializer → reviewer →
-final-report phases under the intended submission caps.
+The full flagship `COMPLETE` run is now demonstrated on real memory: a GPT-5.6
+Sol + HEAVY investigation of the public DC01 case ran the typed
+`finish_investigation({"status":"DONE"})` → serializer → fresh judge →
+final-report phases to a sealed bundle that passes strict verification. It ships
+at [`examples/public-run-complete`](examples/public-run-complete). To rehearse
+cheaply first, run a harmless case on the rehearsal model before spending on Sol.
 
 ## What you will see
 
@@ -432,7 +440,7 @@ Read the full [architecture](docs/ARCHITECTURE.md) or the detailed
 | Cheap GPT-5.6 Luna typed-tool canary | ✅ Demonstrated live; second-reviewer-attested (project-affiliated) sanitized receipt |
 | Authentic GPT-5.6 Sol capped opening on real Windows memory | ✅ Sanitized receipt committed; `VALID` recorded at creation; terminal state intentionally `PARTIAL` |
 | Shipped verifiable GPT-5.6 bundle in this repo | ✅ [`examples/public-run-partial`](examples/public-run-partial): `gpt-5.6-luna`, 14/14 typed tools, custody match, verifies `VALID` on current code |
-| Authentic `COMPLETE` GPT-5.6 Sol evidence bundle | ⏳ Opening/tool path proven; findings → reviewer → final report still pending |
+| Authentic `COMPLETE` GPT-5.6 Sol evidence bundle | ✅ Shipped at [`examples/public-run-complete`](examples/public-run-complete): real findings, fresh judge, sealed report; strict `--require-complete --require-live-gpt56` VALID (27 artifacts, 124 audit entries) |
 | Same-evidence speed/cost/accuracy comparison with Qwen | ⏳ Fail-closed comparison scaffold ready; fact set, freeze lock, and measurements pending |
 
 **Live milestones — two authentic GPT-5.6 runs on the same public 2 GiB Windows
@@ -462,7 +470,9 @@ choose exactly one typed action: one eligible forensic tool or the closed
 `finish_investigation` action with the sole argument `status="DONE"`. The
 offline verifier understands historical literal-DONE-v1 bundles but requires
 the new runtime's typed catalog, `tool_choice=required`, and exact terminal
-schema. A live `COMPLETE` v2 bundle remains pending.
+schema. A live `COMPLETE` v2 bundle now ships at
+[`examples/public-run-complete`](examples/public-run-complete) and passes strict
+verification.
 
 ## Proof status
 
@@ -479,7 +489,7 @@ schema. A live `COMPLETE` v2 bundle remains pending.
 | Live GPT-5.6 Luna canary | Independently demonstrated; [attested sanitized projection](docs/runs/luna-canary-receipt.json), with no raw receipt available for bundle proof |
 | Authentic GPT-5.6 Sol opening on real memory | [Bundle-derived sanitized receipt](docs/runs/sol-capped-dc01-opening.json): 2 model responses, 6 successful opening tools, recorded custody match, `VALID` recorded at creation |
 | Shipped GPT-5.6 bundle in this repo | [`examples/public-run-partial`](examples/public-run-partial): 4 responses, 14 successful typed tools, custody match, verifies `VALID` on current code (20 artifacts, 62 audit entries) |
-| Authentic complete GPT-5.6 Sol case | Pending; retained Sol run is explicitly `PARTIAL` at `MAX_TOOL_CALLS` |
+| Authentic complete GPT-5.6 Sol case | ✅ [`examples/public-run-complete`](examples/public-run-complete): Sol + HEAVY `COMPLETE`, 3 findings, judge verdicts, sealed report, strict-VALID |
 | Faster/better than Qwen | Architectural thesis only until the frozen benchmark is run |
 
 The verifier establishes local protocol and bundle consistency. It does not
@@ -507,7 +517,7 @@ and externally anchor the final checksum if that threat model matters.
 
 | Evidence / host route | Status |
 |---|---|
-| Windows memory image on native Windows | Live Sol opening and six typed tools demonstrated; `COMPLETE` findings/review/report case pending |
+| Windows memory image on native Windows | Live Sol + HEAVY `COMPLETE` case demonstrated: opening, adaptive loop, findings, fresh judge, sealed report, strict-VALID |
 | Raw memory image in the safe Linux container | Supported by Volatility; case-specific symbols/readiness still apply |
 | Raw disk image with Sleuth Kit in the safe container | Unprivileged raw inspection available |
 | Mounted E01/NTFS/APFS inside Docker | Not enabled; would require elevated device/FUSE authority |
@@ -555,7 +565,7 @@ sentinel view <bundle>
 ```
 
 Bare `sentinel` on a terminal walks you through everything (welcome → one
-question → verified card → depth → explicit launch). The subcommands above
+question → verified card → key card → one launch card). The subcommands above
 remain for `$0` previews, scripting, and advanced non-interactive runs.
 
 | Exit | Meaning |
@@ -608,9 +618,9 @@ processors=6
 
 ## Honest limits
 
-- A real Sol evidence bundle now proves the live opening/tool/cap/custody path,
-  but it is `PARTIAL`; no authentic `COMPLETE` GPT-5.6 vNext bundle is published
-  yet.
+- A real Sol + HEAVY `COMPLETE` bundle now ships and passes strict verification
+  ([`examples/public-run-complete`](examples/public-run-complete)). It is one
+  case (the public DC01 image), not a benchmark.
 - The Luna receipt is a second-reviewer attestation (project-affiliated) because
   its raw JSON response was not retained; it is not bundle-derived proof.
 - No frozen same-evidence Qwen latency/cost/accuracy benchmark is published yet.

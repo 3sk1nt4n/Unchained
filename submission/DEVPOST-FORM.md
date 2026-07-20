@@ -84,7 +84,7 @@ The differentiator is not that an LLM can call forensic tools. It is that model 
 **A completed case makes exactly 4 fixed GPT-5.6 requests (opening book, findings serialization, fresh review, report draft) plus one per adaptive action — minimum five, never an unbounded loop.**
 
 **Honest limits (kept on purpose):**
-- The retained Sol bundle proves the live opening/tool/cap/custody path, but it is PARTIAL; no authentic COMPLETE GPT-5.6 vNext bundle is published yet. Bundle census: 19 run bundles, 0 COMPLETE (12 PARTIAL / 7 INVALID).
+- An authentic COMPLETE GPT-5.6 Sol + HEAVY bundle now ships at `examples/public-run-complete` (real findings, fresh judge, sealed report; strict `--require-complete --require-live-gpt56` VALID, 27 artifacts / 124 audit entries). It is one public case (DC01), not a measured benchmark; earlier retained runs also include PARTIAL and INVALID states, which we keep rather than cherry-pick.
 - Exact receipts establish execution and citation support, not forensic truth. The fresh reviewer is a same-family model call, not independent ground truth.
 - No frozen same-evidence Qwen latency/cost/accuracy benchmark is published yet — deliberately cut rather than making unmeasured claims.
 - Private worker containment and process-tree cleanup are not a complete OS sandbox; SHA-256 pre/post checks do not defeat every privileged concurrent pathname race; a privileged actor who can rewrite and reseal the whole local bundle is outside the current trust boundary (signed/timestamped external anchoring is future work).
@@ -193,7 +193,7 @@ Honest, framed as engineering maturity: the failures are recorded, capped, and l
 
 **Terminal authority.** Prose, Markdown, and empty output have no terminal authority. Only the typed finish_investigation({"status":"DONE"}) call terminates a case (terminal contract v2; the verifier still reads historical literal-DONE-v1 bundles).
 
-**Honest bundle census.** 19 run bundles exist: 0 COMPLETE, 12 PARTIAL, 7 INVALID. We publish that count rather than cherry-picking.
+**Honest bundle census.** A COMPLETE Sol + HEAVY bundle now exists and ships at `examples/public-run-complete`; earlier retained runs span PARTIAL and INVALID states, which we keep and label rather than cherry-picking.
 ```
 
 ---
@@ -229,7 +229,7 @@ Honest, framed as engineering maturity: the failures are recorded, capped, and l
 ## What's next
 
 ```
-- Publish an authentic COMPLETE GPT-5.6 vNext bundle and its public viewer (currently PENDING_COMPLETE_RUN; the retained run is PARTIAL by cap, by design).
+- Broaden the COMPLETE proof beyond one case: the first authentic COMPLETE GPT-5.6 Sol bundle now ships at `examples/public-run-complete`; next is a second case and a frozen benchmark.
 - Ship the frozen same-evidence Qwen benchmark that was deliberately cut for Build Week — we make no unmeasured comparative claims until it exists (prior-work boundary pinned at github.com/3sk1nt4n/Sentinel-Ensemble-Qwen, commit 9f309c6134e857f7b86f3e6b9c6709ce954944a5).
 - Signed/timestamped external anchoring of bundles, since a privileged actor who can rewrite and reseal a whole local bundle is outside the current trust boundary.
 - Verify the Linux and macOS lanes on real hosts (today those claims are honestly labeled STATIC-ONLY / Docker-emulation).
@@ -307,7 +307,7 @@ Optional secondary thread (Docker/README work; thread provenance only, not a fee
 
 After install, bare `sentinel` is identical to the launcher. Re-verify anytime with `.\setup.ps1 -Check` (or `./setup.sh --check`). `-FullTest` runs pytest/Ruff/format/build. Installs are non-editable, so `sentinel` keeps working if the clone moves.
 
-**API key (only for paid runs)**: `sentinel key` prompts hidden and saves to `%LOCALAPPDATA%\sentinel-unchained\openai_api_key` (owner-only). Paid runs are gated behind an explicit LAUNCH confirmation (1 = LAUNCH / B = back / Q = quit) on a money screen showing hard cost ceilings.
+**API key (only for paid runs)**: `sentinel key` prompts hidden and saves to `%LOCALAPPDATA%\sentinel-unchained\openai_api_key` (owner-only). Paid runs are gated behind one launch card that owns model and depth (1 = LAUNCH / 2 = switch depth / 3 = switch model / Q = quit) and shows hard cost ceilings.
 ```
 
 ---
@@ -368,10 +368,10 @@ Run this checklist against the pasted form before hitting Submit.
 
 - [ ] Opening tool count says **up to twelve** everywhere. The only permitted "six" is the historical note that the retained run executed 6/6 under the earlier six-tool cap.
 - [ ] Zero banned claims: no "faster/better than Qwen" (benchmark is unpublished), no "production-ready", no "should work", no invented numbers or URLs.
-- [ ] Numbers spot-check against the receipts and test run: 404/404 tests in 25.11s (24 files); shipped bundle `examples/public-run-partial` — 180,285 tokens, ~$1.16, 55.5 s, 14/14 tools, VALID with 20 artifacts / 62 audit entries; Sol receipt — 59,254 tokens, $0.38789875, 43.702 s, 3,961,843 vol_netscan bytes, 13 artifacts / 38 audit entries recorded at creation; 2,147,483,648 evidence bytes; SHA-256 starting `8079a745`; 19 local bundles (0 COMPLETE / 12 PARTIAL / 7 INVALID); exit code 3.
+- [ ] Numbers spot-check against the receipts and test run: 404/404 tests in 25.11s (24 files); shipped COMPLETE bundle `examples/public-run-complete` — Sol + HEAVY, 3 findings, judge verdicts, sealed report, strict `--require-complete --require-live-gpt56` VALID with 27 artifacts / 124 audit entries; shipped PARTIAL bundle `examples/public-run-partial` — 180,285 tokens, ~$1.16, 55.5 s, 14/14 tools, VALID with 20 artifacts / 62 audit entries; Sol receipt — 59,254 tokens, $0.38789875, 43.702 s, 3,961,843 vol_netscan bytes, 13 artifacts / 38 audit entries recorded at creation; 2,147,483,648 evidence bytes; SHA-256 starting `8079a745`; exit code 3 on a capped PARTIAL, 0 on a COMPLETE.
 - [ ] Only real URLs appear: github.com/3sk1nt4n/Unchained, openai.devpost.com/rules, github.com/3sk1nt4n/Sentinel-Ensemble-Qwen (pinned 9f309c61...), dfirmadness.com/the-stolen-szechuan-sauce/.
 - [ ] Codex Session ID pasted exactly: `019f61e5-5755-7a02-adb4-618d32baab27`.
 - [ ] Video URL no longer says ADDED-ON-UPLOAD. It is the one mandatory gap.
-- [ ] PARTIAL is labeled PARTIAL; nothing claims a COMPLETE bundle exists.
+- [ ] The shipped COMPLETE bundle is real and strict-VALID; PARTIAL bundles are still labeled PARTIAL; no unmeasured comparison is claimed.
 - [ ] Submission commit/tag PENDING_FINAL_FREEZE has been resolved to a real frozen commit before submitting.
 - [ ] Track reads Developer Tools; deadline 2026-07-21 17:00 PT respected (target Tue ~11:00 ET, hard floor Tue 14:00 ET).

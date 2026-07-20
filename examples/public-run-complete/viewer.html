@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src 'none'; font-src 'none'; media-src 'none'; connect-src 'none'; script-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Unchained proof — 20260720T173528Z-bc67e45b</title>
+  <style>
+    :root { color-scheme: dark; --bg:#07111f; --panel:#0d1b2d; --line:#233852; --ink:#e8f0fb; --muted:#9db0c8; --cyan:#56d7e8; --green:#55d692; --amber:#f2be63; --red:#ff7b84; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:radial-gradient(circle at top right,#112b42 0,#07111f 42rem); color:var(--ink); font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    main { width:min(1180px,calc(100% - 32px)); margin:0 auto; padding:40px 0 72px; }
+    header { display:flex; gap:24px; align-items:flex-start; justify-content:space-between; margin-bottom:24px; }
+    h1 { margin:0; font-size:clamp(28px,5vw,52px); letter-spacing:-.04em; }
+    h2 { margin:0 0 14px; font-size:18px; }
+    p { margin:.35rem 0; }
+    .eyebrow { color:var(--cyan); text-transform:uppercase; letter-spacing:.14em; font-weight:700; font-size:12px; }
+    .badge { border:1px solid currentColor; border-radius:999px; padding:8px 14px; font-weight:800; letter-spacing:.08em; }
+    .complete { color:var(--green); } .partial { color:var(--amber); } .invalid,.fatal { color:var(--red); }
+    .grid { display:grid; grid-template-columns:repeat(12,1fr); gap:16px; }
+    .card { grid-column:span 6; background:var(--panel); background:color-mix(in srgb,var(--panel) 94%,transparent); border:1px solid var(--line); border-radius:16px; padding:20px; box-shadow:0 16px 48px #0004; overflow:hidden; }
+    .wide { grid-column:1/-1; } .third { grid-column:span 4; }
+    .label { color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.09em; }
+    .value { font-size:18px; font-weight:700; overflow-wrap:anywhere; }
+    code { color:#b9f3fb; font:12px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace; overflow-wrap:anywhere; }
+    table { width:100%; border-collapse:collapse; } th,td { text-align:left; padding:10px 9px; border-bottom:1px solid var(--line); vertical-align:top; } th { color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.06em; }
+    ol { list-style:none; margin:0; padding:0; } ol li { display:flex; justify-content:space-between; gap:16px; padding:8px 0; border-bottom:1px solid var(--line); } time,.muted { color:var(--muted); }
+    details { border-top:1px solid var(--line); padding-top:14px; } summary { cursor:pointer; color:var(--cyan); font-weight:700; }
+    pre { white-space:pre-wrap; overflow-wrap:anywhere; padding:16px; background:#06101c; border:1px solid var(--line); border-radius:12px; color:#dbe8f7; max-height:70vh; overflow:auto; }
+    .notice { border-left:3px solid var(--amber); padding-left:12px; color:var(--muted); }
+    @media (max-width:800px) { header { display:block; } .badge { display:inline-block; margin-top:16px; } .card,.third { grid-column:1/-1; } main { width:min(100% - 20px,1180px); padding-top:24px; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div><div class="eyebrow">Recorded local proof bundle · verify before trust</div><h1>Unchained</h1><p><code>20260720T173528Z-bc67e45b</code></p></div>
+    <div class="badge complete">RECORDED COMPLETE</div>
+  </header>
+  <section class="grid" aria-label="Run overview">
+    <article class="card third"><div class="label">Evidence route</div><div class="value">windows / both</div></article>
+    <article class="card third"><div class="label">Capability</div><div class="value">Windows tested path - memory ready, disk raw-only</div></article>
+    <article class="card third"><div class="label">Exit code</div><div class="value"></div></article>
+    <article class="card"><h2>Protocol timeline</h2><ol><li><span>Profile and route</span><time>4.58s</time></li><li><span>Opening tools</span><time>52.89s</time></li><li><span>Literal DONE</span><time>252.61s</time></li><li><span>Forced serialization</span><time>299.28s</time></li><li><span>Fresh judge</span><time>319.89s</time></li><li><span>Report draft and render</span><time>335.92s</time></li><li><span>Final custody check</span><time>340.00s</time></li></ol></article>
+    <article class="card"><h2>Custody receipt</h2><p class="value complete">MATCH</p><p>4 evidence digest(s) recorded.</p><p class="notice">This inert page displays recorded receipts and cannot verify itself. Open it through <code>sentinel view &lt;run&gt;</code> to validate the manifest first. An offline recipient does not rehash the original evidence or authenticate provider-issued IDs.</p></article>
+    <article class="card wide"><h2>Evidence inventory</h2><table><thead><tr><th>ID</th><th>Kind</th><th>Bytes</th><th>Health</th><th>SHA-256</th></tr></thead><tbody><tr><td><code>E001</code></td><td>memory</td><td>2,147,483,648</td><td>ready</td><td><code>8079a7459b1739caf7d4fbf6dde5eb0ae7a9d24dbde657debf4d5202c8dc6b62</code></td></tr><tr><td><code>E002</code></td><td>disk</td><td>2,524,848,357</td><td>raw-only-mount-unavailable</td><td><code>c0c8fe58dcdb65f6574cb63b34f086856087cfaf06872ed702a4c0c264446bac</code></td></tr><tr><td><code>E003</code></td><td>unknown</td><td>1,399</td><td>unrecognized-content</td><td><code>af08169bc8c32b27fbaa85f26646f8c1bb9f5f71f0ee04a759f9064928c8ca79</code></td></tr><tr><td><code>E004</code></td><td>unknown</td><td>2,347,582,840</td><td>ewf-continuation-segment</td><td><code>73f87df9de0fa9ed41c6fdc360f0e15c3d13955e7fd24f5e59a5b2e282d6b384</code></td></tr></tbody></table></article>
+    <article class="card wide"><h2>Typed tool receipts</h2><table><thead><tr><th>Call</th><th>Tool</th><th>Status</th><th>Duration</th><th>Evidence binding</th></tr></thead><tbody><tr><td><code>call_NslRBZRZZkUMRm7RwKsFweCU</code></td><td>vol_cmdline</td><td>success</td><td>1436 ms</td><td><code>E001:8079a7459b17</code></td></tr><tr><td><code>call_aWrX9WEYr0p9ymq3VDBspZLT</code></td><td>vol_pstree</td><td>success</td><td>1483 ms</td><td><code>E001:8079a7459b17</code></td></tr><tr><td><code>call_nFTGNgt1IC1i6z3Nqylv4YMx</code></td><td>vol_mftscan</td><td>error</td><td>702 ms</td><td><code>E001:8079a7459b17</code></td></tr><tr><td><code>call_pfZ3XqfI7dXwKZYkFZzmfqXy</code></td><td>vol_reg_hivelist</td><td>success</td><td>1250 ms</td><td><code>E001:8079a7459b17</code></td></tr><tr><td><code>call_3H9Jzd6hCHz0ZqEPZbcUNqMR</code></td><td>vol_svcscan</td><td>success</td><td>7061 ms</td><td><code>E001:8079a7459b17</code></td></tr><tr><td><code>call_YpxMbPCbSUO0RmyIXwpDUAAZ</code></td><td>vol_psscan</td><td>success</td><td>8108 ms</td><td><code>E001:8079a7459b17</code></td></tr><tr><td><code>call_hNfaPFgwpyPnKq1dUFxABaV9</code></td><td>vol_envars</td><td>success</td><td>1375 ms</td><td><code>E001:8079a7459b17</code></td></tr><tr><td><code>call_G7etTGvT228vGblf9ghX5Vdb</code></td><td>vol_dlllist</td><td>success</td><td>2672 ms</td><td><code>E001:8079a7459b17</code></td></tr><tr><td><code>call_seBSqqV33GWbBEjOLgdgGPm5</code></td><td>vol_malfind</td><td>success</td><td>10483 ms</td><td><code>E001:8079a7459b17</code></td></tr><tr><td><code>call_7z4ocCuJnNPc8sBpp9toVMAf</code></td><td>vol_handles</td><td>success</td><td>16858 ms</td><td><code>E001:8079a7459b17</code></td></tr><tr><td><code>call_CsoFTC4g9X3owOEuLHhkq46h</code></td><td>vol_netscan</td><td>success</td><td>32311 ms</td><td><code>E001:8079a7459b17</code></td></tr><tr><td><code>call_m3wl8LLhFRU9SxK5TeKTk7bJ</code></td><td>vol_filescan</td><td>success</td><td>39608 ms</td><td><code>E001:8079a7459b17</code></td></tr><tr><td><code>call_QHNo2QMuzyWWCdUatvb4ZEp9</code></td><td>vol_handles</td><td>success</td><td>13125 ms</td><td><code>E001:8079a7459b17</code></td></tr><tr><td><code>call_jWWtOt5MkCmXeWPmN3bGyBt1</code></td><td>vol_dlllist</td><td>success</td><td>2453 ms</td><td><code>E001:8079a7459b17</code></td></tr><tr><td><code>call_sYArmqYcWJPDl7gksUbiLZdn</code></td><td>vol_envars</td><td>success</td><td>1296 ms</td><td><code>E001:8079a7459b17</code></td></tr><tr><td><code>call_5Pc6suWYDyQDHJCtmJfhDXM8</code></td><td>vol_dlllist</td><td>success</td><td>2453 ms</td><td><code>E001:8079a7459b17</code></td></tr><tr><td><code>call_m3LAFPx2BXvlnAeBuuvFPCZA</code></td><td>vol_handles</td><td>success</td><td>13045 ms</td><td><code>E001:8079a7459b17</code></td></tr><tr><td><code>call_hg8h31KWsN3X0LEIiiU0Fi4e</code></td><td>vol_getsids</td><td>success</td><td>1735 ms</td><td><code>E001:8079a7459b17</code></td></tr><tr><td><code>call_vSkdiUTqADdz97KWkCHOwV7N</code></td><td>vol_privileges</td><td>success</td><td>1233 ms</td><td><code>E001:8079a7459b17</code></td></tr><tr><td><code>call_P8LYdSDp7R5NWuF9ztuskWea</code></td><td>vol_cmdline</td><td>success</td><td>1219 ms</td><td><code>E001:8079a7459b17</code></td></tr><tr><td><code>call_pQdoXUv4Owc3L5RyQpS6cGaK</code></td><td>vol_getsids</td><td>success</td><td>1750 ms</td><td><code>E001:8079a7459b17</code></td></tr></tbody></table></article>
+    <article class="card wide"><h2>Terminal context</h2><p>No terminal reason was recorded.</p></article>
+    <article class="card wide"><h2>Analyst report</h2><details open><summary>Show deterministic Markdown artifact</summary><pre># Unchained DFIR Report - COMPLETE
+
+## Verification scope
+
+This system has no deterministic validator by design. Code verifies protocol structure, custody receipts, exact evidence spans, and status monotonicity; forensic meaning still requires analyst review.
+
+## Case profile
+
+- OS route: `windows`
+- Evidence shape: `both`
+- Capability: Windows tested path \- memory ready\, disk raw\-only
+- Evidence items: 4
+- Ready tool families: volatility3\.windows
+
+## Executive summary (model-authored, nonauthoritative)
+
+Memory evidence strongly supports that the Print Spooler process was hosting injected or reflectively loaded executable content\. The evidence establishes suspicious private executable memory but does not identify the payload\, its source\, or the responsible injector\. A short\-lived\, highly privileged process is a plausible precursor because it possessed capabilities consistent with process injection\; however\, no direct artifact links it to the spooler\. Targeted follow\-up queries did not recover corroborating process artifacts\, leaving attribution unsupported rather than disproved\.
+
+## Investigative narrative (model-authored, nonauthoritative)
+
+The investigation was led by the hypothesis that the Print Spooler process had been compromised in memory\. The process was observed at the expected system path with a recorded parent identifier\, while memory inspection identified private read\-write\-execute allocations containing shellcode\-like 64\-bit instruction bytes and MZ\-bearing content\. Taken together\, these observations strongly support in\-memory injection or reflective loading\. The available lineage evidence does not itself identify the recorded parent as the Services process\, and the conclusion rests on memory evidence without disk corroboration\.\\n\\nA secondary line of inquiry assessed a short\-lived process as a possible injector\. It existed for approximately 15 seconds and reported a parent that was not recovered through the targeted follow\-up\. Its security context included remote\-interactive\, domain\-administrator\, and high\-integrity attributes\, together with enabled debug privilege\. This establishes that the process had privileged capability consistent with accessing or manipulating another process\, but capability alone does not demonstrate that it acted against the spooler\. No direct process relationship\, injection artifact\, recovered executable path\, or command line connected the candidate to the compromised process\.\\n\\nTargeted examination of the exited candidate produced no environment\, loaded\-module\, or handle records\. Separate command\-line and security\-identifier queries for its reported parent also produced no records\. These non\-affirmative results do not establish benign activity and do not show that the artifacts never existed\; process termination\, memory degradation\, or artifact loss may account for their absence\. Accordingly\, the candidate\-injector theory remains uncorroborated by direct evidence\.
+
+## Findings
+
+| ID | Finding | Severity | Investigator | Judge | Tool calls | Evidence spans |
+|---|---|---|---|---|---|---|
+| F\-001 | Private executable payload regions in Print Spooler | CRITICAL | CONFIRMED | CONFIRMED | [call_aWrX9WEYr0p9ymq3VDBspZLT] [call_seBSqqV33GWbBEjOLgdgGPm5] | `Se77223761f656bccf8cdef39` `Sc272bf780bd4c2000b75e18f` `S009d6882de3732e5af5e8bb1` |
+| F\-002 | Privileged short\-lived coreupdater\.exe is a candidate precursor\, not a proven injector | HIGH | NEEDS-REVIEW | NEEDS-REVIEW | [call_YpxMbPCbSUO0RmyIXwpDUAAZ] [call_hg8h31KWsN3X0LEIiiU0Fi4e] [call_vSkdiUTqADdz97KWkCHOwV7N] | `Sd852075ce534b2a089016745` `Sbe6e45e70e8c79623198193d` `S72cbcedc40085c03114c7618` `S0c6eb0e2de77fb210c213373` `Sa155948718fbba7dc3f81200` |
+| F\-003 | Candidate\-injector attribution could not be corroborated | MEDIUM | UNSUPPORTED | UNSUPPORTED | [call_sYArmqYcWJPDl7gksUbiLZdn] [call_5Pc6suWYDyQDHJCtmJfhDXM8] [call_m3LAFPx2BXvlnAeBuuvFPCZA] [call_P8LYdSDp7R5NWuF9ztuskWea] [call_pQdoXUv4Owc3L5RyQpS6cGaK] | `Sc92767857e938b236485aec0` `S601531e9f7ffc946727ffda2` `Sa348cbd20d729ccc8d63fb0d` `Sfe4f342a020ff42102fc282d` `Se507d0f0d7f955a710e469d0` |
+
+## IOC list
+
+| Finding | IOC |
+|---|---|
+| F\-001 | spoolsv\.exe |
+| F\-001 | PID 3724 |
+| F\-001 | C\:\\\\Windows\\\\System32\\\\spoolsv\.exe |
+| F\-002 | coreupdater\.ex |
+| F\-002 | PID 3644 |
+| F\-002 | PPID 2244 |
+| F\-003 | coreupdater\.ex |
+| F\-003 | PID 3644 |
+| F\-003 | PID 2244 |
+
+The process names\, identifiers\, parent identifier\, and system path supplied with the findings are useful pivots for validation against independent endpoint\, identity\, and network telemetry\. They should be treated as investigative indicators rather than standalone proof of attribution\, particularly because the candidate process name was recovered from volatile memory and no corresponding path or disk artifact was available\.
+
+## Evidence spans
+
+- `Se77223761f656bccf8cdef39` from [call_aWrX9WEYr0p9ymq3VDBspZLT], artifact `ea5e9a2d18f5cc9b4fa48a266e9be5a43d6b0bef9d50a0642f46cbc37fcaad1e`, bytes 4051:4174, occurrences 1
+  - Evidence text: \\\&amp;quot\;ImageFileName\\\&amp;quot\;\:\\\&amp;quot\;spoolsv\.exe\\\&amp;quot\;\,\\\&amp;quot\;Offset\(V\)\\\&amp;quot\;\:246292267448576\,\\\&amp;quot\;PID\\\&amp;quot\;\:3724\,\\\&amp;quot\;PPID\\\&amp;quot\;\:452\,\\\&amp;quot\;Path\\\&amp;quot\;\:\\\&amp;quot\;C\:\\\\\\\\Windows\\\\\\\\System32\\\\\\\\spoolsv\.exe\\\&amp;quot\;
+- `Sc272bf780bd4c2000b75e18f` from [call_seBSqqV33GWbBEjOLgdgGPm5], artifact `c0ae7ba27657d7b166993c465c55fe7fe7edde2bef0319dcf651cc7901e4f104`, bytes 4168:4371, occurrences 1
+  - Evidence text: \\\&amp;quot\;Hexdump\\\&amp;quot\;\:\\\&amp;quot\;fc 48 89 ce 48 81 ec 00 20 00 00 48 83 e4 f0 e8 cc 00 00 00 41 51 41 50 52 51 56 48 31 d2 65 48 8b 52 60 48 8b 52 18 48 8b 52 20 48 8b 72 50 48 0f b7 4a 4a 4d 31 c9 48 31 c0 ac 3c 61 7c 02 2c\\\&amp;quot\;
+- `S009d6882de3732e5af5e8bb1` from [call_seBSqqV33GWbBEjOLgdgGPm5], artifact `c0ae7ba27657d7b166993c465c55fe7fe7edde2bef0319dcf651cc7901e4f104`, bytes 5008:5118, occurrences 3
+  - Evidence text: \\\&amp;quot\;Notes\\\&amp;quot\;\:\\\&amp;quot\;MZ header\\\&amp;quot\;\,\\\&amp;quot\;PID\\\&amp;quot\;\:3724\,\\\&amp;quot\;PrivateMemory\\\&amp;quot\;\:1\,\\\&amp;quot\;Process\\\&amp;quot\;\:\\\&amp;quot\;spoolsv\.exe\\\&amp;quot\;\,\\\&amp;quot\;Protection\\\&amp;quot\;\:\\\&amp;quot\;PAGE\_EXECUTE\_READWRITE\\\&amp;quot\;
+- `Sd852075ce534b2a089016745` from [call_YpxMbPCbSUO0RmyIXwpDUAAZ], artifact `27c61e09c990f16517ae75ee31d7cb43693f4400ab27c880b42e89fa8077b4ed`, bytes 5939:6136, occurrences 1
+  - Evidence text: \\\&amp;quot\;CreateTime\\\&amp;quot\;\:\\\&amp;quot\;2020\-09\-19T03\:56\:37\+00\:00\\\&amp;quot\;\,\\\&amp;quot\;ExitTime\\\&amp;quot\;\:\\\&amp;quot\;2020\-09\-19T03\:56\:52\+00\:00\\\&amp;quot\;\,\\\&amp;quot\;File output\\\&amp;quot\;\:\\\&amp;quot\;Disabled\\\&amp;quot\;\,\\\&amp;quot\;Handles\\\&amp;quot\;\:null\,\\\&amp;quot\;ImageFileName\\\&amp;quot\;\:\\\&amp;quot\;coreupdater\.ex\\\&amp;quot\;\,\\\&amp;quot\;Offset\(V\)\\\&amp;quot\;\:545441536\,\\\&amp;quot\;PID\\\&amp;quot\;\:3644\,\\\&amp;quot\;PPID\\\&amp;quot\;\:2244
+- `Sbe6e45e70e8c79623198193d` from [call_hg8h31KWsN3X0LEIiiU0Fi4e], artifact `39e498916d1be8e28d79cb6137380aeb02104ee025c144995489d7090110212e`, bytes 724:812, occurrences 1
+  - Evidence text: \\\&amp;quot\;Name\\\&amp;quot\;\:\\\&amp;quot\;Remote Interactive Logon\\\&amp;quot\;\,\\\&amp;quot\;PID\\\&amp;quot\;\:3644\,\\\&amp;quot\;Process\\\&amp;quot\;\:\\\&amp;quot\;coreupdater\.ex\\\&amp;quot\;\,\\\&amp;quot\;SID\\\&amp;quot\;\:\\\&amp;quot\;S\-1\-5\-14\\\&amp;quot\;
+- `S72cbcedc40085c03114c7618` from [call_hg8h31KWsN3X0LEIiiU0Fi4e], artifact `39e498916d1be8e28d79cb6137380aeb02104ee025c144995489d7090110212e`, bytes 1494:1608, occurrences 1
+  - Evidence text: \\\&amp;quot\;Name\\\&amp;quot\;\:\\\&amp;quot\;Domain Admins\\\&amp;quot\;\,\\\&amp;quot\;PID\\\&amp;quot\;\:3644\,\\\&amp;quot\;Process\\\&amp;quot\;\:\\\&amp;quot\;coreupdater\.ex\\\&amp;quot\;\,\\\&amp;quot\;SID\\\&amp;quot\;\:\\\&amp;quot\;S\-1\-5\-21\-2232410529\-1445159330\-2725690660\-512\\\&amp;quot\;
+- `S0c6eb0e2de77fb210c213373` from [call_hg8h31KWsN3X0LEIiiU0Fi4e], artifact `39e498916d1be8e28d79cb6137380aeb02104ee025c144995489d7090110212e`, bytes 2134:2222, occurrences 1
+  - Evidence text: \\\&amp;quot\;Name\\\&amp;quot\;\:\\\&amp;quot\;High Mandatory Level\\\&amp;quot\;\,\\\&amp;quot\;PID\\\&amp;quot\;\:3644\,\\\&amp;quot\;Process\\\&amp;quot\;\:\\\&amp;quot\;coreupdater\.ex\\\&amp;quot\;\,\\\&amp;quot\;SID\\\&amp;quot\;\:\\\&amp;quot\;S\-1\-16\-12288\\\&amp;quot\;
+- `Sa155948718fbba7dc3f81200` from [call_vSkdiUTqADdz97KWkCHOwV7N], artifact `ee5bfa841cc003e93cc729c6618218dfdaead50656f39a1c9df3c5ac7e8cd4ce`, bytes 3053:3183, occurrences 1
+  - Evidence text: \\\&amp;quot\;Attributes\\\&amp;quot\;\:\\\&amp;quot\;Present\,Enabled\\\&amp;quot\;\,\\\&amp;quot\;Description\\\&amp;quot\;\:\\\&amp;quot\;Debug programs\\\&amp;quot\;\,\\\&amp;quot\;PID\\\&amp;quot\;\:3644\,\\\&amp;quot\;Privilege\\\&amp;quot\;\:\\\&amp;quot\;SeDebugPrivilege\\\&amp;quot\;\,\\\&amp;quot\;Process\\\&amp;quot\;\:\\\&amp;quot\;coreupdater\.ex\\\&amp;quot\;
+- `Sc92767857e938b236485aec0` from [call_sYArmqYcWJPDl7gksUbiLZdn], artifact `4a939973aa50b39942baffd55aa2784e4621cd1fffc976d805681aa935ed839b`, bytes 46:99, occurrences 1
+  - Evidence text: \\\&amp;quot\;output\\\&amp;quot\;\:\[\]\,\\\&amp;quot\;record\_count\\\&amp;quot\;\:0\,\\\&amp;quot\;tool\_name\\\&amp;quot\;\:\\\&amp;quot\;vol\_envars\\\&amp;quot\;
+- `S601531e9f7ffc946727ffda2` from [call_5Pc6suWYDyQDHJCtmJfhDXM8], artifact `a8a97a4b292a85a5e823e691f0a2e3bb692c19ae308afe19be413d22b7ab5ce5`, bytes 47:101, occurrences 1
+  - Evidence text: \\\&amp;quot\;output\\\&amp;quot\;\:\[\]\,\\\&amp;quot\;record\_count\\\&amp;quot\;\:0\,\\\&amp;quot\;tool\_name\\\&amp;quot\;\:\\\&amp;quot\;vol\_dlllist\\\&amp;quot\;
+- `Sa348cbd20d729ccc8d63fb0d` from [call_m3LAFPx2BXvlnAeBuuvFPCZA], artifact `25c09ad24ddadd5b8c48ce27d2c5fba79e0f61825e896c44f26fc35ddb3c7ead`, bytes 48:102, occurrences 1
+  - Evidence text: \\\&amp;quot\;output\\\&amp;quot\;\:\[\]\,\\\&amp;quot\;record\_count\\\&amp;quot\;\:0\,\\\&amp;quot\;tool\_name\\\&amp;quot\;\:\\\&amp;quot\;vol\_handles\\\&amp;quot\;
+- `Sfe4f342a020ff42102fc282d` from [call_P8LYdSDp7R5NWuF9ztuskWea], artifact `0ba99ab3ae727ecb4a7b526b640c2007888b7cedf798f7d38d49541ce6cc0022`, bytes 46:100, occurrences 1
+  - Evidence text: \\\&amp;quot\;output\\\&amp;quot\;\:\[\]\,\\\&amp;quot\;record\_count\\\&amp;quot\;\:0\,\\\&amp;quot\;tool\_name\\\&amp;quot\;\:\\\&amp;quot\;vol\_cmdline\\\&amp;quot\;
+- `Se507d0f0d7f955a710e469d0` from [call_pQdoXUv4Owc3L5RyQpS6cGaK], artifact `cae15b4306d516a7c9a79c5113098f1d05e410876afcef8b57eef31122c0bad5`, bytes 47:101, occurrences 1
+  - Evidence text: \\\&amp;quot\;output\\\&amp;quot\;\:\[\]\,\\\&amp;quot\;record\_count\\\&amp;quot\;\:0\,\\\&amp;quot\;tool\_name\\\&amp;quot\;\:\\\&amp;quot\;vol\_getsids\\\&amp;quot\;
+
+## Limitations
+
+- Analysis was effectively memory\-only\; the disk container was raw\-only\/mount\-unavailable in the supplied profile\.
+- The attempted MFT analysis failed because no Volatility plugin was mapped \[call\_nFTGNgt1IC1i6z3Nqylv4YMx\]\.
+- No cross\-domain corroboration was possible\.
+- Payload family\, injector\, remote peer\, and persistence mechanism remain unresolved\.
+- Large network and file\-scan outputs were not sufficient to attribute a peer or payload path\.
+- Memory evidence alone does not identify the payload family\, source file\, or injector\.
+- No disk\-domain corroboration was available\.
+- No recovered path\, command line\, process handle\, or direct relation to PID 3724\.
+- Privilege demonstrates capability\, not use\.
+- Zero recovered records may reflect process termination and artifact loss\; they do not prove benign activity or that objects never existed\.
+- Single\-domain memory finding\; no disk corroboration\.
+- The supplied span does not explicitly identify PPID 452 as services\.exe\.
+- Capability is not causation\.
+- No direct relation to spoolsv\.exe PID 3724 is supplied\.
+- Single\-domain memory evidence\.
+- Zero\-record results are non\-affirmative\.
+- Process termination or artifact loss may explain missing records\.
+- No direct injector artifact is supplied\.
+- The effective analysis domain was memory\. The disk container could not be mounted or resolved\, the attempted filesystem metadata analysis had no mapped capability\, and no cross\-domain corroboration was available\. Missing records from targeted memory queries are inherently inconclusive\, especially for terminated processes\. The payload family and source\, responsible injector\, candidate executable path and purpose\, identity of the reported parent\, remote peer\, persistence mechanism\, and any command\-and\-control activity remain unresolved\. Available network and file\-scan results were insufficient to attribute a peer or payload path\.
+- Offline bundle verification cannot authenticate self-recorded provider IDs.
+- Recorded custody verification is not a fresh rehash of originals by an offline recipient.
+
+## Unresolved questions
+
+- What payload or family occupies the private executable regions in PID 3724\?
+- Who or what injected or reflectively loaded the spooler payload\?
+- What was the executable path and purpose of coreupdater\.exe PID 3644\?
+- What process was parent PID 2244\?
+- Was there persistence or external command\-and\-control activity\?
+</pre></details></article>
+  </section>
+</main>
+</body>
+</html>

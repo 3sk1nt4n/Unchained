@@ -71,9 +71,10 @@ thing** — where the evidence is — then profiles content and rechecks SHA-256
 custody locally to print a deterministic case card. Archives are not unpacked;
 unsupported documents are hashed/listed and set aside. The router accepts at
 most one ready memory image and one ready disk image per case; same-class
-multiples fail closed. It then asks the depth, finds your key (or asks once at a
-hidden prompt), and stops at the explicit launch menu — no flags, no
-environment variables.
+multiples fail closed. It then shows a key card (finding your key, or taking it
+once at a hidden prompt) and stops at one launch card that owns model and depth
+(`1 = LAUNCH · 2 = depth · 3 = model · Q = quit`) — no flags, no environment
+variables.
 
 If PATH changes are restricted, the full form always works:
 
@@ -91,7 +92,7 @@ model either way:
 
 These are hard ceilings, not price quotes, reasoning-depth modes, or promises of
 finding quality. The effective values appear in the case card. A paid run starts
-only in an interactive terminal after the explicit launch menu (`1 = LAUNCH`);
+only in an interactive terminal after you press `1 = LAUNCH` on the launch card;
 JSON and noninteractive runs cannot launch.
 
 The full junior-analyst walkthrough is [Start Here](docs/START-HERE.md).
@@ -311,7 +312,7 @@ form stops at the card):
 ## 7. Run the bounded investigator
 
 The recommended live path re-runs the local profile, prints the selected cloud
-and hard-cap boundary, and then stops at the explicit confirmation gate:
+and hard-cap boundary, and then stops at the one launch card:
 
 > Prototype boundary: use an externally read-only or immutable evidence copy
 > and a restricted nonsynchronized case workspace. The current router accepts
@@ -325,9 +326,9 @@ and hard-cap boundary, and then stops at the explicit confirmation gate:
 sentinel
 ```
 
-You point it at `C:\Evidence\sentinel\dc01` when it asks, pick the depth, and
-press `1` at the explicit launch menu only after checking the case and cap cards.
-Anything else cancels with no investigation request. (Prefer a launcher?
+You point it at `C:\Evidence\sentinel\dc01` when it asks, then press `1` on the
+launch card only after checking the case and cap cards (`2` switches depth, `3`
+switches model). Anything else cancels with no investigation request. (Prefer a launcher?
 `.\unchained.ps1` is identical.) The onboarding path keeps disk handling
 raw-only unless you later opt into a contained read-only mount.
 

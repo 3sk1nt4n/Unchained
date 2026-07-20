@@ -1,0 +1,84 @@
+{
+  "caps": {
+    "cache_write_usd_per_million": 6.25,
+    "cached_input_usd_per_million": 0.5,
+    "input_usd_per_million": 5.0,
+    "max_cost_usd": 10.0,
+    "max_tool_calls": 60,
+    "max_total_tokens": 400000,
+    "max_wall_seconds": 1800.0,
+    "output_usd_per_million": 30.0,
+    "profile": "default"
+  },
+  "captured_at_utc": "2026-07-20T17:41:08.487107+00:00",
+  "dependencies": {
+    "openai": "2.31.0",
+    "python-registry": "1.3.1",
+    "sentinel-unchained": "0.1.0",
+    "sift-sentinel": "0.1.0",
+    "tiktoken": "0.12.0",
+    "volatility3": "2.28.0"
+  },
+  "dependency_lock": {
+    "installed_versions_match": null,
+    "path": null,
+    "sha256": null,
+    "target": "windows-amd64-cp311"
+  },
+  "model_configuration": {
+    "requested_model": "gpt-5.6-sol",
+    "store": false
+  },
+  "native_tools": {
+    "ewfmount": {
+      "available": false
+    },
+    "fsstat": {
+      "available": false
+    },
+    "img_stat": {
+      "available": false
+    },
+    "mmls": {
+      "available": false
+    },
+    "ntfs-3g": {
+      "available": false
+    },
+    "vol": {
+      "available": true
+    }
+  },
+  "privacy": {
+    "absolute_evidence_path_recorded": false,
+    "environment_allowlist_only": true,
+    "hostname_recorded": false,
+    "secrets_recorded": false,
+    "username_recorded": false
+  },
+  "project": {
+    "git_commit": null,
+    "git_dirty": null,
+    "name": "sentinel-unchained",
+    "version": "0.1.0"
+  },
+  "prompt_bundle": {
+    "sha256": "e4063fd258872ae8ffeeb23577355c776e29d9fd601226b764b61e2dba391add"
+  },
+  "run_id": "20260720T173528Z-bc67e45b",
+  "runtime": {
+    "implementation": "CPython",
+    "machine": "AMD64",
+    "python_version": "3.11.9",
+    "release": "10",
+    "system": "Windows",
+    "target_python": "3.11",
+    "target_python_satisfied": true,
+    "user_site_enabled": false
+  },
+  "schema_version": 1,
+  "tool_catalog": {
+    "count": 14,
+    "sha256": "a892308eccf6c23594f355f76ace069e4d2a0d64607cc9d811cc962e6f4e009b"
+  }
+}

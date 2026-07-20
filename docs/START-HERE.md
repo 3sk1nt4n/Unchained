@@ -20,7 +20,7 @@ install once, then run one word that walks you through everything else.
 
 > **You can't break anything.** Everything is local and free until the very
 > last step, and even then nothing spends money until you pick
-> `1 = LAUNCH` at the explicit launch menu. If a step ever errors, nothing bad happened — read the
+> `1 = LAUNCH` on the launch card. If a step ever errors, nothing bad happened — read the
 > message and try again.
 
 ```text
@@ -51,10 +51,13 @@ thing at a time:
 2. asks **one question** — where the evidence is;
 3. profiles and SHA-256-hashes the case **locally** and prints a verified
    **case card** (no key, no OpenAI, `$0`);
-4. asks the **depth** (1 = HEAVY, 2 = LIGHT — Enter keeps LIGHT);
-5. finds your API key automatically, or asks for it once at a hidden prompt;
-6. stops at the explicit launch menu (1 = LAUNCH), then runs the investigation live and
-   verifies the sealed proof bundle.
+4. shows a **key card** — it finds your API key automatically, or takes it once
+   at a hidden prompt;
+5. stops at **one launch card** that owns everything: `1 = LAUNCH`,
+   `2 = switch depth` (HEAVY/LIGHT), `3 = switch model` (Sol/rehearsal),
+   `Q = quit`;
+6. after you press `1`, runs the investigation live and verifies the sealed
+   proof bundle.
 
 No flags. No environment variables. If you'd rather type a launcher, `.\unchained.ps1`
 does exactly the same thing.
@@ -114,9 +117,9 @@ sentinel
 ```
 
 That's the whole experience. Answer one question (the evidence folder), read the
-case card, pick a depth by pressing `1`, `2`, or Enter, and — when it asks —
-confirm from the explicit launch menu: press `1` to LAUNCH (or `B` = back,
-`Q` = quit). Nothing spends money until you pick `1`.
+case card and key card, and confirm from the one launch card: press `1` to
+LAUNCH (or `2` to switch depth, `3` to switch model, `Q` to quit). Nothing
+spends money until you pick `1`.
 
 Then **watch it live**: the opening tools with timings, the model's reasoning
 each turn, findings, the reviewer keeping or downgrading them, and a sealed,
@@ -161,9 +164,9 @@ sentinel verify "C:\path\to\bundle" --require-complete --require-live-gpt56
 
 🎉 **VALID with those flags is submission-grade proof.**
 
-> Honest note: the authentic **COMPLETE** Sol bundle is still pending (see the
-> README → Proof status). Those two flags are exactly what you run once that
-> bundle exists; today they will correctly **fail** the shipped `PARTIAL`
+> Honest note: the authentic **COMPLETE** Sol bundle now ships at
+> `examples/public-run-complete` and passes both flags (see the README → Proof
+> status). Those same flags will correctly **fail** the shipped `PARTIAL`
 > fixture, which is the verifier refusing to overstate.
 
 > Verification proves the lifecycle, custody, citations, report, and viewer are

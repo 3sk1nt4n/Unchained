@@ -2,9 +2,10 @@
 
 > **Status: RECORD NOW.** This script supersedes the gate in `docs/DEMO-SCRIPT.md`
 > that required a COMPLETE bundle before recording. Per `HACKATHON_HANDOVER.md`
-> (2026-07-20, W2/W7), the controlling plan records today with the authentic
-> retained PARTIAL bundle, honestly labeled. An optional splice slot below
-> upgrades one 20-second segment if a COMPLETE run (W5) lands before upload.
+> (2026-07-20, W2/W7), the controlling plan can now record the strict COMPLETE
+> segment: an authentic COMPLETE Sol + HEAVY bundle ships at
+> `examples/public-run-complete` (W5 landed). The PARTIAL segment remains a valid
+> honest alternative; the splice slot below is now the recommended main path.
 
 **Runtime target: 2:45. Hard ceiling: 2:59.** Narration paced at ~150 words per
 minute. Audio names both Codex (how the project was built) and GPT-5.6 (what it
@@ -71,8 +72,8 @@ logs-only, still shows E001, SHA-256 custody, and `openai_called: false`).
 
 Do **not** pass `--require-complete` on this bundle; it is PARTIAL by design
 and plain `sentinel verify` returns VALID — proven on current code 2026-07-20:
-20 artifacts, 62 audit entries. The strict flags belong to the splice slot
-only.
+20 artifacts, 62 audit entries. The strict `--require-complete --require-live-gpt56`
+flags now pass on the shipped COMPLETE bundle (see the splice slot below).
 
 Never run a live verify on a 2026-07-19 bundle (including
 `unchained-runs\20260719T020118Z-ede6c445`): the deterministic renderer has
@@ -85,16 +86,16 @@ history and may be shown as a document — never as a live verify.
 
 ## OPTIONAL 20-SECOND SPLICE SLOT (1:23-1:43)
 
-**Use only if W5 lands: an authentic COMPLETE GPT-5.6 bundle exists before
-upload.** This slot replaces the 1:23-1:43 segment one-for-one; total runtime
+**Now available (W5 landed): an authentic COMPLETE GPT-5.6 bundle ships at
+`examples/public-run-complete`.** This slot replaces the 1:23-1:43 segment one-for-one; total runtime
 does not change. If W5 does not land, record the PARTIAL segment as scripted
 above and change nothing.
 
 | Time | Screen content | Command | Narration (read aloud) |
 |---|---|---|---|
-| 1:23-1:43 | Strict verify on the COMPLETE bundle: result VALID, terminal status COMPLETE. | `sentinel verify <COMPLETE_BUNDLE_PATH> --require-complete --require-live-gpt56` | This time the case ran to a typed DONE: forced structured findings, a fresh-context reviewer that can only preserve or downgrade, and a sealed COMPLETE bundle. The strict verifier, require-complete and require-live-GPT-5.6, reconstructs the whole lifecycle and returns VALID. |
+| 1:23-1:43 | Strict verify on the COMPLETE bundle: result VALID, terminal status COMPLETE. | `sentinel verify examples/public-run-complete --require-complete --require-live-gpt56` | This time the case ran to a typed DONE: forced structured findings, a fresh-context reviewer that can only preserve or downgrade, and a sealed COMPLETE bundle. The strict verifier, require-complete and require-live-GPT-5.6, reconstructs the whole lifecycle and returns VALID. |
 
-`<COMPLETE_BUNDLE_PATH>`: PENDING_COMPLETE_RUN. Exists only if W5 lands.
+`examples/public-run-complete`: Sol + HEAVY, 3 findings, judge verdicts, sealed report, 27 artifacts / 124 audit entries.
 
 ---
 
@@ -229,9 +230,9 @@ cut. Section breaks match the scene table.
 These stay true in the video and in all submission copy. None of them block
 recording.
 
-- The retained Sol bundle proves the live opening/tool/cap/custody path, but it
-  is PARTIAL; no authentic COMPLETE GPT-5.6 vNext bundle is published yet. The
-  video labels it PARTIAL on screen and in narration.
+- An authentic COMPLETE GPT-5.6 Sol + HEAVY bundle is now published at
+  `examples/public-run-complete` and passes strict verify. If the video shows
+  the PARTIAL bundle instead, it labels it PARTIAL on screen and in narration.
 - The retained run executed six opening tools under the earlier six-tool cap;
   the opening now allows up to twelve. The mandatory on-screen caption in the
   0:58-1:23 scene states this.
@@ -259,7 +260,7 @@ recording.
 |---|---|
 | Video link | Added on upload |
 | Submission commit/tag | PENDING_FINAL_FREEZE |
-| Authentic COMPLETE bundle / public viewer | PENDING_COMPLETE_RUN (splice slot only) |
+| Authentic COMPLETE bundle / public viewer | Shipped: `examples/public-run-complete` (strict-VALID) |
 | Same-evidence Qwen benchmark | Deliberately cut; no unmeasured claims |
 
 Rules of record: https://openai.devpost.com/rules (video shorter than three

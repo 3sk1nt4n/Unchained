@@ -1,0 +1,61 @@
+{
+  "custody": {
+    "baseline_established": true,
+    "final_check_performed": true,
+    "match": true,
+    "mount_released": true
+  },
+  "investigation": {
+    "finding_count": 3,
+    "turns": 10,
+    "verdict_count": 3
+  },
+  "model": {
+    "provider_models": [
+      "gpt-5.6-sol"
+    ],
+    "request_ids_present": 14,
+    "requested_models": [
+      "gpt-5.6-sol"
+    ],
+    "response_ids_present": 14,
+    "responses": 14
+  },
+  "profile": {
+    "capability_label": "Windows tested path - memory ready, disk raw-only",
+    "evidence_items": 4,
+    "os": "windows",
+    "shape": "both"
+  },
+  "run_id": "20260720T173528Z-bc67e45b",
+  "schema_version": 1,
+  "terminal": {
+    "cap": null,
+    "exit_code": 0,
+    "reason": null,
+    "status": "COMPLETE"
+  },
+  "time": {
+    "ended_at_utc": "2026-07-20T17:41:08.445413+00:00",
+    "started_at_utc": "2026-07-20T17:35:28.433271+00:00",
+    "wall_ms": 340000
+  },
+  "tools": {
+    "completed": 21,
+    "started": 21,
+    "status_counts": {
+      "error": 1,
+      "success": 20
+    }
+  },
+  "usage": {
+    "cache_write_tokens": 212957,
+    "cached_input_tokens": 1963,
+    "estimated_cost_usd": 1.67564775,
+    "input_tokens": 216655,
+    "output_tokens": 11167,
+    "provider_billed_cost_usd": null,
+    "provider_total_tokens": 227822,
+    "reasoning_tokens": 2258
+  }
+}
