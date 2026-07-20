@@ -23,6 +23,115 @@ what is still missing.
 
 ---
 
+## 2026-07-20 ~01:40 ET — 5-agent win-path audit and the WINNER ACTION PLAN
+
+This section is the controlling execution plan for the final ~42 hours. It was
+produced by a 5-agent parallel audit (live-rules corroboration on three official
+pages, a full repo readiness audit, a live test run, an independent judge
+simulation, and a critical-path synthesis), then reconciled with
+[docs/HONEST-WIN-ASSESSMENT.md](docs/HONEST-WIN-ASSESSMENT.md). It supersedes
+the ordering of section E below and the recording gate in
+`docs/DEMO-SCRIPT.md:3-6`. Labels: PROVEN / VERIFIED / INFERRED / GUESSING,
+used literally.
+
+### A0. What this audit PROVED (ran on this host, 2026-07-20 ~01:30 ET)
+
+- **404/404 tests pass in 25.11s, ruff check + format clean, `sentinel --help`
+  renders correctly** (`.venv` CPython 3.11.9). PROVEN.
+- **Live rules re-verified on all three official pages** (rules, FAQ, overview):
+  deadline Tue 2026-07-21 17:00 PT confirmed; video safest read is **strictly
+  under 3:00**; **AI narration is explicitly allowed** ("A screencast with
+  background music won't cut it" — audio must explain Codex use and what
+  GPT-5.6 is doing); free-Codex-credit request window is already closed
+  (passed 2026-07-17). VERIFIED.
+- **Bundle census: 19 run bundles, 0 COMPLETE** (12 PARTIAL / 7 INVALID by
+  summary.json iteration). VERIFIED.
+- **The load-bearing proof asset already exists**: authentic
+  `unchained-runs/20260719T020118Z-ede6c445` — `gpt-5.6-sol` returned on 2
+  responses, 6/6 opening tools on real DC01 memory, custody match, offline
+  `sentinel verify` **VALID**, honestly terminal PARTIAL at MAX_TOOL_CALLS;
+  sanitized receipt committed at `docs/runs/sol-capped-dc01-opening.json`.
+  VERIFIED. **Consequence: an honest video can show real GPT-5.6 work today,
+  with zero new spend. Stage One is passable without a new live run.**
+- DC01 was already exposed to Sol pre-freeze (the 07-19 capped opening), so the
+  "untouched preregistration" claim stays retired and the freeze gate no longer
+  blocks anything. VERIFIED against `docs/WINNER_ROADMAP.md` section 3.
+- `docs/SUBMISSION.md` is a real Devpost draft but stale: line 40 still says
+  "up to six tools" (runtime now allows twelve) and lines 3-6/92-93 carry
+  PENDING placeholders. VERIFIED.
+
+### A1. Independent judge simulation (equal-weight criteria, harsh)
+
+| Scenario | Tech | Design | Impact | Idea | Stage One |
+|---|---|---|---|---|---|
+| As-is (no video, no COMPLETE run) | 6 | 5 | 6 | 8 | **FAIL — no video** |
+| Video + authentic COMPLETE run + benchmark | 8 | 7 | 7 | 8 | PASS |
+
+Win-probability estimates are GUESSING, stated as ranges: this audit's critic
+puts top-2 in Developer Tools at **~0%** with no video, **1–3%** with video but
+no COMPLETE run, **3–7%** with both. `docs/HONEST-WIN-ASSESSMENT.md` argues
+**12–18%** conditional on a strong video. The difference is field-size
+assumptions, not facts; both agree on the same ordering of moves. The critic's
+controlling directive: **the video is worth more than the run — never trade
+video time for run retries.**
+
+### A2. WINNER ACTION PLAN (all times ET; owner in bold when human-only)
+
+| # | Action | Owner | Target window | Latest safe start | State |
+|---|---|---|---|---|---|
+| W1 | Refresh `docs/SUBMISSION.md`: fix six→twelve (line 40), strip/fill PENDING placeholders, produce paste-ready Devpost blocks | agent | Mon early | Mon 18:00 | PENDING |
+| W2 | Final video script + exact shot list from `docs/DEMO-SCRIPT.md`, overriding its COMPLETE-only recording gate; leave a 20s splice slot for a COMPLETE run | agent | Mon early | Mon 20:00 | PENDING |
+| W3 | Pre-position 429/cap mitigations: serializer packet chunking (<~150k tokens/request), documented `MAX_TOTAL_TOKENS` raise, bounded backoff; offline dry-run | agent | Mon early | Mon 10:00 (before any live attempt) | PENDING |
+| W4 | OpenAI billing: add credit, confirm real TPM tier | **HUMAN** | Mon 08:30–09:30 | Mon 12:00 | PENDING — ceiling path only |
+| W5 | Authentic COMPLETE run attempts on DC01 + strict verify (`--require-complete --require-live-gpt56`) | **HUMAN** key, agent drives | Mon 10:00–16:00 | **HARD ABANDON GATE Mon 16:00** | PENDING — optional ceiling |
+| W6 | Benchmark comparison vs open-weight baseline | agent | Mon 14:00–15:30 | Only if W5 COMPLETE by 14:00, else first cut | PENDING |
+| W7 | Record video, **strictly under 3:00**, audio names Codex + GPT-5.6 (AI narration allowed). Plan A: splice COMPLETE verify. Plan B: `ede6c445` authentic receipt → offline verify VALID → $0 no-key lane → Codex build story | **HUMAN** (voice) or AI narration; agent preps scenes | Mon 17:00–21:00 | Tue 08:00 (emergency slot) | PENDING — **the only mandatory gap** |
+| W8 | YouTube upload public + incognito playback QA (<3:00 runtime, audio audible) | **HUMAN** | Mon 21:00–22:00 | Tue 11:30 | PENDING |
+| W9 | Final README/SUBMISSION sync with real artifact IDs, submission tag, push; re-verify repo is live-public (last checked 07-14) | agent | Mon 22:00–23:00 | Tue 09:00 | PENDING |
+| W10 | `/feedback` re-run from majority-core Codex thread; if new ID, update all 8 referencing files | **HUMAN** in Codex | Tue 07:00–07:30 | Tue 12:00 — fallback: existing ID stands | PENDING |
+| W11 | Devpost form: track = Developer Tools, description, repo URL, video URL, Session ID, install/platform/test-method extras. **SUBMIT Tue ~11:00, hard floor Tue 14:00.** Screenshot confirmation | **HUMAN** submits, agent drafts | Tue 07:30–11:00 | Tue 14:00 | PENDING |
+
+Coordination rule: two Claude sessions have committed to this repo tonight.
+**One executor per file**; every session pulls before editing and records its
+work here in the same session.
+
+### A3. Kill risks and pre-positioned mitigations
+
+1. **No public video by deadline = automatic fail.** Mitigation: W7 is
+   unconditional and independent of W5's outcome; W2 finishes the script hours
+   earlier; AI narration removes voiceover as a blocker; Tue 08:00 emergency
+   re-record slot.
+2. **TPM/billing not fixable in time; run retries eat the window.** The 429 at
+   ~271k tokens vs 200k TPM already happened. Mitigation: W3 lands before any
+   live attempt; hard abandon gate Mon 16:00; Plan B video and Devpost copy
+   stand without a COMPLETE bundle.
+3. **End-stage logistics: form left in draft, video private/processing, ID
+   mismatch, repo flipped private.** Mitigation: submit ~9h early, incognito QA
+   of every link from the Devpost preview, W9 re-verifies public visibility,
+   confirmation screenshot, W10 fallback ID already recorded in 8 files.
+
+### A4. Cut list (top-down when behind) and never-cut
+
+Cut in order: (1) W6 benchmark — and delete every unmeasured "faster/better
+than Qwen" phrase from judge-facing copy; an unmeasured claim is a liability;
+(2) rubric freeze / Gate B (already moot); (3) hosted HTTPS viewer + QA;
+(4) W5 the COMPLETE run itself; (5) W10 `/feedback` refresh (existing ID
+stands); (6) SUBMISSION.md polish beyond the six→twelve fix and placeholders.
+
+**Never cut:** the public sub-3:00 YouTube video with audio naming Codex and
+GPT-5.6; public MIT repo; README Codex disclosure; the fully submitted Devpost
+form with track, Session ID, install instructions, platforms, and the no-key
+test path.
+
+### A5. Copy directive for everything judge-facing
+
+Lead with the one-line pitch and the $0 sixty-second judge lane; move the
+PARTIAL/pending/attested tables below the fold. The judge simulation found the
+radical honesty reads as "unfinished" to a skimming judge. The honesty stays;
+the ordering changes.
+
+---
+
 ## 2026-07-20 session — one-command UX overhaul, honest cross-OS audit, and the path to win
 
 This section is the honest, deep record of the 2026-07-20 session. It supersedes
@@ -36,7 +145,7 @@ literally:
   claims are STATIC-ONLY — there is no Linux or macOS host in this environment.
 - **PENDING** — not done.
 
-### A. What shipped this session (all on `main`, commits `ecc2f75`…`0a623a7`)
+### A. What shipped this session (all on `main`, commits `ecc2f75`…`4e53e3b`)
 
 1. **One command runs a whole case.** Bare `sentinel` on a terminal self-drives:
    welcome → one question (evidence path) → local `$0` SHA-256 case card → depth
@@ -175,22 +284,48 @@ current code this session and is now location-independent. To see the fixed
 flow: open a fresh terminal and run `sentinel`. If you use the one-liner,
 `get.ps1` now reaches the key paste step correctly on a keyless machine.
 
+### G. Handover review corrections (2026-07-20, full-document pass)
+
+A top-to-bottom review of this document against the repo at `4e53e3b` found and
+fixed the following in the CURRENT-state sections (historical checkpoint tables
+below are deliberately unchanged — they describe their named timestamps):
+
+1. Document control refreshed: rules re-verified 2026-07-20 (not 07-14), repo
+   at `4e53e3b`, time remaining ~42 hours at 2026-07-20 05:36 UTC.
+2. Codebase map corrected: the opening is up to **twelve** typed calls
+   (raised 2026-07-20; the six-call texts in the 2026-07-18/19 checkpoint
+   sections are true historical records of the older cap). Added the three
+   modules the map was missing (`viewer_policy.py`, `onboarding.py`,
+   `console.py`).
+3. **Superseding size/quality baseline (2026-07-20):** 19 source modules,
+   **404 tests across 24 test files**, ruff check + format clean. The
+   "17 modules / 267 tests / 32 files" figures below are the 2026-07-18
+   checkpoint, retained as history.
+4. **Superseded guidance:** the proof-ledger row "Demo video … Record only
+   after genuine run" predates the rules-grounded correction in section E. A
+   genuine retained Sol run already exists (capped opening, terminal `PARTIAL`,
+   offline `VALID`) and is legitimate video material with its honest label; do
+   NOT hold the video for a `COMPLETE` run. The video is the mandatory gate.
+5. Link check: every relative link in this document resolves at `4e53e3b`
+   (roadmap, master plan, release handoff, DECISIONS, win assessment,
+   provenance, judge quickstart).
+
 ---
 
 ## Document control
 
 | Field | Current value |
 |---|---|
-| Last live-rule verification | 2026-07-14 22:04 ET, direct current 2026 Official Rules plus official GPT-5.6, pricing, and Responses API references |
-| Last repository verification | 2026-07-20, `main` at `0a623a7`; one-command UX overhaul + a 4-way honest cross-OS audit and its fixes, 404-test suite green + ruff clean locally on Windows |
-| Current event day | Submission Day 8 (2026-07-20) |
+| Last live-rule verification | 2026-07-20, direct fetch of the live Official Rules (judging criteria, mandatory submission items, dates, prizes); grounded in [docs/HONEST-WIN-ASSESSMENT.md](docs/HONEST-WIN-ASSESSMENT.md) |
+| Last repository verification | 2026-07-20, `main` at `4e53e3b`; one-command UX overhaul + a 4-way honest cross-OS audit and its fixes + the rules-grounded win assessment; 404-test suite green + ruff clean locally on Windows |
+| Current event day | Submission Day 8 (2026-07-20 UTC; 2026-07-19 evening PT) |
 | Hard deadline | 2026-07-21 17:00 PT / 20:00 ET |
-| Time remaining at 2026-07-14 22:22 ET | Approximately 165.6 hours |
-| Internal submission deadline | 2026-07-20; July 21 is emergency buffer only |
+| Time remaining at 2026-07-20 05:36 UTC | Approximately 42 hours |
+| Internal submission deadline | 2026-07-20 PT; July 21 is emergency buffer only. **The mandatory gate is the demo video** (see the rules-grounded correction in section E) |
 | Selected track | Developer Tools |
-| Current decision | **CONDITIONAL GO with frozen scope; registry alternative parked** |
-| Flagship-run readiness | **NOT READY: vNext and Docker preflight are verified offline; freeze, authorized credentials, authentic complete Sol run, semantic score, and external attestation remain red** |
-| Submission readiness | **NOT READY** |
+| Current decision | **GO, video-first: execute the WINNER ACTION PLAN (section A2 at top). COMPLETE run is optional ceiling with a hard abandon gate Mon 16:00 ET; registry alternative parked** |
+| Flagship-run readiness | **OPTIONAL CEILING per winner plan: authentic capped-PARTIAL Sol bundle `ede6c445` exists and verifies VALID; a COMPLETE run still needs credentials + TPM headroom (W3-W5) and is cut list item 4, not a submission gate** |
+| Submission readiness | **NOT READY — video (W7/W8) and Devpost form (W11) outstanding; every other required material is READY or PARTIAL per the 2026-07-20 readiness audit** |
 | Retained successful `/feedback` Session ID | `019f61e5-5755-7a02-adb4-618d32baab27` |
 | Current Docker/README follow-up thread ID | `019f76f3-a19f-71d1-81b2-eed6305857f6` — not yet a successful `/feedback` receipt |
 
@@ -557,7 +692,7 @@ The runtime flow is:
 CLI / budget
     -> evidence inventory, classification, routing, and pre-run hashes
     -> typed tool registry and bounded private workers
-    -> GPT-5.6 opening selection (all-or-none, at most six) and adaptive investigator loop
+    -> GPT-5.6 opening selection (all-or-none, up to twelve since 2026-07-20; historically six) and adaptive investigator loop
     -> strict typed DONE and forced investigation serialization
     -> deterministic exact evidence-span resolution
     -> fresh downgrade-only judge over those spans
@@ -576,6 +711,9 @@ CLI / budget
 | `src/unchained/agent.py` | Opening book, stateless ledger loop, serialization, span resolution, judge, structured report draft |
 | `src/unchained/reporting.py` | Deterministic authoritative Markdown rendering and hostile-prose defanging |
 | `src/unchained/viewer.py` | Deterministic inert static proof viewer |
+| `src/unchained/viewer_policy.py` | Independent positive inert-HTML/CSP policy check for the viewer |
+| `src/unchained/onboarding.py` | Guided welcome, verified case card, depth choice, and honest model labels |
+| `src/unchained/console.py` | Dependency-free 256-color console theme with encoding-safe fallback |
 | `src/unchained/audit.py` | Single-writer hash-chained event log and output receipts |
 | `src/unchained/artifacts.py` | Atomic summary, environment record, allowlisted manifest, and detached manifest digest |
 | `src/unchained/caps.py` | Atomic tool/token/time/cost enforcement and cost estimates |
