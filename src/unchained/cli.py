@@ -1184,7 +1184,14 @@ class _AuditNarrator:
                 turn = payload.get("turn")
                 update = str(payload.get("case_ledger_update", "")).strip().replace("\n", " ")
                 if update:
-                    self._console.detail(f"turn {turn} reasoning: {update[:120]}")
+                    # Show the model's whole visible reasoning update (bounded
+                    # by the 8,192-byte ledger cap upstream), wrapped so the
+                    # live screen reads it instead of a 120-char teaser.
+                    label = f"turn {turn} reasoning: "
+                    width = 96
+                    self._console.detail(f"{label}{update[:width]}")
+                    for offset in range(width, min(len(update), 720), width):
+                        self._console.detail(f"{' ' * len(label)}{update[offset : offset + width]}")
             elif event_type == "investigator.action" and isinstance(payload, dict):
                 turn = payload.get("turn")
                 self._console.step(f"turn {turn}: one typed action", elapsed=_elapsed())
@@ -1761,10 +1768,16 @@ def run_cli(
     from .verify import verify_run
 
     _stage("STEP 13  OFFLINE LIFECYCLE, HASH, RECEIPT, AND SPAN VERIFICATION")
+    # A COMPLETE run always takes the full strict lifecycle. The Sol-only
+    # live-GPT-5.6 gate additionally applies only when the run's model can
+    # satisfy it: a rehearsal (Terra) COMPLETE is honest but NONQUALIFYING,
+    # and failing the whole run at STEP 13 for not being Sol would punish a
+    # working rehearsal instead of labeling it.
+    qualifying = model is not None and is_gpt56_sol_model(model.model_id)
     verification = verify_run(
         run_directory,
         require_complete=terminal_status is RunStatus.COMPLETE,
-        require_live_gpt56=terminal_status is RunStatus.COMPLETE,
+        require_live_gpt56=terminal_status is RunStatus.COMPLETE and qualifying,
     )
     if not verification.passed:
         print("Proof-bundle verification failed:", file=sys.stderr)
@@ -1828,6 +1841,14 @@ def run_cli(
         for label, value in artifact_rows:
             stdout_console.kv(label, value)
         stdout_console.kv("Verification", "PASS - report, viewer, custody, and audit chain")
+        if complete:
+            stdout_console.kv(
+                "Qualifying",
+                "YES - Sol COMPLETE; passes --require-live-gpt56"
+                if qualifying
+                else "NO - rehearsal (non-Sol) COMPLETE; press 3 on the launch "
+                "card for the Sol qualifying seal",
+            )
         stdout_console.kv(
             "Strict gates",
             "packets - receipts - spans - usage - cost - report bytes - viewer bytes",
