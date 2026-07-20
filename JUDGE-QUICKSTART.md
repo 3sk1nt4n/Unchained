@@ -71,10 +71,10 @@ thing** — where the evidence is — then profiles content and rechecks SHA-256
 custody locally to print a deterministic case card. Archives are not unpacked;
 unsupported documents are hashed/listed and set aside. The router accepts at
 most one ready memory image and one ready disk image per case; same-class
-multiples fail closed. It then shows a key card (finding your key, or taking it
-once at a hidden prompt) and stops at one launch card that owns model and depth
-(`1 = LAUNCH · 2 = depth · 3 = model · Q = quit`) — no flags, no environment
-variables.
+multiples fail closed. It then stops at one launch card that owns model and
+depth (`1 = LAUNCH · 2 = depth · 3 = model · Q = quit`), followed by the one
+final key step (Enter = saved key, or a hidden paste that never echoes) — no
+flags, no environment variables.
 
 If PATH changes are restricted, the full form always works:
 

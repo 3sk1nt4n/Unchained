@@ -1,6 +1,7 @@
 """The self-driving `sentinel` front door: welcome -> one question -> card ->
-key card -> ONE launch card (model + depth + confirm), in a single command with
-no flags or env juggling. These tests pin that flow and its input guards."""
+ONE launch card (model + depth + confirm) -> final key step (hidden paste), in
+a single command with no flags or env juggling. These tests pin that flow and
+its input guards."""
 
 from __future__ import annotations
 
@@ -81,8 +82,11 @@ def test_bare_sentinel_self_drives_one_command_to_the_live_run(
     install_fake_session(monkeypatch, ready_profile())
     monkeypatch.setattr(cli_module, "_interactive_terminal", lambda: True)
     monkeypatch.setattr(cli_module, "_prompt_evidence_path", lambda: Path("operator-case"))
-    monkeypatch.setattr(cli_module, "_ensure_key_for_launch", lambda: True)
-    monkeypatch.setattr(cli_module, "_launch_menu", lambda _profile: "default")
+    calls: list[str] = []
+    monkeypatch.setattr(
+        cli_module, "_launch_menu", lambda _profile: calls.append("menu") or "default"
+    )
+    monkeypatch.setattr(cli_module, "_final_key_gate", lambda: calls.append("gate") or True)
     captured: dict[str, object] = {}
 
     def fake_run(evidence, caps_profile, *, show_case_card, mount_evidence, show_banner):
@@ -98,6 +102,8 @@ def test_bare_sentinel_self_drives_one_command_to_the_live_run(
     monkeypatch.setattr(cli_module, "run_cli", fake_run)
 
     assert main([]) == EXIT_PARTIAL
+    # The key step is the ONE final gate: launch card first, key paste last.
+    assert calls == ["menu", "gate"]
     assert captured == {
         "evidence": Path("operator-case"),
         "caps_profile": "default",
@@ -156,6 +162,68 @@ def test_launch_menu_enter_never_launches_and_q_cancels(
     assert cli_module._launch_menu("strict") is None
 
 
+def test_final_key_gate_enter_uses_the_saved_key(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    monkeypatch.setattr(cli_module, "openai_api_key_status", lambda: (True, "default-key-file"))
+    monkeypatch.setattr("getpass.getpass", lambda _prompt="": "")
+    monkeypatch.setattr(
+        cli_module,
+        "_store_key_material",
+        lambda *_a: (_ for _ in ()).throw(AssertionError("must not rewrite the key")),
+    )
+
+    assert cli_module._final_key_gate() is True
+    # The card always offers the paste - never a silent "no paste needed" skip.
+    out = capsys.readouterr().out
+    assert "FINAL STEP - OPENAI API KEY" in out
+    assert "Paste" in out
+
+
+def test_final_key_gate_paste_replaces_the_key_and_wins_for_this_run(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Even an inherited environment key loses to the key pasted at the gate.
+    monkeypatch.setenv("OPENAI_API_KEY", "stale-environment-key")
+    monkeypatch.setattr(cli_module, "openai_api_key_status", lambda: (True, "environment"))
+    monkeypatch.setattr("getpass.getpass", lambda _prompt="": "sk0proj0AbCd1234EfGh5678IjKl")
+    stored: list[str] = []
+    monkeypatch.setattr(cli_module, "_store_key_material", stored.append)
+
+    assert cli_module._final_key_gate() is True
+    assert stored == ["sk0proj0AbCd1234EfGh5678IjKl"]
+    assert cli_module.os.environ["OPENAI_API_KEY"] == "sk0proj0AbCd1234EfGh5678IjKl"
+
+
+def test_final_key_gate_without_a_saved_key_requires_a_paste(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(cli_module, "openai_api_key_status", lambda: (False, None))
+    monkeypatch.setattr("getpass.getpass", lambda _prompt="": "")
+
+    assert cli_module._final_key_gate() is False
+
+
+def test_final_key_gate_q_cancels_and_a_malformed_paste_never_saves(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    monkeypatch.setattr(cli_module, "openai_api_key_status", lambda: (True, "default-key-file"))
+    monkeypatch.setattr(
+        cli_module,
+        "_store_key_material",
+        lambda *_a: (_ for _ in ()).throw(AssertionError("must not save")),
+    )
+
+    monkeypatch.setattr("getpass.getpass", lambda _prompt="": "q")
+    assert cli_module._final_key_gate() is False
+
+    monkeypatch.setattr("getpass.getpass", lambda _prompt="": "a" * 600)
+    assert cli_module._final_key_gate() is False
+    assert "single-line" in capsys.readouterr().out
+
+
 def test_guided_cancelled_launch_stays_offline(
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
@@ -163,8 +231,13 @@ def test_guided_cancelled_launch_stays_offline(
     install_fake_session(monkeypatch, ready_profile())
     monkeypatch.setattr(cli_module, "_interactive_terminal", lambda: True)
     monkeypatch.setattr(cli_module, "_prompt_evidence_path", lambda: Path("operator-case"))
-    monkeypatch.setattr(cli_module, "_ensure_key_for_launch", lambda: True)
     monkeypatch.setattr(cli_module, "_launch_menu", lambda _profile: None)
+    # A cancelled launch card never reaches the key step or the lifecycle.
+    monkeypatch.setattr(
+        cli_module,
+        "_final_key_gate",
+        lambda: (_ for _ in ()).throw(AssertionError("must not reach the key gate")),
+    )
     monkeypatch.setattr(
         cli_module,
         "run_cli",

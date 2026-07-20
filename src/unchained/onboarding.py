@@ -290,25 +290,29 @@ def render_launch_gate(
 def render_key_card(
     found: bool, source_label: str | None = None, *, stream: TextIO, no_color: bool = False
 ) -> None:
-    """Render the OpenAI-key step as a card: configured-and-using, or paste-now."""
+    """Render the FINAL step before spend: the key card with the hidden paste
+    always offered, so a stale or exhausted key can be replaced right here."""
 
     stream = _encoding_safe_stream(stream)
     color = _supports_color(stream, no_color=no_color)
     if found:
         lines = [
-            f"Status: configured - via {source_label or 'a configured source'}.",
-            "Using it for this run - no paste needed.",
-            "Change it any time with:  sentinel key",
+            f"Status: a key is saved - via {source_label or 'a configured source'}.",
+            "Enter = use the saved key and start the run now",
+            "Paste = a NEW key at the HIDDEN prompt below to replace it",
+            "        (never echoes, never logged, owner-only file)",
+            "Q     = cancel; nothing is sent, nothing is spent",
         ]
         accent = _GREEN
     else:
         lines = [
             "Status: no key saved yet.",
-            "Paste your OpenAI key at the HIDDEN prompt below. It never echoes,",
-            "is never logged, and never leaves this machine (owner-only file).",
+            "Paste your OpenAI key at the HIDDEN prompt below to start the run.",
+            "It never echoes, is never logged, and never leaves this machine",
+            "(owner-only file). Enter or Q = cancel; nothing is sent or spent.",
         ]
         accent = _AMBER
-    _boxed("OPENAI API KEY", lines, stream=stream, color=color, accent=accent)
+    _boxed("FINAL STEP - OPENAI API KEY", lines, stream=stream, color=color, accent=accent)
 
 
 def active_model_label() -> str:
@@ -708,8 +712,8 @@ def render_profile(
         )
     if guided:
         launch_line = (
-            "◆ NEXT (same command): the key card, then ONE launch card - "
-            "1 = LAUNCH, 2 = depth, 3 = model, Q = quit."
+            "◆ NEXT (same command): ONE launch card - 1 = LAUNCH, 2 = depth, "
+            "3 = model, Q = quit - then the final key step (hidden paste)."
         )
     else:
         launch_line = (

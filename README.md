@@ -74,9 +74,10 @@ local SHA-256 case card before any model is involved.
 > **New analyst? There is exactly one command:** `sentinel`
 >
 > It opens the welcome, asks one thing (where the evidence is), prints a local
-> SHA-256 case card and a key card, and only then stops at one launch card
-> (`1 = LAUNCH · 2 = depth · 3 = model · Q = quit`) before any spend. No flags, no
-> environment variables. Follow the card-by-card
+> SHA-256 case card, stops at one launch card
+> (`1 = LAUNCH · 2 = depth · 3 = model · Q = quit`), and then one final key step
+> (Enter = use the saved key, or paste a new one at a hidden prompt) before any
+> spend. No flags, no environment variables. Follow the card-by-card
 > [first-case guide](docs/START-HERE.md).
 
 ## For judges — the submission at a glance
@@ -196,9 +197,10 @@ git clone https://github.com/3sk1nt4n/Unchained.git && cd Unchained
 
 **What the second command does** (identical on every OS): a full-color welcome,
 **one question** (where the evidence is), a SHA-256 verified case card computed
-locally (`$0`, no key, no OpenAI), an always-shown key card (auto-resolved or one
-hidden prompt), and then one launch card
-(`1 = LAUNCH · 2 = depth · 3 = model · Q = quit`)
+locally (`$0`, no key, no OpenAI), one launch card
+(`1 = LAUNCH · 2 = depth · 3 = model · Q = quit`), and then the ONE final key
+step before the pipeline starts: Enter uses the saved key, or a hidden paste
+replaces it right there
 before it runs live and verifies the sealed bundle. No flags, no environment
 variables. Depth (option 2) sets only hard stop ceilings; the same GPT-5.6 Sol
 investigator runs either way:
@@ -284,9 +286,9 @@ public `gpt-5.6` alias (Sol) automatically, so there is nothing to configure:
 sentinel
 ```
 
-It profiles the case, shows a key card (saving your key at a one-time hidden
-prompt if you have not already, `sentinel key`), and stops at one launch card
-(`1 = LAUNCH · 2 = depth · 3 = model · Q = quit`) before spending. At completion
+It profiles the case, stops at one launch card
+(`1 = LAUNCH · 2 = depth · 3 = model · Q = quit`), and then asks the final key
+step (Enter = saved key, or a hidden paste) before spending. At completion
 it prints the exact next `verify` and `view` commands. Advanced automation may
 still invoke `sentinel run` directly when authorization is established outside
 the CLI.
@@ -565,8 +567,8 @@ sentinel view <bundle>
 ```
 
 Bare `sentinel` on a terminal walks you through everything (welcome → one
-question → verified card → key card → one launch card). The subcommands above
-remain for `$0` previews, scripting, and advanced non-interactive runs.
+question → verified card → one launch card → final key step). The subcommands
+above remain for `$0` previews, scripting, and advanced non-interactive runs.
 
 | Exit | Meaning |
 |---:|---|

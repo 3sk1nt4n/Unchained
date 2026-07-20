@@ -236,6 +236,37 @@ _KEY_SOURCE_LABELS = {
 }
 
 
+def _store_key_material(entered: str) -> Path:
+    """Write the key to the canonical owner-only file and return its path."""
+
+    from .model import default_api_key_file
+
+    key_path = default_api_key_file()
+    key_path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor = os.open(key_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    try:
+        os.write(descriptor, (entered + "\n").encode("utf-8"))
+    finally:
+        os.close(descriptor)
+    if os.name == "nt":
+        import subprocess
+
+        with contextlib.suppress(Exception):
+            subprocess.run(
+                [
+                    "icacls",
+                    str(key_path),
+                    "/inheritance:r",
+                    "/grant:r",
+                    f"{os.environ.get('USERNAME', 'SYSTEM')}:(R,W)",
+                ],
+                capture_output=True,
+                check=False,
+                timeout=15,
+            )
+    return key_path
+
+
 def _key_command(*, status: bool, remove: bool) -> int:
     """Manage the canonical hidden-input key file; never print the credential."""
 
@@ -288,29 +319,8 @@ def _key_command(*, status: bool, remove: bool) -> int:
         print("That does not look like one single-line API key; nothing was saved.")
         return EXIT_INVALID
 
-    key_path.parent.mkdir(parents=True, exist_ok=True)
-    descriptor = os.open(key_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
-    try:
-        os.write(descriptor, (entered + "\n").encode("utf-8"))
-    finally:
-        os.close(descriptor)
+    _store_key_material(entered)
     entered = ""
-    if os.name == "nt":
-        import subprocess
-
-        with contextlib.suppress(Exception):
-            subprocess.run(
-                [
-                    "icacls",
-                    str(key_path),
-                    "/inheritance:r",
-                    "/grant:r",
-                    f"{os.environ.get('USERNAME', 'SYSTEM')}:(R,W)",
-                ],
-                capture_output=True,
-                check=False,
-                timeout=15,
-            )
 
     success = "Key saved. Every sentinel command now finds it automatically."
     if console.enabled:
@@ -639,10 +649,10 @@ def _onboard(
             )
         )
     else:
-        # When a launch is happening, the key card and the one launch card come
-        # next in THIS same command, so use the guided footer instead of printing
-        # a separate "sentinel onboard ... --launch" command that would read as a
-        # redundant, contradictory extra step.
+        # When a launch is happening, the one launch card and the final key
+        # step come next in THIS same command, so use the guided footer instead
+        # of printing a separate "sentinel onboard ... --launch" command that
+        # would read as a redundant, contradictory extra step.
         render_profile(
             profile,
             assessment,
@@ -660,14 +670,14 @@ def _onboard(
         return EXIT_INVALID
     if not launch:
         return EXIT_COMPLETE
-    # The key step is ALWAYS a visible card: a hidden paste when missing, a
-    # green KEY READY card when configured - never a silent skip.
-    if not _ensure_key_for_launch():
-        print("  No API key configured - cannot launch. Run 'sentinel key', then start again.")
-        return EXIT_INVALID
     chosen_profile = _launch_menu(caps_profile)
     if chosen_profile is None:
         print("Launch cancelled. The local profile remains valid; OpenAI calls: 0.")
+        return EXIT_COMPLETE
+    # The ONE final step before any money is spent: the key card with the
+    # hidden paste always offered - never a silent "no paste needed" skip.
+    if not _final_key_gate():
+        print("Launch cancelled at the key step. Nothing was sent; OpenAI calls: 0.")
         return EXIT_COMPLETE
     print("Confirmation accepted. Starting the bounded GPT-5.6 lifecycle...")
     return run_cli(
@@ -827,36 +837,53 @@ def _offer_zip_extraction(evidence: Path, profile: EvidenceProfile) -> Path | No
     return destination
 
 
-def _ensure_key_for_launch() -> bool:
-    """A run needs a key. Always shows a visible key step: if one is already
-    configured (env, secret file, or the saved sentinel key) it says so and uses
-    it; otherwise it runs the one-time hidden paste right here so the flow never
-    dead-ends on a missing key. To re-paste, run ``sentinel key`` (or
-    ``sentinel key --remove`` first)."""
+def _final_key_gate() -> bool:
+    """The ONE final step between the launch card and the pipeline: the key
+    card with the hidden paste always offered. Enter keeps a saved key, a paste
+    (never echoed) replaces it for this and future runs, and q cancels. The
+    pasted key also overrides any inherited OPENAI_API_KEY for this process, so
+    the key just pasted is always the key the run uses."""
 
     from .onboarding import render_key_card
 
     present, source = openai_api_key_status()
-    if present:
-        label = _KEY_SOURCE_LABELS.get(source or "", source or "a configured source")
-        render_key_card(True, label, stream=sys.stdout)
-        return True
-    render_key_card(False, stream=sys.stdout)
-    if _key_command(status=False, remove=False) != EXIT_COMPLETE:
+    label = _KEY_SOURCE_LABELS.get(source or "", source or "a configured source")
+    render_key_card(present, label if present else None, stream=sys.stdout)
+    import getpass
+
+    prompt = (
+        "  > Enter = use saved key - or paste a new key (input stays hidden): "
+        if present
+        else "  > Paste your OpenAI API key (input stays hidden) - Enter/q cancels: "
+    )
+    try:
+        entered = getpass.getpass(prompt).strip()
+    except (EOFError, OSError):
         return False
-    present, _source = openai_api_key_status()
-    return present
+    if not entered:
+        return present
+    if entered.lower() in ("q", "quit", "exit"):
+        return False
+    if "\n" in entered or "\r" in entered or len(entered.encode("utf-8")) > 512:
+        print("  That does not look like one single-line API key; launch cancelled.")
+        return False
+    _store_key_material(entered)
+    os.environ["OPENAI_API_KEY"] = entered
+    entered = ""
+    print("  Key saved with hidden input - using it for this run.")
+    return True
 
 
 def _guided(*, mount: bool = False, caps_profile: str = "strict", no_color: bool = False) -> int:
     """The self-driving front door: one command from welcome to a live, verified
-    run. Welcome -> ask the case (one question) -> local $0 card -> key card ->
-    ONE launch card -> live lifecycle -> verify/view commands.
+    run. Welcome -> ask the case (one question) -> local $0 card -> ONE launch
+    card -> final key step (hidden paste) -> live lifecycle -> verify/view.
 
-    No flags, no environment juggling: the key is auto-found or pasted on the
-    key card, and the launch card owns model AND depth on a single menu so no
-    question is ever asked twice. The explicit 1 = LAUNCH confirmation is kept
-    deliberately - it is the one honest boundary before money is spent.
+    No flags, no environment juggling: the launch card owns model AND depth on
+    a single menu, and the key card is the ONE final step before the pipeline
+    starts - Enter keeps a saved key, a hidden paste replaces a stale one right
+    there. No question is ever asked twice, and nothing is spent before both
+    the explicit 1 = LAUNCH confirmation and the key step pass.
     """
 
     caps = CapConfig.from_env(caps_profile)
@@ -926,18 +953,19 @@ def _guided(*, mount: bool = False, caps_profile: str = "strict", no_color: bool
         if again in ("q", "quit", "exit", "n", "no"):
             return EXIT_INVALID
 
-    # Step 3: key - ALWAYS a visible card: hidden paste when missing, a green
-    # KEY READY card when configured. Never a silent skip, never a dead-end.
-    if not _ensure_key_for_launch():
-        print("  No API key configured - cannot launch. Run 'sentinel key', then start again.")
-        return EXIT_INVALID
-
-    # Step 4: ONE launch card - model, depth, ceilings, and confirmation on the
+    # Step 3: ONE launch card - model, depth, ceilings, and confirmation on the
     # same menu (1 = LAUNCH, 2 = depth, 3 = model, Q = quit). The card owns the
     # model choice, so no earlier step ever asks the same question.
     chosen_profile = _launch_menu(caps_profile)
     if chosen_profile is None:
         print("Launch cancelled. The local profile remains valid; OpenAI calls: 0.")
+        return EXIT_COMPLETE
+
+    # Step 4: the ONE final step before money is spent - the key card with the
+    # hidden paste always offered. Enter keeps a saved key, a paste replaces a
+    # stale or exhausted one right here, q cancels. Never a silent skip.
+    if not _final_key_gate():
+        print("Launch cancelled at the key step. Nothing was sent; OpenAI calls: 0.")
         return EXIT_COMPLETE
     print("Confirmation accepted. Starting the bounded GPT-5.6 lifecycle...")
     return run_cli(

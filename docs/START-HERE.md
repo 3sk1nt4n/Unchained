@@ -51,11 +51,11 @@ thing at a time:
 2. asks **one question** — where the evidence is;
 3. profiles and SHA-256-hashes the case **locally** and prints a verified
    **case card** (no key, no OpenAI, `$0`);
-4. shows a **key card** — it finds your API key automatically, or takes it once
-   at a hidden prompt;
-5. stops at **one launch card** that owns everything: `1 = LAUNCH`,
+4. stops at **one launch card** that owns everything: `1 = LAUNCH`,
    `2 = switch depth` (HEAVY/LIGHT), `3 = switch model` (Sol/rehearsal),
    `Q = quit`;
+5. asks the **one final key step** before the pipeline starts — Enter uses the
+   saved key, or paste a new one at a hidden prompt (never echoed);
 6. after you press `1`, runs the investigation live and verifies the sealed
    proof bundle.
 
@@ -117,9 +117,9 @@ sentinel
 ```
 
 That's the whole experience. Answer one question (the evidence folder), read the
-case card and key card, and confirm from the one launch card: press `1` to
-LAUNCH (or `2` to switch depth, `3` to switch model, `Q` to quit). Nothing
-spends money until you pick `1`.
+case card, confirm from the one launch card (`1` to LAUNCH, `2` to switch depth,
+`3` to switch model, `Q` to quit), then pass the final key step (Enter = saved
+key, or a hidden paste). Nothing spends money until both.
 
 Then **watch it live**: the opening tools with timings, the model's reasoning
 each turn, findings, the reviewer keeping or downgrading them, and a sealed,
