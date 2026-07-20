@@ -26,7 +26,7 @@ skip() { printf '      %sOK already done - %s%s\n' "$GREEN" "$1" "$RESET"; }
 printf '\n%s+========================================================================+%s\n' "$CYAN" "$RESET"
 printf '%s|                               UNCHAINED                                |%s\n' "$BOLD" "$RESET"
 printf '%s|                Unchained reasoning. Chained evidence.                  |%s\n' "$VIOLET" "$RESET"
-printf '%s|    One command: build the hardened container, walk into your case.    |%s\n' "$GRAY" "$RESET"
+printf '%s|    One command: build the hardened, offline container and explore.     |%s\n' "$GRAY" "$RESET"
 printf '%s+========================================================================+%s\n\n' "$CYAN" "$RESET"
 printf '%sThis bootstrap never reads evidence and never sends anything to OpenAI.%s\n' "$AMBER" "$RESET"
 printf '%sThe offline lane has no network at all; the paid Sol lane is Windows-native.%s\n\n' "$AMBER" "$RESET"

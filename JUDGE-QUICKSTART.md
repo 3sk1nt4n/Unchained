@@ -121,17 +121,21 @@ Conda, or global packages into the proof environment.
 
 ## 2. Clone and install
 
-For the simplest supported setup, the complete install, dependency, and test
-gate is one command after cloning:
+For the simplest supported setup, install plus a fast health check is one
+command after cloning:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1
 ```
 
 The script creates the validated Python 3.11 environment outside OneDrive,
-installs the pinned dependencies, runs `pip check`, tests, Ruff, formatting,
-and the package build. The individual commands below remain available when a
-junior analyst needs to see or diagnose each stage.
+installs the pinned dependencies (a **non-editable** copy, so `sentinel` keeps
+working if this folder moves), runs `pip check`, and confirms the toolchain
+imports and the CLI responds — a fast health check in seconds, not the full test
+suite. Add `-FullTest` to also run pytest, Ruff, the format check, and the
+package build; `-Check` re-verifies an existing install without reinstalling.
+The individual commands below remain available when a junior analyst needs to
+see or diagnose each stage.
 
 Run each block from a new PowerShell window:
 
@@ -152,7 +156,7 @@ $python = "$venv\Scripts\python.exe"
 $env:PIP_REQUIRE_VIRTUALENV = "true"
 & $python -m pip install --upgrade pip setuptools wheel
 & $python -m pip install -r requirements/bootstrap.txt
-& $python -m pip install -c requirements/constraints.windows-amd64-cp311.txt -e ".[dev]"
+& $python -m pip install -c requirements/constraints.windows-amd64-cp311.txt ".[dev]"
 & $python -m pip check
 ```
 

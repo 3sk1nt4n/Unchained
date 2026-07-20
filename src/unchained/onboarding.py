@@ -251,7 +251,7 @@ def active_model_label() -> str:
     return "GPT-5.6 Sol"
 
 
-def _budget_choice_lines(selected: str, effective: CapConfig) -> list[str]:
+def _budget_choice_lines(selected: str, effective: CapConfig, guided: bool = False) -> list[str]:
     strict = _preset_caps("strict")
     flagship = _preset_caps("default")
     model_label = active_model_label()
@@ -259,11 +259,13 @@ def _budget_choice_lines(selected: str, effective: CapConfig) -> list[str]:
     def marker(profile: str) -> str:
         return "[SELECTED]" if selected == profile else ""
 
+    # In the guided flow the choice is a number at the prompt below, so show the
+    # keypress; only the standalone profile card teaches the raw --caps flags.
+    heavy_how = "press 1" if guided else "--caps default"
+    light_how = "press 2" if guided else "--caps strict"
+
     return [
-        (
-            f"1) HEAVY — FLAGSHIP {marker('default')} · --caps default · "
-            "deepest bounded investigation"
-        ),
+        (f"1) HEAVY — FLAGSHIP {marker('default')} · {heavy_how} · deepest bounded investigation"),
         (
             f"ceilings: {flagship.max_tool_calls} tools / "
             f"{flagship.max_total_tokens:,} tokens / "
@@ -271,7 +273,7 @@ def _budget_choice_lines(selected: str, effective: CapConfig) -> list[str]:
             "estimated cost"
         ),
         (
-            f"2) LIGHT — CAUTIOUS {marker('strict')} · --caps strict · "
+            f"2) LIGHT — CAUTIOUS {marker('strict')} · {light_how} · "
             "same investigator, tighter stop ceilings"
         ),
         (
@@ -590,7 +592,7 @@ def render_profile(
     # Launch-ready: the depth pick plus three compact honest lines.
     _boxed(
         "CHOOSE ANALYSIS DEPTH — HEAVY OR LIGHT",
-        _budget_choice_lines(caps_profile, caps),
+        _budget_choice_lines(caps_profile, caps, guided=guided),
         stream=stream,
         color=color,
         accent=_VIOLET,

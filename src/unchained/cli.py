@@ -835,11 +835,13 @@ def _guided(*, mount: bool = False, caps_profile: str = "strict", no_color: bool
         f"${caps.max_cost_usd:.2f} estimated cost"
     )
 
-    # Step 4: default the model so a first-time user needs no $env: juggling.
-    # A cheap rehearsal (installer sets UNCHAINED_ALLOW_TEST_MODEL + a Luna model)
-    # is respected; otherwise the real GPT-5.6 Sol investigator is the default.
-    if not os.getenv("UNCHAINED_MODEL") and not cheap_model_opt_in():
-        os.environ["UNCHAINED_MODEL"] = "gpt-5.6"
+    # Step 4: default the model so a first-time user needs no $env: juggling and
+    # the run never dead-ends AFTER the paid gate on a missing model. A configured
+    # UNCHAINED_MODEL always wins; otherwise pick GPT-5.6 Sol, or the cheap Luna
+    # model when a rehearsal was opted in (so cheap mode without a model set does
+    # not crash post-confirmation).
+    if not os.getenv("UNCHAINED_MODEL"):
+        os.environ["UNCHAINED_MODEL"] = "gpt-5.6-luna" if cheap_model_opt_in() else "gpt-5.6"
 
     # Step 5: key - auto-found, or set now with hidden input. Never dead-ends.
     if not _ensure_key_for_launch():
