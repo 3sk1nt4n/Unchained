@@ -7,12 +7,18 @@
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/Windows-flagship%20lane-0078D6?logo=windows&logoColor=white" alt="Windows flagship lane">
+  <img src="https://img.shields.io/badge/Linux-hardened%20container-1793D1?logo=linux&logoColor=white" alt="Linux hardened container">
+  <img src="https://img.shields.io/badge/macOS-via%20Docker-000000?logo=apple&logoColor=white" alt="macOS via Docker">
+</p>
+
+<p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-22c55e.svg" alt="MIT License"></a>
-  <img src="https://img.shields.io/badge/Python-3.11-3776ab.svg" alt="Python 3.11">
-  <img src="https://img.shields.io/badge/Docker-Linux%2FAMD64-2496ed.svg" alt="Docker Linux AMD64">
+  <img src="https://img.shields.io/badge/Python-3.11-3776ab.svg?logo=python&logoColor=white" alt="Python 3.11">
+  <img src="https://img.shields.io/badge/Docker-Linux%2FAMD64-2496ed.svg?logo=docker&logoColor=white" alt="Docker Linux AMD64">
   <img src="https://img.shields.io/badge/Evidence-read--only-dc2626.svg" alt="Read-only evidence">
   <img src="https://img.shields.io/badge/Proof-offline--verifiable-f59e0b.svg" alt="Offline-verifiable proof">
-  <img src="https://img.shields.io/badge/OpenAI-GPT--5.6-111827.svg" alt="OpenAI GPT-5.6">
+  <img src="https://img.shields.io/badge/OpenAI-GPT--5.6-111827.svg?logo=openai&logoColor=white" alt="OpenAI GPT-5.6">
 </p>
 
 <p align="center">
@@ -109,12 +115,12 @@ OpenAI calls:
 ### ⏱️ 60 seconds, any OS, zero keys, zero spend
 
 ```powershell
-# Windows (one line — installs, walks you in, never spends)
+# 🪟 Windows (one line — installs, walks you in, never spends)
 irm https://raw.githubusercontent.com/3sk1nt4n/Unchained/main/get.ps1 | iex
 ```
 
 ```bash
-# Linux / macOS (one line — hardened container, never spends)
+# 🐧 Linux / 🍎 macOS (one line — hardened container, never spends)
 curl -fsSL https://raw.githubusercontent.com/3sk1nt4n/Unchained/main/get.sh | bash
 ```
 
