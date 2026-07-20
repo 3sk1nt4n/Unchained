@@ -61,6 +61,37 @@ def is_gpt56_luna_model(value: str) -> bool:
     return value == "gpt-5.6-luna" or value.startswith("gpt-5.6-luna-")
 
 
+def is_gpt56_model(value: str) -> bool:
+    """Return whether *value* is any GPT-5.6 family model (Sol, Luna, Terra...)."""
+
+    return value == "gpt-5.6" or value.startswith("gpt-5.6-")
+
+
+def is_gpt5_family(value: str) -> bool:
+    """Return whether *value* is any GPT-5.x model.
+
+    The pipeline sends GPT-5.x reasoning controls (reasoning_effort, verbosity)
+    on every request, so a cheap test run must stay within the GPT-5 family
+    (e.g. gpt-5.6-luna or gpt-5.4-nano). Non-5.x models would reject those
+    parameters. gpt-5.6-luna is the recommended cheap test model: same family
+    as Sol, cheap, and capable enough to complete the typed forensic protocol.
+    """
+
+    return value.startswith("gpt-5")
+
+
+def cheap_model_opt_in() -> bool:
+    """Whether the operator explicitly opted into a cheaper non-Sol test model.
+
+    A test run exercises the full live pipeline on a cheaper GPT-5.6 model to
+    validate it end to end before spending on Sol. Its bundle records the real
+    model and is honest but NONQUALIFYING: it cannot pass the verifier's
+    ``--require-live-gpt56`` (Sol) gate. Off by default; production stays Sol.
+    """
+
+    return os.getenv("UNCHAINED_ALLOW_TEST_MODEL", "").strip().lower() in {"1", "true", "yes", "on"}
+
+
 def default_api_key_file() -> Path:
     """Return the canonical per-user key file written by ``sentinel key``.
 
@@ -163,6 +194,12 @@ class OpenAIResponsesModel:
         if connectivity_smoke:
             if not is_gpt56_luna_model(configured_model):
                 raise ValueError("connectivity smoke model must identify GPT-5.6 Luna")
+        elif cheap_model_opt_in():
+            if not is_gpt5_family(configured_model):
+                raise ValueError(
+                    "test-model runs require a GPT-5 model (e.g. gpt-5.6-luna); "
+                    "non-5.x models reject the reasoning parameters this pipeline sends"
+                )
         elif not is_gpt56_sol_model(configured_model):
             raise ValueError("UNCHAINED_MODEL must identify GPT-5.6 Sol")
         configured_key, _key_source = _load_openai_api_key(api_key)
@@ -593,9 +630,16 @@ def _join_error(current: str | None, extra: str) -> str:
 
 
 def _is_gpt56_model(value: str) -> bool:
-    """Accept only the public Sol alias and dated/provider Sol snapshots."""
+    """Accept a Sol response, or any GPT-5.6 response under explicit test opt-in.
 
-    return is_gpt56_sol_model(value)
+    The Sol-specific enforcement for a qualifying COMPLETE bundle lives in the
+    verifier's ``--require-live-gpt56`` gate, not here, so a cheap test run on
+    another GPT-5.6 model is accepted at runtime and correctly fails that gate.
+    """
+
+    if is_gpt56_sol_model(value):
+        return True
+    return cheap_model_opt_in() and is_gpt5_family(value)
 
 
 def _provider_status_code(error: Exception) -> int | None:

@@ -34,6 +34,8 @@ from .model import (
     ModelProviderError,
     ModelRequest,
     OpenAIResponsesModel,
+    cheap_model_opt_in,
+    is_gpt5_family,
     is_gpt56_luna_model,
     is_gpt56_sol_model,
     openai_api_key_status,
@@ -323,17 +325,25 @@ def _key_command(*, status: bool, remove: bool) -> int:
 def _doctor(*, json_output: bool) -> int:
     configured_model = os.getenv("UNCHAINED_MODEL")
     key_present, key_source = openai_api_key_status()
+    test_mode = cheap_model_opt_in()
+    if test_mode:
+        model_ok = bool(configured_model and is_gpt5_family(configured_model))
+        model_check_name = "model_is_gpt5_test"
+    else:
+        model_ok = bool(configured_model and is_gpt56_sol_model(configured_model))
+        model_check_name = "model_is_gpt56_sol"
     checks = {
         "python_3_11": sys.version_info[:2] == (3, 11),
         "openai_sdk": importlib.util.find_spec("openai") is not None,
         "volatility3": importlib.util.find_spec("volatility3") is not None,
         "qwen_tool_package": importlib.util.find_spec("sift_sentinel") is not None,
-        "model_is_gpt56_sol": bool(configured_model and is_gpt56_sol_model(configured_model)),
+        model_check_name: model_ok,
         "openai_api_key_present": key_present,
     }
     ready = all(checks.values())
     payload = {
         "ready_for_live_run": ready,
+        "test_model_mode": test_mode,
         "checks": checks,
         "configured_model": configured_model,
         "openai_api_key_source": key_source,
@@ -979,6 +989,13 @@ def run_cli(
     if stderr_console.enabled:
         stderr_console.banner("U N C H A I N E D", "Unchained reasoning. Chained evidence.")
         stderr_console.detail("GPT-5.6 chooses where to look; code proves what happened.")
+    if cheap_model_opt_in():
+        configured = os.getenv("UNCHAINED_MODEL", "a non-Sol GPT-5.6 model")
+        stderr_console.warn(
+            f"TEST MODEL MODE: running on {configured}, not Sol. This validates the "
+            "pipeline live and cheaply; the bundle is NONQUALIFYING and cannot pass "
+            "--require-live-gpt56. Cost is Sol-priced (an upper bound)."
+        )
     _progress("checking GPT-5.6 configuration before evidence I/O")
     model = OpenAIResponsesModel()
     run_id, run_directory = _run_directory(evidence_path)
