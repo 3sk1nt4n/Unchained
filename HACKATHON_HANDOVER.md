@@ -21,13 +21,161 @@ what is still missing.
 > work session. Never mark an item complete merely because corresponding code
 > exists.
 
+---
+
+## 2026-07-20 session — one-command UX overhaul, honest cross-OS audit, and the path to win
+
+This section is the honest, deep record of the 2026-07-20 session. It supersedes
+older UX notes below where they conflict. Verification levels are labeled
+literally:
+
+- **PROVEN** — I ran it on this Windows host and saw the output.
+- **CODE-FIXED** — edited and covered by the unit suite (404 tests) or a direct
+  Python check, but NOT run through the full interactive path end-to-end.
+- **STATIC-ONLY** — read and reasoned about; NOT executed. All Linux/macOS/Docker
+  claims are STATIC-ONLY — there is no Linux or macOS host in this environment.
+- **PENDING** — not done.
+
+### A. What shipped this session (all on `main`, commits `ecc2f75`…`0a623a7`)
+
+1. **One command runs a whole case.** Bare `sentinel` on a terminal self-drives:
+   welcome → one question (evidence path) → local `$0` SHA-256 case card → depth
+   pick (1/2) → **visible** key step → exact phrase `LAUNCH GPT-5.6 SOL` → live
+   run → verify/view. No `--launch`, no `--caps`, no `$env:` juggling. Covered by
+   `tests/test_guided.py`. **CODE-FIXED** (interactive path pieces PROVEN
+   individually; full TTY walk not scripted).
+2. **Two commands per OS, clone-first.** Windows: `git clone …; cd Unchained` →
+   `.\setup.ps1` → `.\unchained.ps1` (or `sentinel`). Linux: `./setup.sh` →
+   `./unchained.sh`. Docs, `unchained.ps1`, `setup.sh`, `unchained.sh` all added.
+3. **Location-independent install (the "install anywhere, works anywhere"
+   requirement).** `setup.ps1`/`setup.sh` now install **non-editable**
+   (`pip install .[dev]`, not `-e`), so the package is copied into the isolated
+   venv and `sentinel` keeps working if the clone is moved or deleted.
+   **PROVEN**: `sentinel` runs from an unrelated directory, no `__editable__`
+   `.pth` remains, `import unchained` resolves to the venv copy.
+4. **Fast install.** `setup.ps1` default is now a health check (import + CLI
+   smoke), not the full 404-test dev suite; the heavy gate is `-FullTest`;
+   `-Check` re-verifies; pip output is quiet; PS installers force UTF-8 so the
+   banners render on legacy code pages. **PROVEN** (`-Check` run).
+5. **Docs harmonized and simplified.** README/START-HERE/JUDGE-QUICKSTART share
+   an OS-logo header + nav; the multi-step `sentinel onboard … --launch --caps`
+   walkthroughs are gone from the start paths; two inline CLI screenshots removed;
+   test counts corrected to **404**; macOS honestly labeled "via Docker."
+6. **Benchmark time-bomb fixed.** `tests/test_benchmark_compare.py` pinned the
+   freeze tag to a fixed date so the 5 comparison tests are deterministic
+   regardless of the system clock. **PROVEN** (35/35 pass).
+7. **Honest demo.** `demo.ps1` now seals and verifies exactly this run's fresh
+   fail-closed bundle (diffs the run dir), zero OpenAI calls. **PROVEN**
+   end-to-end (`DEMO PASSED … VALID`, exit 0).
+
+### B. The 4-way honest audit and its fixes
+
+I ran four parallel auditors (Windows scripts, Linux/macOS+Docker, CLI runtime,
+docs) against the current design. Verified defects fixed this session:
+
+| Severity | Defect | Fix | State |
+|---|---|---|---|
+| **CRITICAL** | `get.ps1` key check `-match "Key configured"` was case-insensitive, so `"No key configured"` matched → the hidden key paste was skipped and the run dead-ended at launch (this is exactly the "I never saw the key step" report) | match `"Key configured via"` | CODE-FIXED |
+| HIGH | Launch box said `STRICT`/`DEFAULT` while the flow said `LIGHT`/`HEAVY` | use the LIGHT/HEAVY label | PROVEN (box render) |
+| HIGH | `get.ps1` silently set `MAX_TOTAL_TOKENS=3000000`/`MAX_COST_USD=30`, so a "LIGHT $2.50" run showed a `$30/3M` ceiling | dropped the override → honest ceilings | CODE-FIXED |
+| HIGH | Hardcoded "GPT-5.6 Sol" appeared during a Luna rehearsal (welcome banner, depth line, onboard success line, launch box) | use `active_model_label()` / drop literal "Sol" | PROVEN (confirm box) |
+| HIGH | Guided card printed a pre-choice "HARD CEILINGS" number that went stale after the depth pick | suppressed in guided mode | CODE-FIXED |
+| MEDIUM | Interactive prompts used em-dash/middle-dot via bare `print`/`input` → `UnicodeEncodeError` crash risk on cp437/850 consoles | ASCII-only in `cli.py`; PS installers force UTF-8 | CODE-FIXED |
+| MEDIUM | `setup.sh` never `cd`-ed into the repo → installed the wrong dir when run from elsewhere; no git guard | added `cd "$REPO_DIR"` + git check | STATIC-ONLY |
+| MEDIUM | The "HOW DO YOU WANT TO RUN?" box spilled (double-width emoji) | no right border on emoji lines | CODE-FIXED |
+| MEDIUM | `demo.ps1` could print "DEMO PASSED … VALID" against a stale bundle | verify exactly the new run dir | PROVEN |
+| LOW-MED | `setup.ps1` READY box off by one column; prereq only checked `py`, not 3.11 | realigned; added `py -3.11` probe | PROVEN (parse + measure) |
+| LOW | `get.sh` overstated "walk into your case" (it is Docker-only) | honest banner | STATIC-ONLY |
+
+### C. Honest state matrix
+
+| Path | Level | Note |
+|---|---|---|
+| Windows two-command install, location independence, `$0` card, `demo.ps1`, confirm box | **PROVEN** | ran on this host |
+| `get.ps1` one-liner key gate + launch | **CODE-FIXED** | logic fixed; not run interactively end-to-end |
+| Bare `sentinel` full guided TTY walk to a live run | **CODE-FIXED** | pieces PROVEN; full TTY not scripted |
+| Linux/macOS `setup.sh`/`unchained.sh`/`get.sh` + Docker offline | **STATIC-ONLY** | no Linux/macOS host here; not executed |
+| **Authentic COMPLETE GPT-5.6 Sol bundle** | **PENDING** | the qualifying proof does not exist yet |
+| Same-evidence benchmark vs the open-weight baseline | **PENDING** | harness exists; no frozen real run |
+| Demo video | **PENDING** | |
+
+### D. Known-remaining backlog (honest, not yet fixed)
+
+1. **Split EWF disk (`.E01` + `.E02` …) is counted as two disks** and false-blocks
+   as "more than one ready disk." Every segment carries the EWF magic, so
+   `assess_profile` sees two. Fix = group `.Exx` siblings as one logical disk
+   BEFORE the readiness count. **Deferred deliberately**: it is proof-critical
+   evidence-model code and must be validated against a real split image, which I
+   do not have here. (A memory+disk *pair* is handled correctly; a disk-zip
+   alongside a memory-zip is set aside because archives are intentionally not
+   unpacked — that is by design, not this bug.)
+2. **No Linux dependency lock.** Only `constraints.windows-amd64-cp311.txt` exists
+   (it even pins `pywin32`, unusable on Linux). Linux installs float transitive
+   deps and `capture_environment` emits null lock-hash fields on Linux → weaker,
+   platform-divergent provenance.
+3. **Non-editable provenance gap.** `capture_environment` uses
+   `Path(__file__).resolve().parents[2]`; in a non-editable install that resolves
+   into the venv (no `.git`), so `git_commit` is null on Windows (venv is outside
+   the repo) and differs on Linux (venv inside the repo). Graceful (`None`), but
+   the bundle carries less provenance than a dev checkout.
+4. **The pinned `sift-sentinel` git dependency is a single point of failure** for
+   every *build* lane (Windows install, Linux install, `docker build`). The
+   offline *runtime* container is unaffected (wheels-only, `--no-index`). This is
+   the intentional benchmark/prior-work dependency and must stay public and
+   reachable.
+5. **`get.sh` is Docker-only** and shallower than `get.ps1` (no native install,
+   case pick, or launch). Relabeled honestly this session; not feature-matched.
+6. Minor/cosmetic: redundant banners across get.ps1 → setup.ps1 → onboard;
+   `run.ps1` does not check the child `setup.ps1` exit code; step-count labels
+   differ across scripts (`[x/4]` vs `[x/5]` vs `[x/6]`); "tools" vs "calls"
+   wording drift on the card.
+
+### E. Next steps to WIN — prioritized and honest
+
+The single thing that converts this from "polished tool" to "winning
+submission" is **one authentic, verifiable COMPLETE run**. Everything else is
+secondary.
+
+1. **Produce ONE authentic COMPLETE GPT-5.6 Sol bundle** on a real Windows memory
+   image and verify it strictly:
+   `sentinel verify <bundle> --require-complete --require-live-gpt56` → VALID.
+   Known blockers, all real:
+   - **OpenAI account TPM tier.** The forced serializer packet was ~271k tokens
+     against a new-account 200k TPM limit → HTTP 429. Add credit / complete
+     billing verification to raise TPM before the run.
+   - **Token headroom.** The full lifecycle can exceed the 400k HEAVY cap during
+     serialization. Run HEAVY and, if needed, deliberately raise
+     `MAX_TOTAL_TOKENS` (documented) — this is an honest operator choice, not a
+     silent override.
+   - **Real evidence.** Use the public DFIR Madness memory image (never committed).
+   - Disclose the run; update section C to PROVEN and attach the bundle path.
+2. **Freeze the benchmark rubric BEFORE the run**, then run the same case on the
+   OpenAI vNext and record numerator/denominator/source for every metric. The
+   comparison harness and freeze gate already exist and are tested.
+3. **Record the demo video** of the one-command flow to a VALID bundle.
+4. **Assemble the DevPost submission**: writeup, the Codex session ID
+   (`019f61e5-5755-7a02-adb4-618d32baab27` — re-confirm the final one), the repo
+   link, and the proof bundle.
+5. **Optional hardening if time allows** (in value order): run the Linux/Docker
+   lane on a real host to lift it from STATIC-ONLY; implement the EWF-segment
+   grouping against a real split image; add a Linux dependency lock.
+
+### F. Immediate re-run instruction for the operator
+
+Your installed `sentinel` (venv under `%LOCALAPPDATA%`) was refreshed to the
+current code this session and is now location-independent. To see the fixed
+flow: open a fresh terminal and run `sentinel`. If you use the one-liner,
+`get.ps1` now reaches the key paste step correctly on a keyless machine.
+
+---
+
 ## Document control
 
 | Field | Current value |
 |---|---|
 | Last live-rule verification | 2026-07-14 22:04 ET, direct current 2026 Official Rules plus official GPT-5.6, pricing, and Responses API references |
-| Last repository verification | 2026-07-18, vNext published to `main`; Linux/AMD64 Docker test/runtime/profile/custody follow-up green locally |
-| Current event day | Submission Day 6 (2026-07-18) |
+| Last repository verification | 2026-07-20, `main` at `0a623a7`; one-command UX overhaul + a 4-way honest cross-OS audit and its fixes, 404-test suite green + ruff clean locally on Windows |
+| Current event day | Submission Day 8 (2026-07-20) |
 | Hard deadline | 2026-07-21 17:00 PT / 20:00 ET |
 | Time remaining at 2026-07-14 22:22 ET | Approximately 165.6 hours |
 | Internal submission deadline | 2026-07-20; July 21 is emergency buffer only |
