@@ -75,7 +75,7 @@ local SHA-256 case card before any model is involved.
 >
 > It opens the welcome, asks one thing (where the evidence is), prints a local
 > SHA-256 case card, stops at one launch card
-> (`1 = LAUNCH · 2 = depth · 3 = model · Q = quit`), and then one final key step
+> (`1 = quick Terra test · 2 = full Terra run · 3 = qualifying Sol · Q = quit`), and then one final key step
 > (Enter = use the saved key, or paste a new one at a hidden prompt) before any
 > spend. No flags, no environment variables. Follow the card-by-card
 > [first-case guide](docs/START-HERE.md).
@@ -163,7 +163,7 @@ key and no network.
 
 | Your machine | Lane | First result in | Spend | Verified state |
 |---|---|---|---|---|
-| 🪟 **Windows 10/11** | Native CPython 3.11 — the flagship forensic lane | ~5 min | $0 until you pick `1 = LAUNCH` on the launch card | ✅ Tested; the live Sol `COMPLETE` run happened here |
+| 🪟 **Windows 10/11** | Native CPython 3.11 — the flagship forensic lane | ~5 min | $0 until you pick a package on the launch card and pass the key step | ✅ Tested; the live Sol `COMPLETE` run happened here |
 | 🐧 **Linux (AMD64)** | Hardened Docker offline lane | ~3 min | $0 | ✅ Same 432-test suite in-container (a few Windows-only tests skip) |
 | 🍎 **macOS** | Same Docker lane via Docker Desktop | ~3 min | $0 | ⚠️ Expected via Docker's `linux/amd64` emulation; not yet verified on Mac hardware |
 
@@ -198,7 +198,7 @@ git clone https://github.com/3sk1nt4n/Unchained.git && cd Unchained
 **What the second command does** (identical on every OS): a full-color welcome,
 **one question** (where the evidence is), a SHA-256 verified case card computed
 locally (`$0`, no key, no OpenAI), one launch card
-(`1 = LAUNCH · 2 = depth · 3 = model · Q = quit`), and then the ONE final key
+(`1 = quick Terra test · 2 = full Terra run · 3 = qualifying Sol · Q = quit`), and then the ONE final key
 step before the pipeline starts: Enter uses the saved key, or a hidden paste
 replaces it right there.
 
@@ -297,7 +297,7 @@ sentinel
 ```
 
 It profiles the case, stops at one launch card
-(`1 = LAUNCH · 2 = depth · 3 = model · Q = quit`), and then asks the final key
+(`1 = quick Terra test · 2 = full Terra run · 3 = qualifying Sol · Q = quit`), and then asks the final key
 step (Enter = saved key, or a hidden paste) before spending. At completion
 it prints the exact next `verify` and `view` commands. Advanced automation may
 still invoke `sentinel run` directly when authorization is established outside

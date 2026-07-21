@@ -246,8 +246,8 @@ if ([Environment]::GetEnvironmentVariable("UNCHAINED_MODEL", "User")) {
 $env:UNCHAINED_MODEL = $null
 $env:UNCHAINED_ALLOW_TEST_MODEL = $null
 if ($keyStatus -match "Key configured via") {
-    Write-Host "      Next: the verified case card, the one launch card, then the final key step:" -ForegroundColor Gray
-    Write-Host "      1 = LAUNCH  -  2 = depth  -  3 = model  -  Q = quit" -ForegroundColor Yellow
+    Write-Host "      Next: the verified case card, then pick ONE package on the launch card:" -ForegroundColor Gray
+    Write-Host "      1 = quick Terra test - 2 = full Terra run - 3 = qualifying Sol - Q = quit" -ForegroundColor Yellow
     Write-Host ""
     & $sentinelExe onboard $chosenCase --launch --caps strict
 } else {

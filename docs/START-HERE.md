@@ -19,9 +19,9 @@ New to this? You're in the right place. It's really just **two commands**:
 install once, then run one word that walks you through everything else.
 
 > **You can't break anything.** Everything is local and free until the very
-> last step, and even then nothing spends money until you pick
-> `1 = LAUNCH` on the launch card. If a step ever errors, nothing bad happened — read the
-> message and try again.
+> last step, and even then nothing spends money until you pick a package on
+> the launch card AND pass the final key step. If a step ever errors, nothing
+> bad happened — read the message and try again.
 
 ```text
 ╔════════════════════════════════════════════════════════════════════╗
@@ -51,12 +51,12 @@ thing at a time:
 2. asks **one question** — where the evidence is;
 3. profiles and SHA-256-hashes the case **locally** and prints a verified
    **case card** (no key, no OpenAI, `$0`);
-4. stops at **one launch card** that owns everything: `1 = LAUNCH`,
-   `2 = switch depth` (HEAVY/LIGHT), `3 = switch model` (Sol/rehearsal),
-   `Q = quit`;
+4. stops at **one launch card** with three complete packages:
+   `1 = quick Terra test (LIGHT)`, `2 = full Terra run (HEAVY, recommended)`,
+   `3 = qualifying Sol (HEAVY)`, `Q = quit`;
 5. asks the **one final key step** before the pipeline starts — Enter uses the
    saved key, or paste a new one at a hidden prompt (never echoed);
-6. after you press `1`, runs the investigation live and verifies the sealed
+6. after the key step, runs the investigation live and verifies the sealed
    proof bundle.
 
 No flags. No environment variables. If you'd rather type a launcher, `.\unchained.ps1`
@@ -131,10 +131,10 @@ and there are two easy answers:
   └─ host-disk.E01      ← one disk image (.E01 / .dd / raw)
   ```
 
-Then read the verified case card, confirm from the one launch card (`1` to
-LAUNCH, `2` to switch depth, `3` to switch model, `Q` to quit), and pass the
-final key step (Enter = saved key, or a hidden shape-checked paste). Nothing
-spends money until both.
+Then read the verified case card, pick a package from the one launch card
+(`1` quick Terra test, `2` full Terra run, `3` qualifying Sol, `Q` quit), and
+pass the final key step (Enter = saved key, or a hidden shape-checked paste).
+Nothing spends money until both.
 
 Then **watch it live**: the opening tools with timings, the model's reasoning
 each turn, findings, the reviewer keeping or downgrading them, and a sealed,
@@ -149,13 +149,19 @@ commands when it finishes.
 > Original evidence bytes stay local; OpenAI only receives the bounded public
 > profile and bounded typed-tool outputs.
 
-Depth is only a set of **hard stop ceilings**, never a different model or a
-quality promise. Both depths use the same GPT-5.6 Sol investigator:
+Each package pairs a model with a set of **hard stop ceilings** — ceilings
+are budget stops, never a quality promise:
 
-| Choice | Hard ceilings (not a price quote) |
-|---|---|
-| **LIGHT** — recommended first case | 20 tools · 100,000 tokens · 10 min · $2.50 est. |
-| **HEAVY** — deeper run | 60 tools · 400,000 tokens · 30 min · $10 est. |
+| Package | Model | Hard ceilings (not a price quote) |
+|---|---|---|
+| **1 QUICK TEST** — fastest live check | gpt-5.6-terra | 20 tools · 100,000 tokens · 10 min · $2.50 max |
+| **2 FULL RUN** — recommended first | gpt-5.6-terra | 60 tools · 400,000 tokens · 30 min · $10 max |
+| **3 QUALIFYING** — the official seal | GPT-5.6 Sol | 60 tools · 400,000 tokens · 30 min · $10 max |
+
+Package 1 hits its ceiling early on big cases (honest `PARTIAL`, few findings);
+package 2 runs all 13 steps with findings, judge, and report at cheap Terra
+pricing; only package 3 produces the Sol bundle that passes
+`--require-live-gpt56`.
 
 ---
 

@@ -311,19 +311,19 @@ def test_paid_launch_menu_is_explicit_and_enter_never_launches(
         monkeypatch.setattr("builtins.input", lambda _prompt: pending.pop(0))
 
     feed("1")
-    assert cli_module._launch_menu("strict") == "strict"
+    assert cli_module._launch_menu() == "strict"
     feed("q")
-    assert cli_module._launch_menu("strict") is None
-    # Enter alone must never start a paid run - it re-asks until an explicit
-    # choice arrives.
+    assert cli_module._launch_menu() is None
+    # Enter alone must never pick a paid package - it re-asks until an
+    # explicit choice arrives.
     feed("", "", "q")
-    assert cli_module._launch_menu("strict") is None
+    assert cli_module._launch_menu() is None
     # Gibberish re-asks instead of silently cancelling or launching.
     feed("wat", "1")
-    assert cli_module._launch_menu("strict") == "strict"
-    # 2 toggles the depth on the SAME card and launches from it.
-    feed("2", "1")
-    assert cli_module._launch_menu("default") == "strict"
+    assert cli_module._launch_menu() == "strict"
+    # 2 is the full Terra run: HEAVY ceilings on the cheap rehearsal model.
+    feed("2")
+    assert cli_module._launch_menu() == "default"
 
 
 def test_launch_requires_interactive_terminal_before_evidence_is_read(
@@ -349,7 +349,7 @@ def test_declined_exact_confirmation_keeps_profile_offline(
 ) -> None:
     install_fake_session(monkeypatch, ready_profile())
     monkeypatch.setattr(cli_module, "_interactive_terminal", lambda: True)
-    monkeypatch.setattr(cli_module, "_launch_menu", lambda _profile: None)
+    monkeypatch.setattr(cli_module, "_launch_menu", lambda: None)
     # A cancelled launch card never reaches the final key step.
     monkeypatch.setattr(
         cli_module,
@@ -372,7 +372,7 @@ def test_confirmed_launch_calls_existing_lifecycle_with_hidden_child_case_card(
     install_fake_session(monkeypatch, ready_profile())
     monkeypatch.setattr(cli_module, "_interactive_terminal", lambda: True)
     monkeypatch.setattr(cli_module, "_final_key_gate", lambda: "launch")
-    monkeypatch.setattr(cli_module, "_launch_menu", lambda profile: profile)
+    monkeypatch.setattr(cli_module, "_launch_menu", lambda: "default")
     captured: dict[str, object] = {}
 
     def fake_run(

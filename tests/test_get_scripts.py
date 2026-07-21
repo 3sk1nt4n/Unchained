@@ -18,7 +18,7 @@ def test_windows_bootstrap_is_key_safe_and_hands_off_to_onboarding() -> None:
     assert "UNCHAINED_MODEL" in script
     assert "setup.ps1" in script
     assert "sentinel.exe" in script or "sentinel onboard" in script
-    assert "1 = LAUNCH" in script
+    assert "1 = quick Terra test" in script
 
     # No inline plaintext key handling and no hardcoded credential shape.
     assert "PtrToStringBSTR" not in script

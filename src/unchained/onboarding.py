@@ -246,53 +246,44 @@ def _boxed(
     print(_paint(f"└{'─' * inner}┘", accent, color), file=stream)
 
 
-def render_launch_gate(
-    caps_profile: str, caps: CapConfig, *, stream: TextIO, no_color: bool = False
-) -> None:
-    """Render THE one pre-spend card: model, depth, ceilings, and every choice.
+def render_launch_gate(*, stream: TextIO, no_color: bool = False) -> None:
+    """Render THE one pre-spend card: three complete packages, one keypress.
 
-    This is the single money menu - no separate depth card, no second model
-    question. It names the ACTUAL model for the run (so a cheap rehearsal never
-    claims Sol), states the chosen depth's hard ceilings, and shows exactly what
-    1/2/3/Q do; the interactive prompt follows. Content is routed through
-    :func:`_boxed`, which wraps to the fixed card width, so nothing can spill.
+    No toggles, no separate depth or model question: 1 = quick Terra test,
+    2 = full Terra run (recommended), 3 = the qualifying Sol run, Q = quit.
+    Each package names its exact model and hard ceilings, so nothing about
+    the spend is implicit. Content is routed through :func:`_boxed`, which
+    wraps to the fixed card width, so nothing can spill.
     """
-
-    from .model import cheap_model_opt_in
 
     stream = _encoding_safe_stream(stream)
     color = _supports_color(stream, no_color=no_color)
-    sol_selected = not cheap_model_opt_in()
-    heavy_selected = caps_profile == "default"
-    light_caps = caps if not heavy_selected else _preset_caps("strict")
-    heavy_caps = caps if heavy_selected else _preset_caps("default")
-
-    # Both choices stay visible in FIXED positions; only the marker moves, so
-    # a toggle press is always a visible state change, never a mystery.
-    def row(selected: bool, text: str) -> str:
-        return f" {'●' if selected else '○'} {text}{'   [SELECTED]' if selected else ''}"
+    light = _preset_caps("strict")
+    heavy = _preset_caps("default")
 
     def ceilings(c: CapConfig) -> str:
         return (
             f"{c.max_tool_calls} tools / {c.max_total_tokens:,} tokens / "
-            f"{c.max_wall_seconds / 60:g} min / ${c.max_cost_usd:.2f}"
+            f"{c.max_wall_seconds / 60:g} min / ${c.max_cost_usd:.2f} max"
         )
 
     lines = [
-        "MODEL - press 3 to move the marker:",
-        row(not sol_selected, "gpt-5.6-terra - cheap rehearsal, nonqualifying"),
-        row(sol_selected, "GPT-5.6 Sol - the official qualifying seal (costs more)"),
-        "DEPTH - hard stop ceilings, press 2 to move the marker:",
-        row(not heavy_selected, f"LIGHT (CAUTIOUS) - {ceilings(light_caps)}"),
-        row(heavy_selected, f"HEAVY (FLAGSHIP) - {ceilings(heavy_caps)}"),
+        "Pick ONE package. Money is spent only after the key step that follows.",
         "",
-        "Evidence bytes stay local; the model sees only the bounded profile and "
-        "typed-tool observations. This is no longer the $0 preview.",
+        "1) QUICK TEST  - gpt-5.6-terra + LIGHT ceilings - nonqualifying",
+        f"     {ceilings(light)} - fastest live check",
+        "     (big cases hit this ceiling early: honest PARTIAL, few findings)",
+        "2) FULL RUN    - gpt-5.6-terra + HEAVY ceilings - nonqualifying",
+        f"     {ceilings(heavy)} - all 13 steps:",
+        "     findings, judge, report - at cheap Terra pricing. START HERE.",
+        "3) QUALIFYING  - GPT-5.6 Sol + HEAVY ceilings - the official seal",
+        f"     {ceilings(heavy)} - submission-grade proof",
+        "Q) QUIT        - cancel; nothing is sent, nothing is spent",
         "",
-        "1) LAUNCH with the [SELECTED] model and depth (this spends real money)",
-        "2) Switch depth  -  3) Switch model  -  Q) Quit (nothing is spent)",
+        "Evidence bytes stay local; the model sees only the bounded profile and",
+        "typed-tool observations. Next: the key step (B there returns here).",
     ]
-    _boxed("LAUNCH - EVERYTHING ON ONE CARD", lines, stream=stream, color=color, accent=_AMBER)
+    _boxed("LAUNCH - PICK ONE PACKAGE", lines, stream=stream, color=color, accent=_AMBER)
 
 
 def render_result_card(
@@ -352,7 +343,7 @@ def render_key_card(
             "Enter = use the saved key and start the run now",
             "Paste = a NEW key at the HIDDEN prompt below to replace it",
             "        (shape-checked; never echoes, never logged, owner-only file)",
-            "B     = back to the launch card (change depth or model)",
+            "B     = back to the launch card (pick a different package)",
             "Q     = cancel; nothing is sent, nothing is spent",
         ]
         accent = _GREEN
@@ -765,8 +756,8 @@ def render_profile(
         )
     if guided:
         launch_line = (
-            "◆ NEXT (same command): ONE launch card - 1 = LAUNCH, 2 = depth, "
-            "3 = model, Q = quit - then the final key step (hidden paste)."
+            "◆ NEXT (same command): pick ONE package - 1 = quick Terra test, "
+            "2 = full Terra run, 3 = qualifying Sol - then the final key step."
         )
     else:
         launch_line = (

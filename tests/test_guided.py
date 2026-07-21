@@ -84,7 +84,7 @@ def test_bare_sentinel_self_drives_one_command_to_the_live_run(
     monkeypatch.setattr(cli_module, "_prompt_evidence_path", lambda: Path("operator-case"))
     calls: list[str] = []
     monkeypatch.setattr(
-        cli_module, "_launch_menu", lambda _profile: calls.append("menu") or "default"
+        cli_module, "_launch_menu", lambda: calls.append("menu") or "default"
     )
     # First gate answer is B (back to the launch card), second launches - the
     # guided loop must redraw the launch card in between.
@@ -119,53 +119,57 @@ def test_bare_sentinel_self_drives_one_command_to_the_live_run(
     }
 
 
-def test_launch_menu_defaults_to_the_cheap_rehearsal_and_owns_the_model(
+def test_launch_menu_package_1_is_the_quick_terra_test(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     # A stale environment variable can never silently preselect the expensive
-    # model: the card starts on the Terra rehearsal no matter what is inherited.
+    # model: every package sets the model explicitly, whatever is inherited.
     monkeypatch.setenv("UNCHAINED_MODEL", "gpt-5.6")
     monkeypatch.setenv("UNCHAINED_ALLOW_TEST_MODEL", "0")
     _script_input(monkeypatch, ["1"])
 
-    assert cli_module._launch_menu("strict") == "strict"
+    assert cli_module._launch_menu() == "strict"
     assert cli_module.os.getenv("UNCHAINED_MODEL") == "gpt-5.6-terra"
     assert cli_module.os.getenv("UNCHAINED_ALLOW_TEST_MODEL") == "1"
 
 
-def test_launch_menu_3_switches_to_the_official_sol_model(
+def test_launch_menu_package_2_is_the_full_terra_run(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("UNCHAINED_MODEL", "stale-model")
     monkeypatch.setenv("UNCHAINED_ALLOW_TEST_MODEL", "0")
-    _script_input(monkeypatch, ["3", "1"])
+    _script_input(monkeypatch, ["2"])
 
-    assert cli_module._launch_menu("strict") == "strict"
+    assert cli_module._launch_menu() == "default"
+    assert cli_module.os.getenv("UNCHAINED_MODEL") == "gpt-5.6-terra"
+    assert cli_module.os.getenv("UNCHAINED_ALLOW_TEST_MODEL") == "1"
+
+
+def test_launch_menu_package_3_is_the_qualifying_sol_run(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("UNCHAINED_MODEL", "stale-model")
+    monkeypatch.setenv("UNCHAINED_ALLOW_TEST_MODEL", "0")
+    _script_input(monkeypatch, ["3"])
+
+    assert cli_module._launch_menu() == "default"
     assert cli_module.os.getenv("UNCHAINED_MODEL") == "gpt-5.6"
     assert cli_module.os.getenv("UNCHAINED_ALLOW_TEST_MODEL") is None
 
 
-def test_launch_menu_2_switches_the_depth_on_the_same_card(
+def test_launch_menu_enter_never_picks_and_gibberish_warns(
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     monkeypatch.setenv("UNCHAINED_MODEL", "stale-model")
     monkeypatch.setenv("UNCHAINED_ALLOW_TEST_MODEL", "0")
-    _script_input(monkeypatch, ["2", "1"])
+    _script_input(monkeypatch, ["", "banana", "q"])
 
-    assert cli_module._launch_menu("strict") == "default"
-    # The card was redrawn for the new depth - same menu, never a second question.
-    assert capsys.readouterr().out.count("LAUNCH - EVERYTHING ON ONE CARD") == 2
-
-
-def test_launch_menu_enter_never_launches_and_q_cancels(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    monkeypatch.setenv("UNCHAINED_MODEL", "stale-model")
-    monkeypatch.setenv("UNCHAINED_ALLOW_TEST_MODEL", "0")
-    _script_input(monkeypatch, ["", "q"])
-
-    assert cli_module._launch_menu("strict") is None
+    assert cli_module._launch_menu() is None
+    out = capsys.readouterr().out
+    assert "That was not an option" in out
+    # The card is redrawn after every non-answer - never a dead prompt.
+    assert out.count("LAUNCH - PICK ONE PACKAGE") == 3
 
 
 def _script_getpass(monkeypatch: pytest.MonkeyPatch, answers: list[str]) -> None:
@@ -334,7 +338,7 @@ def test_guided_cancelled_launch_stays_offline(
     install_fake_session(monkeypatch, ready_profile())
     monkeypatch.setattr(cli_module, "_interactive_terminal", lambda: True)
     monkeypatch.setattr(cli_module, "_prompt_evidence_path", lambda: Path("operator-case"))
-    monkeypatch.setattr(cli_module, "_launch_menu", lambda _profile: None)
+    monkeypatch.setattr(cli_module, "_launch_menu", lambda: None)
     # A cancelled launch card never reaches the key step or the lifecycle.
     monkeypatch.setattr(
         cli_module,

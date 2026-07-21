@@ -75,7 +75,7 @@ a clean sibling folder; other archives and unsupported documents are
 hashed/listed and set aside. The router accepts at
 most one ready memory image and one ready disk image per case; same-class
 multiples fail closed. It then stops at one launch card that owns model and
-depth (`1 = LAUNCH · 2 = depth · 3 = model · Q = quit`), followed by the one
+depth (`1 = quick Terra test · 2 = full Terra run · 3 = qualifying Sol · Q = quit`), followed by the one
 final key step (Enter = saved key, or a hidden paste that never echoes) — no
 flags, no environment variables.
 
@@ -95,7 +95,8 @@ model either way:
 
 These are hard ceilings, not price quotes, reasoning-depth modes, or promises of
 finding quality. The effective values appear in the case card. A paid run starts
-only in an interactive terminal after you press `1 = LAUNCH` on the launch card;
+only in an interactive terminal after you pick a package on the launch card
+and pass the final key step;
 JSON and noninteractive runs cannot launch.
 
 The full junior-analyst walkthrough is [Start Here](docs/START-HERE.md).

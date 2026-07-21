@@ -542,41 +542,41 @@ def _set_run_model(rehearsal: bool) -> None:
         os.environ["UNCHAINED_MODEL"] = "gpt-5.6"
 
 
-def _launch_menu(caps_profile: str) -> str | None:
-    """THE one pre-spend menu: model, depth, ceilings, and confirmation on a
-    single card. 1 = LAUNCH, 2 = switch depth, 3 = switch model, Q = quit -
-    no question is ever asked twice, and each switch redraws the same card.
+def _launch_menu() -> str | None:
+    """THE one pre-spend menu: three complete packages on a single card.
 
-    Starts on the cheaper Terra rehearsal (recommended first run); 3 flips to the
-    official Sol run. Returns the final caps profile on launch, or None on
-    cancel. Enter alone re-asks - an accidental keypress can never start a
-    paid run.
+    1 = quick Terra test (LIGHT), 2 = full Terra run (HEAVY, recommended),
+    3 = the qualifying Sol run (HEAVY), Q = quit. Picking a package sets the
+    model for this process and returns its caps profile; the final key step
+    follows before any spend. Enter alone re-asks - an accidental keypress
+    can never pick a paid package.
     """
 
     from .onboarding import render_launch_gate
 
-    rehearsal = True
     while True:
-        _set_run_model(rehearsal)
-        caps = CapConfig.from_env(caps_profile)
         print()
-        render_launch_gate(caps_profile, caps, stream=sys.stdout)
+        render_launch_gate(stream=sys.stdout)
         try:
             answer = input("  > Pick 1, 2, 3, or Q: ").strip().lower()
         except (EOFError, OSError):
             return None
-        if answer in ("1", "launch", "l", "go", "y", "yes"):
-            return caps_profile
+        if answer == "1":
+            _set_run_model(rehearsal=True)
+            return "strict"
         if answer == "2":
-            caps_profile = "default" if caps_profile == "strict" else "strict"
-            continue
+            _set_run_model(rehearsal=True)
+            return "default"
         if answer == "3":
-            rehearsal = not rehearsal
-            continue
+            _set_run_model(rehearsal=False)
+            return "default"
         if answer in ("q", "quit", "cancel", "n", "no"):
             return None
         guard = Console(sys.stdout)
-        message = "That was not an option: 1 = LAUNCH, 2 = depth, 3 = model, Q = quit."
+        message = (
+            "That was not an option: 1 = quick test, 2 = full run, "
+            "3 = qualifying Sol, Q = quit."
+        )
         guard.warn(message) if guard.enabled else print(f"     ! {message}")
 
 
@@ -679,7 +679,7 @@ def _onboard(
     if not launch:
         return EXIT_COMPLETE
     while True:
-        chosen_profile = _launch_menu(caps_profile)
+        chosen_profile = _launch_menu()
         if chosen_profile is None:
             print("Launch cancelled. The local profile remains valid; OpenAI calls: 0.")
             return EXIT_COMPLETE
@@ -884,10 +884,14 @@ def _final_key_gate() -> str:
         console.ok(message) if console.enabled else print(message)
 
     prompt = (
-        "  > Enter = use saved key - paste a new key (hidden) - B = back - Q = quit: "
+        "  > Enter = use saved key - paste a new key - B = back - Q = quit: "
         if present
-        else "  > Paste your OpenAI API key (hidden) - B = back - Enter/Q = cancel: "
+        else "  > Paste your OpenAI API key - B = back - Enter/Q = cancel: "
     )
+    # Hidden input looks broken to first-time users: nothing appears while
+    # they type or paste. Say so BEFORE the prompt, every time.
+    print("  The next input is HIDDEN: typing or pasting shows NOTHING on the")
+    print("  screen. That is normal. Paste or type, then press Enter.")
     while True:
         try:
             entered = getpass.getpass(prompt).strip()
@@ -1012,7 +1016,7 @@ def _guided(*, mount: bool = False, caps_profile: str = "strict", no_color: bool
     # paste replaces a stale or exhausted one right here, B goes back to the
     # launch card, q cancels. Never a silent skip, never a garbage launch.
     while True:
-        chosen_profile = _launch_menu(caps_profile)
+        chosen_profile = _launch_menu()
         if chosen_profile is None:
             print("Launch cancelled. The local profile remains valid; OpenAI calls: 0.")
             return EXIT_COMPLETE
