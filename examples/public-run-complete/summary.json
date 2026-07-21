@@ -6,20 +6,20 @@
     "mount_released": true
   },
   "investigation": {
-    "finding_count": 3,
-    "turns": 10,
-    "verdict_count": 3
+    "finding_count": 4,
+    "turns": 20,
+    "verdict_count": 4
   },
   "model": {
     "provider_models": [
       "gpt-5.6-sol"
     ],
-    "request_ids_present": 14,
+    "request_ids_present": 24,
     "requested_models": [
-      "gpt-5.6-sol"
+      "gpt-5.6"
     ],
-    "response_ids_present": 14,
-    "responses": 14
+    "response_ids_present": 24,
+    "responses": 24
   },
   "profile": {
     "capability_label": "Windows tested path - memory ready, disk raw-only",
@@ -27,7 +27,7 @@
     "os": "windows",
     "shape": "both"
   },
-  "run_id": "20260720T173528Z-bc67e45b",
+  "run_id": "20260721T001718Z-f0cd5641",
   "schema_version": 1,
   "terminal": {
     "cap": null,
@@ -36,26 +36,26 @@
     "status": "COMPLETE"
   },
   "time": {
-    "ended_at_utc": "2026-07-20T17:41:08.445413+00:00",
-    "started_at_utc": "2026-07-20T17:35:28.433271+00:00",
-    "wall_ms": 340000
+    "ended_at_utc": "2026-07-21T00:26:58.204909+00:00",
+    "started_at_utc": "2026-07-21T00:17:18.826492+00:00",
+    "wall_ms": 579375
   },
   "tools": {
-    "completed": 21,
-    "started": 21,
+    "completed": 31,
+    "started": 31,
     "status_counts": {
-      "error": 1,
-      "success": 20
+      "error": 2,
+      "success": 29
     }
   },
   "usage": {
-    "cache_write_tokens": 212957,
-    "cached_input_tokens": 1963,
-    "estimated_cost_usd": 1.67564775,
-    "input_tokens": 216655,
-    "output_tokens": 11167,
+    "cache_write_tokens": 373792,
+    "cached_input_tokens": 0,
+    "estimated_cost_usd": 2.915215,
+    "input_tokens": 376747,
+    "output_tokens": 18808,
     "provider_billed_cost_usd": null,
-    "provider_total_tokens": 227822,
-    "reasoning_tokens": 2258
+    "provider_total_tokens": 395555,
+    "reasoning_tokens": 5388
   }
 }

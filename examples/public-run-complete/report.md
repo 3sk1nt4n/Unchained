@@ -14,19 +14,20 @@ This system has no deterministic validator by design. Code verifies protocol str
 
 ## Executive summary (model-authored, nonauthoritative)
 
-Memory evidence strongly supports that the Print Spooler process was hosting injected or reflectively loaded executable content\. The evidence establishes suspicious private executable memory but does not identify the payload\, its source\, or the responsible injector\. A short\-lived\, highly privileged process is a plausible precursor because it possessed capabilities consistent with process injection\; however\, no direct artifact links it to the spooler\. Targeted follow\-up queries did not recover corroborating process artifacts\, leaving attribution unsupported rather than disproved\.
+The memory review supports privileged in\-memory compromise of PID 3724\, spoolsv\.exe\. The process used the expected System32 image identity\, yet contained private executable\-read\-write memory and repeated MZ\-header indications while running as Local System\. A short\-lived\, highly privileged process associated with coreupdater\.exe is a credible investigative lead\, but the available evidence does not establish malicious conduct or a causal relationship to the spooler compromise\. Broader conclusions were constrained by memory\-only evidence and unsuccessful disk and timeline corroboration\.
 
 ## Investigative narrative (model-authored, nonauthoritative)
 
-The investigation was led by the hypothesis that the Print Spooler process had been compromised in memory\. The process was observed at the expected system path with a recorded parent identifier\, while memory inspection identified private read\-write\-execute allocations containing shellcode\-like 64\-bit instruction bytes and MZ\-bearing content\. Taken together\, these observations strongly support in\-memory injection or reflective loading\. The available lineage evidence does not itself identify the recorded parent as the Services process\, and the conclusion rests on memory evidence without disk corroboration\.\\n\\nA secondary line of inquiry assessed a short\-lived process as a possible injector\. It existed for approximately 15 seconds and reported a parent that was not recovered through the targeted follow\-up\. Its security context included remote\-interactive\, domain\-administrator\, and high\-integrity attributes\, together with enabled debug privilege\. This establishes that the process had privileged capability consistent with accessing or manipulating another process\, but capability alone does not demonstrate that it acted against the spooler\. No direct process relationship\, injection artifact\, recovered executable path\, or command line connected the candidate to the compromised process\.\\n\\nTargeted examination of the exited candidate produced no environment\, loaded\-module\, or handle records\. Separate command\-line and security\-identifier queries for its reported parent also produced no records\. These non\-affirmative results do not establish benign activity and do not show that the artifacts never existed\; process termination\, memory degradation\, or artifact loss may account for their absence\. Accordingly\, the candidate\-injector theory remains uncorroborated by direct evidence\.
+The host evidence identified Active Directory Domain Services\, although the supplied passage does not establish that the service was running\. Within PID 3724\, the expected spoolsv\.exe System32 path was present\. Memory analysis identified private executable\-read\-write regions and repeated MZ\-header annotations\, and the process token showed Local System membership\. These facts support the conclusion that a highly privileged service process contained anomalous executable content\. The supplied passages do not expose the asserted shellcode bytes\, identify the payloads\, or establish how the content entered the process\.\\n\\nPID 3644\, shown as coreupdater\.ex with an audit path ending in coreupdater\.exe\, existed for approximately 15 seconds\. Its token reflected the built\-in Administrator identity\, Domain Admins and Enterprise Admins memberships\, and enabled SeDebugPrivilege\. This establishes substantial access and technical capability\, but not malicious purpose\, injection activity\, or linkage to PID 3724\. Schema Admin membership was not demonstrated by the supplied evidence\, and the executable path could not be validated against a disk file\, signature\, or hash\.\\n\\nThe reviewed spooler artifacts included an expected command line\, expected spoolsv\.exe and ntdll\.dll loader entries\, and a routine\-looking RouterPreInitEvent handle\. These scoped examples do not exhaustively exclude masquerading or a loader\-linked rogue module\, and they do not prove manual mapping\. Accordingly\, the conventional rogue\-DLL or masquerading hypothesis was not affirmatively established or eliminated by the available passages\.\\n\\nTwo intended corroboration routes did not complete\: the filescan worker returned an error\, and the requested MFT scan lacked a mapped Volatility plugin\. These failures document unavailable results from those methods\, but do not demonstrate that every possible corroboration method was exhausted\.
 
 ## Findings
 
 | ID | Finding | Severity | Investigator | Judge | Tool calls | Evidence spans |
 |---|---|---|---|---|---|---|
-| F\-001 | Private executable payload regions in Print Spooler | CRITICAL | CONFIRMED | CONFIRMED | [call_aWrX9WEYr0p9ymq3VDBspZLT] [call_seBSqqV33GWbBEjOLgdgGPm5] | `Se77223761f656bccf8cdef39` `Sc272bf780bd4c2000b75e18f` `S009d6882de3732e5af5e8bb1` |
-| F\-002 | Privileged short\-lived coreupdater\.exe is a candidate precursor\, not a proven injector | HIGH | NEEDS-REVIEW | NEEDS-REVIEW | [call_YpxMbPCbSUO0RmyIXwpDUAAZ] [call_hg8h31KWsN3X0LEIiiU0Fi4e] [call_vSkdiUTqADdz97KWkCHOwV7N] | `Sd852075ce534b2a089016745` `Sbe6e45e70e8c79623198193d` `S72cbcedc40085c03114c7618` `S0c6eb0e2de77fb210c213373` `Sa155948718fbba7dc3f81200` |
-| F\-003 | Candidate\-injector attribution could not be corroborated | MEDIUM | UNSUPPORTED | UNSUPPORTED | [call_sYArmqYcWJPDl7gksUbiLZdn] [call_5Pc6suWYDyQDHJCtmJfhDXM8] [call_m3LAFPx2BXvlnAeBuuvFPCZA] [call_P8LYdSDp7R5NWuF9ztuskWea] [call_pQdoXUv4Owc3L5RyQpS6cGaK] | `Sc92767857e938b236485aec0` `S601531e9f7ffc946727ffda2` `Sa348cbd20d729ccc8d63fb0d` `Sfe4f342a020ff42102fc282d` `Se507d0f0d7f955a710e469d0` |
+| F\-001 | Private executable payloads in SYSTEM spoolsv\.exe on a domain controller | CRITICAL | CONFIRMED | CONFIRMED | [call_Qen5TG5rgblsG89hSbVk0aC5] [call_djYKowIct7A13ZEK8ktvN73s] [call_JZD6wOvLZMULlOPRrnjkuSXH] [call_YI6sBmsQBYBQZxTpi2hOfsUd] | `S2bbeb6f412828da8b9d0409d` `S40c277cc4905b1579b6e0c87` `S923301e1f2154978d350cfbb` `S5d46ac1351402cda0d6b93bc` `S73a31bec65df9e6f3439d3ae` `Sde22253318cf49d9d12d95dc` |
+| F\-002 | Highly privileged short\-lived coreupdater\.exe is a credible but unlinked precursor | HIGH | NEEDS-REVIEW | NEEDS-REVIEW | [call_19UWjHJjNeOqBgAvvdDD0G5y] [call_djYKowIct7A13ZEK8ktvN73s] [call_sJSVDkSBa13vTxusIVfttZj5] [call_lzWgd6jrTfAcISaUvlqdMU7G] | `S68332cb89ae783ab900d3d18` `S8b36e04350af11b4a8f43ee1` `S40a5711f6e37ae922d2a5458` `Sfb79b25752523032fdfebf9e` `Sf0b040056b8a0196d9bf141c` `S586afb1720e61168858edba3` |
+| F\-003 | Conventional spooler masquerading or loader\-linked rogue DLL hypothesis not supported | INFORMATIONAL | UNSUPPORTED | UNSUPPORTED | [call_69Pg38WAL5sr8z4cTS4f7zj1] [call_sj0bigduEMv5o00IZ2XTXUjP] [call_JmaDTqVTNYKzDfZx1jFHMHw7] | `S84a23da33e4f4d2f129be2a2` `S78c427587f2992490de24c59` `S89e0e260bd3498121954fa53` `S935d75848e65dac2bba0ed26` |
+| F\-004 | Disk and memory\-timeline corroboration could not be completed | INFORMATIONAL | NEEDS-REVIEW | NEEDS-REVIEW | [call_5GBEodP5tpzoVBvWRDteFCIW] [call_vorq76abso1Fib9TP3lVWL8K] | `S26346b8023ac736faee91d4f` `S1aa1d41b987b233741e8e5d3` |
 
 ## IOC list
 
@@ -35,72 +36,91 @@ The investigation was led by the hypothesis that the Print Spooler process had b
 | F\-001 | spoolsv\.exe |
 | F\-001 | PID 3724 |
 | F\-001 | C\:\\\\Windows\\\\System32\\\\spoolsv\.exe |
+| F\-001 | RWX VPN 322054520832 |
+| F\-001 | RWX VPN 322055897088 |
+| F\-001 | RWX VPN 322057469952 |
+| F\-001 | RWX VPN 322057928704 |
+| F\-002 | coreupdater\.exe |
 | F\-002 | coreupdater\.ex |
 | F\-002 | PID 3644 |
-| F\-002 | PPID 2244 |
-| F\-003 | coreupdater\.ex |
-| F\-003 | PID 3644 |
-| F\-003 | PID 2244 |
+| F\-002 | \\\\Device\\\\HarddiskVolume2\\\\Windows\\\\System32\\\\coreupdater\.exe |
+| F\-002 | S\-1\-5\-21\-2232410529\-1445159330\-2725690660\-500 |
 
-The process names\, identifiers\, parent identifier\, and system path supplied with the findings are useful pivots for validation against independent endpoint\, identity\, and network telemetry\. They should be treated as investigative indicators rather than standalone proof of attribution\, particularly because the candidate process name was recovered from volatile memory and no corresponding path or disk artifact was available\.
+The principal investigative focus is the anomalous executable memory within the privileged spooler process and the separate short\-lived coreupdater process\. These artifacts should be used as pivots for payload recovery\, process\-interaction analysis\, file validation\, execution\-history review\, and persistence hunting if additional evidence becomes available\.
 
 ## Evidence spans
 
-- `Se77223761f656bccf8cdef39` from [call_aWrX9WEYr0p9ymq3VDBspZLT], artifact `ea5e9a2d18f5cc9b4fa48a266e9be5a43d6b0bef9d50a0642f46cbc37fcaad1e`, bytes 4051:4174, occurrences 1
+- `S2bbeb6f412828da8b9d0409d` from [call_Qen5TG5rgblsG89hSbVk0aC5], artifact `6eeeb2fa7bbb767ff454fa7d2a94519dba41490f5f6afbadc0ce76b44f6791fd`, bytes 12885:12985, occurrences 2
+  - Evidence text: \\\&quot\;Display\\\&quot\;\:\\\&quot\;Active Directory Domain Services\\\&quot\;\,\\\&quot\;Dll\\\&quot\;\:\\\&quot\;\%systemroot\%\\\\\\\\system32\\\\\\\\ntdsa\.dll\\\&quot\;\,\\\&quot\;Name\\\&quot\;\:\\\&quot\;NTDS\\\&quot\;
+- `S40c277cc4905b1579b6e0c87` from [call_djYKowIct7A13ZEK8ktvN73s], artifact `0cca024efa7f1255c98aa63461bae5fed9b824cc669c8de190b22fdbf099198e`, bytes 4051:4174, occurrences 1
   - Evidence text: \\\&quot\;ImageFileName\\\&quot\;\:\\\&quot\;spoolsv\.exe\\\&quot\;\,\\\&quot\;Offset\(V\)\\\&quot\;\:246292267448576\,\\\&quot\;PID\\\&quot\;\:3724\,\\\&quot\;PPID\\\&quot\;\:452\,\\\&quot\;Path\\\&quot\;\:\\\&quot\;C\:\\\\\\\\Windows\\\\\\\\System32\\\\\\\\spoolsv\.exe\\\&quot\;
-- `Sc272bf780bd4c2000b75e18f` from [call_seBSqqV33GWbBEjOLgdgGPm5], artifact `c0ae7ba27657d7b166993c465c55fe7fe7edde2bef0319dcf651cc7901e4f104`, bytes 4168:4371, occurrences 1
-  - Evidence text: \\\&quot\;Hexdump\\\&quot\;\:\\\&quot\;fc 48 89 ce 48 81 ec 00 20 00 00 48 83 e4 f0 e8 cc 00 00 00 41 51 41 50 52 51 56 48 31 d2 65 48 8b 52 60 48 8b 52 18 48 8b 52 20 48 8b 72 50 48 0f b7 4a 4a 4d 31 c9 48 31 c0 ac 3c 61 7c 02 2c\\\&quot\;
-- `S009d6882de3732e5af5e8bb1` from [call_seBSqqV33GWbBEjOLgdgGPm5], artifact `c0ae7ba27657d7b166993c465c55fe7fe7edde2bef0319dcf651cc7901e4f104`, bytes 5008:5118, occurrences 3
-  - Evidence text: \\\&quot\;Notes\\\&quot\;\:\\\&quot\;MZ header\\\&quot\;\,\\\&quot\;PID\\\&quot\;\:3724\,\\\&quot\;PrivateMemory\\\&quot\;\:1\,\\\&quot\;Process\\\&quot\;\:\\\&quot\;spoolsv\.exe\\\&quot\;\,\\\&quot\;Protection\\\&quot\;\:\\\&quot\;PAGE\_EXECUTE\_READWRITE\\\&quot\;
-- `Sd852075ce534b2a089016745` from [call_YpxMbPCbSUO0RmyIXwpDUAAZ], artifact `27c61e09c990f16517ae75ee31d7cb43693f4400ab27c880b42e89fa8077b4ed`, bytes 5939:6136, occurrences 1
-  - Evidence text: \\\&quot\;CreateTime\\\&quot\;\:\\\&quot\;2020\-09\-19T03\:56\:37\+00\:00\\\&quot\;\,\\\&quot\;ExitTime\\\&quot\;\:\\\&quot\;2020\-09\-19T03\:56\:52\+00\:00\\\&quot\;\,\\\&quot\;File output\\\&quot\;\:\\\&quot\;Disabled\\\&quot\;\,\\\&quot\;Handles\\\&quot\;\:null\,\\\&quot\;ImageFileName\\\&quot\;\:\\\&quot\;coreupdater\.ex\\\&quot\;\,\\\&quot\;Offset\(V\)\\\&quot\;\:545441536\,\\\&quot\;PID\\\&quot\;\:3644\,\\\&quot\;PPID\\\&quot\;\:2244
-- `Sbe6e45e70e8c79623198193d` from [call_hg8h31KWsN3X0LEIiiU0Fi4e], artifact `39e498916d1be8e28d79cb6137380aeb02104ee025c144995489d7090110212e`, bytes 724:812, occurrences 1
-  - Evidence text: \\\&quot\;Name\\\&quot\;\:\\\&quot\;Remote Interactive Logon\\\&quot\;\,\\\&quot\;PID\\\&quot\;\:3644\,\\\&quot\;Process\\\&quot\;\:\\\&quot\;coreupdater\.ex\\\&quot\;\,\\\&quot\;SID\\\&quot\;\:\\\&quot\;S\-1\-5\-14\\\&quot\;
-- `S72cbcedc40085c03114c7618` from [call_hg8h31KWsN3X0LEIiiU0Fi4e], artifact `39e498916d1be8e28d79cb6137380aeb02104ee025c144995489d7090110212e`, bytes 1494:1608, occurrences 1
-  - Evidence text: \\\&quot\;Name\\\&quot\;\:\\\&quot\;Domain Admins\\\&quot\;\,\\\&quot\;PID\\\&quot\;\:3644\,\\\&quot\;Process\\\&quot\;\:\\\&quot\;coreupdater\.ex\\\&quot\;\,\\\&quot\;SID\\\&quot\;\:\\\&quot\;S\-1\-5\-21\-2232410529\-1445159330\-2725690660\-512\\\&quot\;
-- `S0c6eb0e2de77fb210c213373` from [call_hg8h31KWsN3X0LEIiiU0Fi4e], artifact `39e498916d1be8e28d79cb6137380aeb02104ee025c144995489d7090110212e`, bytes 2134:2222, occurrences 1
-  - Evidence text: \\\&quot\;Name\\\&quot\;\:\\\&quot\;High Mandatory Level\\\&quot\;\,\\\&quot\;PID\\\&quot\;\:3644\,\\\&quot\;Process\\\&quot\;\:\\\&quot\;coreupdater\.ex\\\&quot\;\,\\\&quot\;SID\\\&quot\;\:\\\&quot\;S\-1\-16\-12288\\\&quot\;
-- `Sa155948718fbba7dc3f81200` from [call_vSkdiUTqADdz97KWkCHOwV7N], artifact `ee5bfa841cc003e93cc729c6618218dfdaead50656f39a1c9df3c5ac7e8cd4ce`, bytes 3053:3183, occurrences 1
-  - Evidence text: \\\&quot\;Attributes\\\&quot\;\:\\\&quot\;Present\,Enabled\\\&quot\;\,\\\&quot\;Description\\\&quot\;\:\\\&quot\;Debug programs\\\&quot\;\,\\\&quot\;PID\\\&quot\;\:3644\,\\\&quot\;Privilege\\\&quot\;\:\\\&quot\;SeDebugPrivilege\\\&quot\;\,\\\&quot\;Process\\\&quot\;\:\\\&quot\;coreupdater\.ex\\\&quot\;
-- `Sc92767857e938b236485aec0` from [call_sYArmqYcWJPDl7gksUbiLZdn], artifact `4a939973aa50b39942baffd55aa2784e4621cd1fffc976d805681aa935ed839b`, bytes 46:99, occurrences 1
-  - Evidence text: \\\&quot\;output\\\&quot\;\:\[\]\,\\\&quot\;record\_count\\\&quot\;\:0\,\\\&quot\;tool\_name\\\&quot\;\:\\\&quot\;vol\_envars\\\&quot\;
-- `S601531e9f7ffc946727ffda2` from [call_5Pc6suWYDyQDHJCtmJfhDXM8], artifact `a8a97a4b292a85a5e823e691f0a2e3bb692c19ae308afe19be413d22b7ab5ce5`, bytes 47:101, occurrences 1
-  - Evidence text: \\\&quot\;output\\\&quot\;\:\[\]\,\\\&quot\;record\_count\\\&quot\;\:0\,\\\&quot\;tool\_name\\\&quot\;\:\\\&quot\;vol\_dlllist\\\&quot\;
-- `Sa348cbd20d729ccc8d63fb0d` from [call_m3LAFPx2BXvlnAeBuuvFPCZA], artifact `25c09ad24ddadd5b8c48ce27d2c5fba79e0f61825e896c44f26fc35ddb3c7ead`, bytes 48:102, occurrences 1
-  - Evidence text: \\\&quot\;output\\\&quot\;\:\[\]\,\\\&quot\;record\_count\\\&quot\;\:0\,\\\&quot\;tool\_name\\\&quot\;\:\\\&quot\;vol\_handles\\\&quot\;
-- `Sfe4f342a020ff42102fc282d` from [call_P8LYdSDp7R5NWuF9ztuskWea], artifact `0ba99ab3ae727ecb4a7b526b640c2007888b7cedf798f7d38d49541ce6cc0022`, bytes 46:100, occurrences 1
-  - Evidence text: \\\&quot\;output\\\&quot\;\:\[\]\,\\\&quot\;record\_count\\\&quot\;\:0\,\\\&quot\;tool\_name\\\&quot\;\:\\\&quot\;vol\_cmdline\\\&quot\;
-- `Se507d0f0d7f955a710e469d0` from [call_pQdoXUv4Owc3L5RyQpS6cGaK], artifact `cae15b4306d516a7c9a79c5113098f1d05e410876afcef8b57eef31122c0bad5`, bytes 47:101, occurrences 1
-  - Evidence text: \\\&quot\;output\\\&quot\;\:\[\]\,\\\&quot\;record\_count\\\&quot\;\:0\,\\\&quot\;tool\_name\\\&quot\;\:\\\&quot\;vol\_getsids\\\&quot\;
+- `S923301e1f2154978d350cfbb` from [call_JZD6wOvLZMULlOPRrnjkuSXH], artifact `ecea9451f2c28e5e0dd12f06034344ba6857cc3f931aa82a75fb11611a103d16`, bytes 4385:4475, occurrences 4
+  - Evidence text: \\\&quot\;PID\\\&quot\;\:3724\,\\\&quot\;PrivateMemory\\\&quot\;\:1\,\\\&quot\;Process\\\&quot\;\:\\\&quot\;spoolsv\.exe\\\&quot\;\,\\\&quot\;Protection\\\&quot\;\:\\\&quot\;PAGE\_EXECUTE\_READWRITE\\\&quot\;
+- `S5d46ac1351402cda0d6b93bc` from [call_JZD6wOvLZMULlOPRrnjkuSXH], artifact `ecea9451f2c28e5e0dd12f06034344ba6857cc3f931aa82a75fb11611a103d16`, bytes 5008:5080, occurrences 3
+  - Evidence text: \\\&quot\;Notes\\\&quot\;\:\\\&quot\;MZ header\\\&quot\;\,\\\&quot\;PID\\\&quot\;\:3724\,\\\&quot\;PrivateMemory\\\&quot\;\:1\,\\\&quot\;Process\\\&quot\;\:\\\&quot\;spoolsv\.exe\\\&quot\;
+- `S73a31bec65df9e6f3439d3ae` from [call_YI6sBmsQBYBQZxTpi2hOfsUd], artifact `0708ffef002728f2a985a4b074b584d2d7f2764650a3fe2a640694c65352368c`, bytes 58:131, occurrences 1
+  - Evidence text: \\\&quot\;Name\\\&quot\;\:\\\&quot\;Local System\\\&quot\;\,\\\&quot\;PID\\\&quot\;\:3724\,\\\&quot\;Process\\\&quot\;\:\\\&quot\;spoolsv\.exe\\\&quot\;\,\\\&quot\;SID\\\&quot\;\:\\\&quot\;S\-1\-5\-18\\\&quot\;
+- `Sde22253318cf49d9d12d95dc` from [call_YI6sBmsQBYBQZxTpi2hOfsUd], artifact `0708ffef002728f2a985a4b074b584d2d7f2764650a3fe2a640694c65352368c`, bytes 1329:1408, occurrences 1
+  - Evidence text: \\\&quot\;Name\\\&quot\;\:\\\&quot\;Administrators\\\&quot\;\,\\\&quot\;PID\\\&quot\;\:3724\,\\\&quot\;Process\\\&quot\;\:\\\&quot\;spoolsv\.exe\\\&quot\;\,\\\&quot\;SID\\\&quot\;\:\\\&quot\;S\-1\-5\-32\-544\\\&quot\;
+- `S68332cb89ae783ab900d3d18` from [call_19UWjHJjNeOqBgAvvdDD0G5y], artifact `bbd36150f366514a58fab45b9c0b82c5ff55a183b643d5f44e51a0738a1b8398`, bytes 5939:6018, occurrences 2
+  - Evidence text: \\\&quot\;CreateTime\\\&quot\;\:\\\&quot\;2020\-09\-19T03\:56\:37\+00\:00\\\&quot\;\,\\\&quot\;ExitTime\\\&quot\;\:\\\&quot\;2020\-09\-19T03\:56\:52\+00\:00\\\&quot\;
+- `S8b36e04350af11b4a8f43ee1` from [call_djYKowIct7A13ZEK8ktvN73s], artifact `0cca024efa7f1255c98aa63461bae5fed9b824cc669c8de190b22fdbf099198e`, bytes 13075:13157, occurrences 1
+  - Evidence text: \\\&quot\;Audit\\\&quot\;\:\\\&quot\;\\\\\\\\Device\\\\\\\\HarddiskVolume2\\\\\\\\Windows\\\\\\\\System32\\\\\\\\coreupdater\.exe\\\&quot\;\,\\\&quot\;Cmd\\\&quot\;\:null
+- `S40a5711f6e37ae922d2a5458` from [call_sJSVDkSBa13vTxusIVfttZj5], artifact `84307469bb6a7fcfd1b243cfe5cc3994232cc08f32e544c38cc6f9db34f9e57a`, bytes 58:118, occurrences 1
+  - Evidence text: \\\&quot\;Name\\\&quot\;\:\\\&quot\;Administrator\\\&quot\;\,\\\&quot\;PID\\\&quot\;\:3644\,\\\&quot\;Process\\\&quot\;\:\\\&quot\;coreupdater\.ex\\\&quot\;
+- `Sfb79b25752523032fdfebf9e` from [call_sJSVDkSBa13vTxusIVfttZj5], artifact `84307469bb6a7fcfd1b243cfe5cc3994232cc08f32e544c38cc6f9db34f9e57a`, bytes 1494:1554, occurrences 1
+  - Evidence text: \\\&quot\;Name\\\&quot\;\:\\\&quot\;Domain Admins\\\&quot\;\,\\\&quot\;PID\\\&quot\;\:3644\,\\\&quot\;Process\\\&quot\;\:\\\&quot\;coreupdater\.ex\\\&quot\;
+- `Sf0b040056b8a0196d9bf141c` from [call_sJSVDkSBa13vTxusIVfttZj5], artifact `84307469bb6a7fcfd1b243cfe5cc3994232cc08f32e544c38cc6f9db34f9e57a`, bytes 1756:1820, occurrences 1
+  - Evidence text: \\\&quot\;Name\\\&quot\;\:\\\&quot\;Enterprise Admins\\\&quot\;\,\\\&quot\;PID\\\&quot\;\:3644\,\\\&quot\;Process\\\&quot\;\:\\\&quot\;coreupdater\.ex\\\&quot\;
+- `S586afb1720e61168858edba3` from [call_lzWgd6jrTfAcISaUvlqdMU7G], artifact `d816de445694dd96a505855290174553cdacb6e258df43eab295c03cf061b067`, bytes 3053:3156, occurrences 1
+  - Evidence text: \\\&quot\;Attributes\\\&quot\;\:\\\&quot\;Present\,Enabled\\\&quot\;\,\\\&quot\;Description\\\&quot\;\:\\\&quot\;Debug programs\\\&quot\;\,\\\&quot\;PID\\\&quot\;\:3644\,\\\&quot\;Privilege\\\&quot\;\:\\\&quot\;SeDebugPrivilege\\\&quot\;
+- `S84a23da33e4f4d2f129be2a2` from [call_69Pg38WAL5sr8z4cTS4f7zj1], artifact `5e708db2a2cd98d478c0c3f46799dea1221120fbd96badfa9f7c7011de39df3b`, bytes 3497:3575, occurrences 1
+  - Evidence text: \\\&quot\;Args\\\&quot\;\:\\\&quot\;C\:\\\\\\\\Windows\\\\\\\\System32\\\\\\\\spoolsv\.exe\\\&quot\;\,\\\&quot\;PID\\\&quot\;\:3724\,\\\&quot\;Process\\\&quot\;\:\\\&quot\;spoolsv\.exe\\\&quot\;
+- `S78c427587f2992490de24c59` from [call_sj0bigduEMv5o00IZ2XTXUjP], artifact `199e04f0a33cdf2b28ea3eb65b441dce7aeb9dd397b2ec4035cb4f31bbfc1bd9`, bytes 160:235, occurrences 1
+  - Evidence text: \\\&quot\;Name\\\&quot\;\:\\\&quot\;spoolsv\.exe\\\&quot\;\,\\\&quot\;PID\\\&quot\;\:3724\,\\\&quot\;Path\\\&quot\;\:\\\&quot\;C\:\\\\\\\\Windows\\\\\\\\System32\\\\\\\\spoolsv\.exe\\\&quot\;
+- `S89e0e260bd3498121954fa53` from [call_sj0bigduEMv5o00IZ2XTXUjP], artifact `199e04f0a33cdf2b28ea3eb65b441dce7aeb9dd397b2ec4035cb4f31bbfc1bd9`, bytes 392:463, occurrences 1
+  - Evidence text: \\\&quot\;Name\\\&quot\;\:\\\&quot\;ntdll\.dll\\\&quot\;\,\\\&quot\;PID\\\&quot\;\:3724\,\\\&quot\;Path\\\&quot\;\:\\\&quot\;C\:\\\\\\\\Windows\\\\\\\\SYSTEM32\\\\\\\\ntdll\.dll\\\&quot\;
+- `S935d75848e65dac2bba0ed26` from [call_JmaDTqVTNYKzDfZx1jFHMHw7], artifact `fb0888f674bf760f19b4e25be40c1e3e75a86d168866fc94d16833a7b0993df2`, bytes 13684:13771, occurrences 1
+  - Evidence text: \\\&quot\;Name\\\&quot\;\:\\\&quot\;RouterPreInitEvent\\\&quot\;\,\\\&quot\;Offset\\\&quot\;\:246292217987872\,\\\&quot\;PID\\\&quot\;\:3724\,\\\&quot\;Process\\\&quot\;\:\\\&quot\;spoolsv\.exe\\\&quot\;
+- `S26346b8023ac736faee91d4f` from [call_5GBEodP5tpzoVBvWRDteFCIW], artifact `6c4db43ecc6f39de75a0f09ff9d87a4456911f6b49c5ab7b379f2da54d396b85`, bytes 1:78, occurrences 1
+  - Evidence text: \\\&quot\;error\\\&quot\;\:\\\&quot\;isolated Qwen worker exited without a response \(1\)\\\&quot\;\,\\\&quot\;status\\\&quot\;\:\\\&quot\;error\\\&quot\;
+- `S1aa1d41b987b233741e8e5d3` from [call_vorq76abso1Fib9TP3lVWL8K], artifact `25da21d0598b6f90d3cd4e55c87d8200e281479821ada1c8bb6bbb34a6ce690c`, bytes 1:83, occurrences 1
+  - Evidence text: \\\&quot\;error\\\&quot\;\:\\\&quot\;ValueError\: No Volatility plugin mapped for vol\_mftscan\\\&quot\;\,\\\&quot\;status\\\&quot\;\:\\\&quot\;error\\\&quot\;
 
 ## Limitations
 
-- Analysis was effectively memory\-only\; the disk container was raw\-only\/mount\-unavailable in the supplied profile\.
-- The attempted MFT analysis failed because no Volatility plugin was mapped \[call\_nFTGNgt1IC1i6z3Nqylv4YMx\]\.
-- No cross\-domain corroboration was possible\.
-- Payload family\, injector\, remote peer\, and persistence mechanism remain unresolved\.
-- Large network and file\-scan outputs were not sufficient to attribute a peer or payload path\.
-- Memory evidence alone does not identify the payload family\, source file\, or injector\.
-- No disk\-domain corroboration was available\.
-- No recovered path\, command line\, process handle\, or direct relation to PID 3724\.
-- Privilege demonstrates capability\, not use\.
-- Zero recovered records may reflect process termination and artifact loss\; they do not prove benign activity or that objects never existed\.
-- Single\-domain memory finding\; no disk corroboration\.
-- The supplied span does not explicitly identify PPID 452 as services\.exe\.
-- Capability is not causation\.
-- No direct relation to spoolsv\.exe PID 3724 is supplied\.
-- Single\-domain memory evidence\.
-- Zero\-record results are non\-affirmative\.
-- Process termination or artifact loss may explain missing records\.
-- No direct injector artifact is supplied\.
-- The effective analysis domain was memory\. The disk container could not be mounted or resolved\, the attempted filesystem metadata analysis had no mapped capability\, and no cross\-domain corroboration was available\. Missing records from targeted memory queries are inherently inconclusive\, especially for terminated processes\. The payload family and source\, responsible injector\, candidate executable path and purpose\, identity of the reported parent\, remote peer\, persistence mechanism\, and any command\-and\-control activity remain unresolved\. Available network and file\-scan results were insufficient to attribute a peer or payload path\.
+- E002 was recognized as a disk container but had no resolved filesystem\, so no cross\-domain corroboration was possible\.
+- The investigation was limited to a single memory snapshot\; exited\-process metadata was incomplete\.
+- Network output was extremely large and did not yield a reliable PID 3724 endpoint attribution\.
+- Payload identity\, injector\, persistence\, external peer\, and parent PID 2244 remain unresolved\.
+- Payloads were not dumped or identified\.
+- No disk\, persistence\, or network\-peer corroboration was available\.
+- The exact injector and injection technique remain unknown\.
+- No command line\, modules\, handles\, environment\, or recoverable parent context established its purpose\.
+- No direct process\-handle\, thread\, or memory evidence linked PID 3644 to PID 3724\.
+- The System32 path was not validated by hash or signature\.
+- Loader and handle review cannot exclude unlinked\/manual\-mapped code\.
+- Absence of an obvious rogue DLL is not evidence that the process was benign\.
+- E002\&\#x27\;s filesystem was unresolved and no disk artifact tools were available\.
+- Memory\-only conclusions cannot establish on\-disk provenance\, persistence\, hashes\, or signatures\.
+- NTDS running state is not shown in the supplied span\.
+- The quoted spans do not show the underlying shellcode\-like bytes\.
+- No usable disk\-domain corroboration was available\.
+- No supplied span demonstrates Schema Admin membership\.
+- Privilege and path establish capability\, not malicious conduct or linkage\.
+- Evidence is memory\-only and the executable was not validated on disk\.
+- Selected benign\-looking entries cannot prove the absence of rogue entries\.
+- The supplied passages are scoped evidence\, not an exhaustive review of native outputs\.
+- The errors establish failed attempts\, not exhaustive unavailability of all corroboration methods\.
+- The unresolved disk filesystem is described in the case profile but not demonstrated by these two tool\-output spans\.
+- The investigation relied primarily on one memory snapshot\. The recognized disk container had no resolved filesystem\, preventing practical cross\-domain validation during this review\. The anomalous memory regions were not dumped or identified\, and no reliable external endpoint attribution was recovered for PID 3724\. The injector\, injection technique\, persistence mechanism\, payload identities\, external peer\, provenance and legitimacy of coreupdater\.exe\, and the identity of PID 2244 remain unresolved\. Selected benign\-looking loader and handle entries cannot establish the absence of malicious entries\, while the failed filescan and MFT attempts do not prove exhaustive unavailability of every alternative method\.
 - Offline bundle verification cannot authenticate self-recorded provider IDs.
 - Recorded custody verification is not a fresh rehash of originals by an offline recipient.
 
 ## Unresolved questions
 
-- What payload or family occupies the private executable regions in PID 3724\?
-- Who or what injected or reflectively loaded the spooler payload\?
-- What was the executable path and purpose of coreupdater\.exe PID 3644\?
-- What process was parent PID 2244\?
-- Was there persistence or external command\-and\-control activity\?
+- What are the identities and hashes of the three PE\-like private mappings and shellcode in PID 3724\?
+- Did PID 3644 open or manipulate PID 3724\, and what was PID 2244\?
+- How was \`coreupdater\.exe\` introduced\, and is its System32 file signed or persistent\?
+- Did PID 3724 communicate externally before acquisition\?
+- What persistence or execution artifacts exist on E002\?

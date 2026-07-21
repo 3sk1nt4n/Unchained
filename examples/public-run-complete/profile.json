@@ -22,7 +22,7 @@
       "evidence_id": "E002",
       "filesystem": null,
       "filesystem_offset": null,
-      "health": "raw-only-mount-unavailable",
+      "health": "disk-container-recognized",
       "kind": "disk",
       "os_hint": "unknown",
       "sha256": "c0c8fe58dcdb65f6574cb63b34f086856087cfaf06872ed702a4c0c264446bac",
@@ -73,7 +73,7 @@
   },
   "health": {
     "E001": "ready",
-    "E002": "raw-only-mount-unavailable",
+    "E002": "disk-container-recognized",
     "E003": "unrecognized-content",
     "E004": "ewf-continuation-segment"
   },
@@ -94,7 +94,6 @@
   "warnings": [
     "E002: Disk container recognized, but its filesystem could not be resolved before mount.",
     "E003: File content did not match a supported evidence structure.",
-    "E004: EWF continuation segment 2 of a split disk image; the first segment carries the analysis and reads its siblings automatically.",
-    "Pinned NTFS mount backend requires root and Linux mountinfo for containment."
+    "E004: EWF continuation segment 2 of a split disk image; the first segment carries the analysis and reads its siblings automatically."
   ]
 }
