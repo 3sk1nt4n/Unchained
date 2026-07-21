@@ -36,7 +36,7 @@ Public evidence case: The Stolen Szechuan Sauce (DC01) - https://dfirmadness.com
 
 - [ ] Confirm the watch page shows runtime under 3:00.
 - [ ] Incognito playback check: full video plays start to finish while logged out.
-- [ ] Copy the final URL into `submission/DEVPOST-FORM.md` (video field, replacing `ADDED-ON-UPLOAD`) and replace the `[YOUTUBE LINK PENDING - replace on upload]` placeholder in `submission/JUDGE-ONE-PAGER.md`.
+- [x] Copy the final URL into `submission/DEVPOST-FORM.md` and `submission/JUDGE-ONE-PAGER.md` - **done: https://youtu.be/ci2M8LmY2hY**.
 
 ## W9 - Devpost form, field by field
 
@@ -74,7 +74,7 @@ Fresh incognito browser, logged out of everything:
 - [ ] Video plays start to finish, publicly.
 - [ ] Every link in the Devpost preview resolves (click each one).
 - [ ] Devpost preview text says "up to twelve" opening tools; no banned phrases survived the paste.
-- [ ] Freeze the final commit/tag (currently PENDING_FINAL_FREEZE) and record it in DEVPOST-FORM.md before submitting.
+- [x] Freeze tag `buildweek-2026-final` created and pushed; recorded in DEVPOST-FORM.md.
 - [ ] **SUBMIT.** Target Tue 11:00 ET; hard floor Tue 14:00 ET; Devpost closes Tue 17:00 PT.
 - [ ] Screenshot the confirmation page and save it into `submission/`.
 

@@ -37,7 +37,7 @@
 | **Strict verify** | `sentinel verify examples/public-run-complete --require-complete --require-live-gpt56` prints **VALID** (37 artifacts, 194 audit entries) |
 | **Secondary proof** | `examples/public-run-partial` - **gpt-5.6-luna**, 14/14 tools, honest **PARTIAL** at `MAX_TOOL_CALLS`; verify prints VALID (20 artifacts, 62 audit entries) |
 | **Quality gate** | **378/378 tests pass**, Ruff clean (2026-07-21, CPython 3.11.9) |
-| **Demo video** | `submission/video/unchained-demo-final.mp4` (2:52.97; YouTube link pending upload) |
+| **Demo video** | **https://youtu.be/ci2M8LmY2hY** (2:52, public; also ships at `submission/video/unchained-demo-final.mp4`) |
 | **Built with Codex** | Sessions `019f61e5-5755-7a02-adb4-618d32baab27` (core build, `/feedback` uploaded) and `019f76f3-a19f-71d1-81b2-eed6305857f6` (release thread). Codex build credits and API runtime billing are separate |
 
 ## 🚀 The judge path

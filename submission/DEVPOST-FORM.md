@@ -269,10 +269,10 @@ Public repo, MIT license. Live receipts in-repo: `docs/runs/sol-capped-dc01-open
 
 ## Video URL
 
-PENDING - video link: added on upload. This is the only mandatory gap; do not submit without it. The final cut is ready at `submission/video/unchained-demo-final.mp4` (2:52.97); only the public YouTube URL is missing.
+READY - public video: https://youtu.be/ci2M8LmY2hY (2:52). The same final cut ships at `submission/video/unchained-demo-final.mp4`.
 
 ```
-ADDED-ON-UPLOAD
+https://youtu.be/ci2M8LmY2hY
 ```
 
 ---
@@ -382,7 +382,7 @@ Run this checklist against the pasted form before hitting Submit.
 - [ ] Numbers spot-check against the receipts and test run: 378/378 tests in 22.5s (23 files); shipped COMPLETE bundle `examples/public-run-complete` (run 20260721T001718Z-f0cd5641) - Sol + HEAVY, 4 findings (1 CONFIRMED / 2 NEEDS-REVIEW / 1 UNSUPPORTED), 20 turns, 31 tools (29 ok / 2 error), 395,555 tokens, ~$2.92, 9m39s, strict `--require-complete --require-live-gpt56` VALID with 37 artifacts / 194 audit entries; shipped PARTIAL bundle `examples/public-run-partial` - 180,285 tokens, ~$1.16, 55.5 s, 14/14 tools, VALID with 20 artifacts / 62 audit entries; Sol receipt - 59,254 tokens, $0.38789875, 43.702 s, 3,961,843 vol_netscan bytes, 13 artifacts / 38 audit entries recorded at creation; 2,147,483,648 evidence bytes; SHA-256 starting `8079a745`; exit code 3 on a capped PARTIAL, 0 on a COMPLETE.
 - [ ] Only real URLs appear: github.com/3sk1nt4n/Unchained, openai.devpost.com/rules, github.com/3sk1nt4n/Sentinel-Ensemble-Qwen (pinned 9f309c61...), dfirmadness.com/the-stolen-szechuan-sauce/.
 - [ ] Codex Session ID pasted exactly: `019f61e5-5755-7a02-adb4-618d32baab27`.
-- [ ] Video URL no longer says ADDED-ON-UPLOAD. It is the one mandatory gap.
+- [x] Video URL is the real public link: https://youtu.be/ci2M8LmY2hY.
 - [ ] The shipped COMPLETE bundle is real and strict-VALID; PARTIAL bundles are still labeled PARTIAL; no unmeasured comparison is claimed.
-- [ ] Submission commit/tag PENDING_FINAL_FREEZE has been resolved to a real frozen commit before submitting.
+- [x] Submission freeze tag `buildweek-2026-final` is created and pushed (resolve to its commit with `git rev-parse buildweek-2026-final`).
 - [ ] Track reads Developer Tools; deadline 2026-07-21 17:00 PT respected (target Tue ~11:00 ET, hard floor Tue 14:00 ET).

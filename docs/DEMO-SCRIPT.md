@@ -12,7 +12,7 @@ and cover what was built and how Codex and GPT-5.6 were used. The
 
 ## Required recording artifacts
 
-- Exact final commit/tag: `PENDING_FINAL_FREEZE`.
+- Exact final commit/tag: `buildweek-2026-final`.
 - Evidence displayed only as public case name, `E001`, byte count, and SHA-256.
 - Authentic COMPLETE bundle: `PENDING_COMPLETE_BUNDLE`.
 - Strict-verifier output: `PENDING`.

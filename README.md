@@ -92,7 +92,7 @@ local SHA-256 case card before any model is involved.
 | Also shipped | [`examples/public-run-partial`](examples/public-run-partial) - a `gpt-5.6-luna` bundle: 14/14 typed tools on real memory, honest `PARTIAL` at the hard cap |
 | Live receipts | [Sol capped opening receipt](docs/runs/sol-capped-dc01-opening.json) · [Luna canary](docs/runs/luna-canary-receipt.json) |
 | One-page judge brief | [submission/JUDGE-ONE-PAGER.md](submission/JUDGE-ONE-PAGER.md) |
-| Honest gaps | The demo video's public YouTube link is pending upload (final cut ships at `submission/video/unchained-demo-final.mp4`, 2:52.97); the [proof status](#proof-status) table never overstates |
+| Demo video | **https://youtu.be/ci2M8LmY2hY** - public, 2:52, every number from the shipped run (final cut also ships at `submission/video/unchained-demo-final.mp4`); the [proof status](#proof-status) table never overstates |
 
 **Where each judging criterion lives:**
 
@@ -113,7 +113,7 @@ local SHA-256 case card before any model is involved.
 | 🟢 Authentic GPT-5.6 bundle **ships in the repo** and verifies `VALID` offline | **Done** - [`examples/public-run-partial`](examples/public-run-partial): 14/14 typed tools, honest `PARTIAL` at the hard cap |
 | 🟢 Zero-key guided onboarding + colorful live run experience | **Done** - see the screen above |
 | 🟢 Authentic `COMPLETE` proof bundle **ships in the repo** and passes strict verify | **Done** - [`examples/public-run-complete`](examples/public-run-complete): Sol, real findings + judge + report, `--require-complete --require-live-gpt56` VALID (37 artifacts, 194 audit entries) |
-| 🟢 Sub-3-minute demo video | **Done** - final cut at `submission/video/unchained-demo-final.mp4` (2:52.97, AI-narrated, real run numbers); YouTube link added on upload |
+| 🟢 Sub-3-minute demo video | **Done** - live at **https://youtu.be/ci2M8LmY2hY** (2:52, AI-narrated, real run numbers); final cut also ships at `submission/video/unchained-demo-final.mp4` |
 | ⚪ Same-evidence competitive benchmark | **Deliberately cut** - no unmeasured claims |
 
 ## Quickstart

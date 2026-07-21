@@ -43,7 +43,7 @@ What backs this up, all from the repository:
 | Earlier `gpt-5.6-sol` capped opening (6/6 tools, VALID recorded at creation: 13 artifacts, 38 audit entries) | Committed at `docs/runs/sol-capped-dc01-opening.json` |
 | Codex Session ID | 019f61e5-5755-7a02-adb4-618d32baab27 |
 | Public MIT repository | https://github.com/3sk1nt4n/Unchained |
-| Demo video link | Added on upload |
+| Demo video link | https://youtu.be/ci2M8LmY2hY |
 
 ---
 
@@ -120,7 +120,7 @@ The wedge revenue is the consultancy that needs to attach a verifiable AI work-p
 ## Honest caveats (read before pricing anything above)
 
 - An authentic COMPLETE GPT-5.6 Sol bundle ships at `examples/public-run-complete` and strict-verifies on current code. The remaining honest caveats: it is one case on one OS route, the same-evidence benchmark was deliberately cut, and verification is self-contained - the verifier ships in the same codebase with no external anchoring.
-- Demo video link: added on upload.
+- Demo video link: https://youtu.be/ci2M8LmY2hY.
 - No frozen same-evidence competitive latency/cost/accuracy benchmark is published yet; that comparison was deliberately cut rather than claimed without measurement.
 - Exact receipts establish execution and citation support, not forensic truth. The offline verifier validates recorded metadata; it does not prove the model's forensic interpretation is true and does not authenticate OpenAI.
 - The fresh-context reviewer is a same-family model call, not independent ground truth.

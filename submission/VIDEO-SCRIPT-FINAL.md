@@ -177,8 +177,8 @@ True in the video and in all submission copy; none block recording.
 
 | Item | Status |
 |---|---|
-| Video link | Added on upload |
-| Submission commit/tag | PENDING_FINAL_FREEZE |
+| Video link | https://youtu.be/ci2M8LmY2hY |
+| Submission commit/tag | `buildweek-2026-final` |
 | Authentic COMPLETE bundle / public viewer | Shipped: `examples/public-run-complete` (run 20260721T001718Z, strict-VALID) |
 | Same-evidence competitive benchmark | Deliberately cut; no unmeasured claims |
 

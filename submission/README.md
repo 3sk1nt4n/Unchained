@@ -11,7 +11,7 @@ Deadline: Tue 2026-07-21 17:00 PT. Submit target Tue ~11:00 ET, hard floor Tue 1
 | `VIDEO-SCRIPT-FINAL.md` | Final shot list and narration for the sub-3:00 demo video, with pre-record checklist and splice slot |
 | `slides/slides.html` | Self-contained 9-slide 1080p deck for recording (arrow keys navigate both directions; no external resources) |
 
-Pending until upload: video URL (ADDED-ON-UPLOAD), final freeze commit/tag (PENDING_FINAL_FREEZE), public COMPLETE viewer/bundle (PENDING_COMPLETE_RUN).
+All resolved: video https://youtu.be/ci2M8LmY2hY · freeze tag `buildweek-2026-final` · COMPLETE bundle ships at `examples/public-run-complete` (strict verify VALID).
 
 Repo: https://github.com/3sk1nt4n/Unchained (public, MIT). Codex Session ID: `019f61e5-5755-7a02-adb4-618d32baab27`.
 

@@ -58,6 +58,6 @@ py -3.11 -m venv .judge; .judge\Scripts\python.exe -m pip install -q .
 ## 🔗 Links
 
 - Repo (public, MIT, Developer Tools track): https://github.com/3sk1nt4n/Unchained · Evidence source: https://dfirmadness.com/the-stolen-szechuan-sauce/
-- Demo video (2:52.97, `submission/video/unchained-demo-final.mp4`): **[YOUTUBE LINK PENDING - replace on upload]**
+- Demo video (2:52, also ships at `submission/video/unchained-demo-final.mp4`): **https://youtu.be/ci2M8LmY2hY**
 - Codex Sessions: `019f61e5-5755-7a02-adb4-618d32baab27` (core build, /feedback uploaded) · `019f76f3-a19f-71d1-81b2-eed6305857f6` (release thread)
 - Pipeline diagram: `docs/ARCHITECTURE.md` · Live receipts: `docs/runs/sol-capped-dc01-opening.json` (earlier capped `gpt-5.6-sol` opening, 6/6 tools, VALID recorded at creation), `docs/runs/luna-canary-receipt.json`
