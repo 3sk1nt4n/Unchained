@@ -86,7 +86,7 @@ local SHA-256 case card before any model is involved.
 |---|---|
 | Track | **Developer Tools** - OpenAI Build Week |
 | Built with | **Codex** (implementation + adversarial review) and **GPT-5.6** (Sol investigator/reviewer, Terra rehearsal/smoke) |
-| Codex Session ID | `019f61e5-5755-7a02-adb4-618d32baab27` - see [Built with Codex](#built-with-codex) |
+| Codex Sessions | `019f61e5-5755-7a02-adb4-618d32baab27` (core build · /feedback uploaded) · `019f76f3-a19f-71d1-81b2-eed6305857f6` (release thread) - see [Built with Codex](#built-with-codex) |
 | Fastest no-key test | Two-command install, then `sentinel verify examples/public-run-complete` → **VALID**. A real GPT-5.6 Sol `COMPLETE` run, zero spend ([judge quickstart](JUDGE-QUICKSTART.md)) |
 | Shipped `COMPLETE` proof | [`examples/public-run-complete`](examples/public-run-complete) - an authentic GPT-5.6 **Sol** `COMPLETE` bundle **inside this repo**: **4 findings** (1 CONFIRMED, 2 NEEDS-REVIEW, 1 UNSUPPORTED), fresh-judge verdicts, and a sealed report on the public DC01 domain-controller case - a full live investigation for **~$2.92 in 9m39s**; passes strict `--require-complete --require-live-gpt56` (37 artifacts, 194 audit entries) |
 | Also shipped | [`examples/public-run-partial`](examples/public-run-partial) - a `gpt-5.6-luna` bundle: 14/14 typed tools on real memory, honest `PARTIAL` at the hard cap |
