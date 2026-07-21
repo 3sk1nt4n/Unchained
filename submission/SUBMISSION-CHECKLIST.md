@@ -49,7 +49,7 @@ Open the Devpost submission form and `submission/DEVPOST-FORM.md` side by side. 
 - [ ] **Built with** field ← the "Built with" block (tag list: python, openai, gpt-5.6, codex, ...).
 - [ ] **Try it out / links** field ← repo URL `https://github.com/3sk1nt4n/Unchained` from the Try-it-out links / Repo URL block.
 - [ ] **Video URL** field ← the YouTube URL from W8.
-- [ ] **Image gallery** ← upload `docs/assets/architecture.png` (the shiny 14-stage pipeline diagram) and optionally `docs/assets/readme-hero.png`.
+- [ ] **Image gallery** ← upload `docs/assets/architecture.png` (14-stage pipeline), `docs/assets/who-pays-dfir.png` (business card), and optionally `docs/assets/readme-hero.png`.
 - [ ] **Track** ← Developer Tools.
 - [ ] **Codex Session ID** field (if the form has one) ← `019f61e5-5755-7a02-adb4-618d32baab27`.
 - [ ] If the form has Developer Tools extra fields ← the three "Developer Tools extras" blocks (Installation instructions, Supported platforms, How judges can test it).
