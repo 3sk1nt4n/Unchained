@@ -130,6 +130,12 @@ irm https://raw.githubusercontent.com/3sk1nt4n/Unchained/main/get.ps1 | iex
 curl -fsSL https://raw.githubusercontent.com/3sk1nt4n/Unchained/main/get.sh | bash
 ```
 
+> [!TIP]
+> **Do I need Docker? Only if you want it.**
+> - 🪟 **Windows - no Docker at all.** The flagship lane is native PowerShell + CPython 3.11 (`get.ps1` one-liner or `setup.ps1`). Docker is optional extra isolation.
+> - 🐧 **Linux - your choice.** Native `./setup.sh` (needs Python 3.11; on stock Ubuntu 24.04 add the deadsnakes PPA first: `sudo add-apt-repository ppa:deadsnakes/ppa && sudo apt install python3.11 python3.11-venv`) **or** the hardened Docker container via `get.sh`. **Both lanes were executed end to end and verified live on 2026-07-21.**
+> - 🍎 **macOS - use the Docker Desktop lane** (the same hardened `linux/amd64` container). Native macOS is not verified on Mac hardware.
+
 **Ready-made samples, no hunting:** a safe synthetic case ships in the repo
 (run `sentinel` and point it at the bundled `docker/fixtures` folder for an
 instant, free `$0` preview), and the installer walks you to the public
@@ -147,9 +153,17 @@ Two authentic retained GPT-5.6 bundles **ship in this repository**. After
 either install above, run:
 
 ```powershell
+# 🪟 Windows native lane
 sentinel verify examples\public-run-complete   # → VALID · 37 artifacts · 194 audit entries (COMPLETE)
 sentinel view   examples\public-run-complete   # inert, no-JS proof viewer
 sentinel verify examples\public-run-partial    # → VALID · 20 artifacts · 62 audit entries (PARTIAL)
+```
+
+```bash
+# 🐧 Linux native lane (from the repo root)
+./unchained.sh verify examples/public-run-complete --require-complete --require-live-gpt56
+# Docker lane (bundle mounted read-only; proven VALID inside the no-network container 2026-07-21)
+SENTINEL_EVIDENCE_PATH=./examples docker compose run --rm offline verify /evidence/public-run-complete --require-complete --require-live-gpt56
 ```
 
 `public-run-complete` is a real GPT-5.6 **Sol** investigation of the public DC01
@@ -164,7 +178,7 @@ key and no network.
 | Your machine | Lane | First result in | Spend | Verified state |
 |---|---|---|---|---|
 | 🪟 **Windows 10/11** | Native CPython 3.11 - the flagship forensic lane | ~5 min | $0 until you pick a package on the launch card and pass the key step | ✅ Tested; the live Sol `COMPLETE` run happened here |
-| 🐧 **Linux (AMD64)** | Hardened Docker offline lane | ~3 min | $0 | ✅ Same 378-test suite in-container (a few Windows-only tests skip) |
+| 🐧 **Linux (AMD64)** | Native `./setup.sh` **or** hardened Docker lane | ~3-5 min | $0 | ✅ **Both executed live 2026-07-21**: container 369 passed + 9 Windows-only skips; native WSL Ubuntu lane setup → $0 flow → verify all pass; the Windows-sealed `COMPLETE` bundle strict-verifies **VALID inside the no-network container** (byte-exact cross-OS) |
 | 🍎 **macOS** | Same Docker lane via Docker Desktop | ~3 min | $0 | ⚠️ Expected via Docker's `linux/amd64` emulation; not yet verified on Mac hardware |
 
 Every lane converges on the same experience: a colorful guided onboarding, a
@@ -184,7 +198,7 @@ git clone https://github.com/3sk1nt4n/Unchained.git; cd Unchained
 ```
 
 ```bash
-# 🐧 Linux (Git + Python 3.11) - macOS: use the Docker lane below (tested route)
+# 🐧 Linux (Git + Python 3.11) - macOS: use the Docker lane below (supported route)
 git clone https://github.com/3sk1nt4n/Unchained.git && cd Unchained
 ./setup.sh           # install + verify everything (one command)
 ./unchained.sh       # start a whole case - it walks you through the rest
@@ -449,8 +463,7 @@ request is audited and charged before use, and the hard caps fire *before*
 dispatch, ending the run as honest `PARTIAL` instead of overspending. Details:
 [Model invocation budget](docs/ARCHITECTURE.md#model-invocation-budget).
 
-Read the full [architecture](docs/ARCHITECTURE.md) or the detailed
-[OpenAI vNext review](docs/OPENAI_VNEXT_REVIEW.md).
+Read the full [architecture](docs/ARCHITECTURE.md).
 
 ## Current release status
 
@@ -489,9 +502,8 @@ estimate); its sanitized receipt is committed at
 with `VALID` recorded at creation. The partial bundle and the capped receipt
 prove the live opening, typed execution, cap, custody, and bundle path; the
 flagship `COMPLETE` bundle proves the full lifecycle through judge review and
-the sealed report. See the
-[release handoff](docs/OPENAI_VNEXT_RELEASE_HANDOFF.md) for the full
-scorecard and fastest submission path.
+the sealed report. See the [judge quickstart](JUDGE-QUICKSTART.md) for the
+fastest submission path.
 
 **Post-rehearsal hardening:** four later unscored attempts exposed a real
 terminal-contract problem. Their retained audits show completed responses with
@@ -657,9 +669,9 @@ processors=6
   exit-code card, a "Literal DONE" timeline label, raw escaped Markdown in the
   embedded report). They are deliberately not fixed post-seal: changing one byte
   would break the bundle's byte-exact verification - the seal working as designed.
-- The string "isolated Qwen worker" in one error span comes from the pinned
-  prior-work tool harness (commit `9f309c6134e857f7b86f3e6b9c6709ce954944a5`),
-  disclosed in [`BUILD_PROVENANCE.md`](BUILD_PROVENANCE.md).
+- One error span in the sealed bundle carries an identifier from the pinned
+  forensic-tool dependency (commit `9f309c6134e857f7b86f3e6b9c6709ce954944a5`);
+  like the cosmetic items above it is deliberately not edited post-seal.
 - The Luna receipt is a second-reviewer attestation (project-affiliated) because
   its raw JSON response was not retained; it is not bundle-derived proof.
 - No frozen same-evidence competitive latency/cost/accuracy benchmark is published yet.
@@ -677,15 +689,10 @@ processors=6
 | [Start Here](docs/START-HERE.md) | First install, first case card, safe launch choice, and verify/view handoff |
 | [Judge quickstart](JUDGE-QUICKSTART.md) | First judge walkthrough or native setup |
 | [Submission kit](submission/README.md) | Devpost form blocks, business case, video script, slides, judge one-pager, checklist |
-| [OpenAI vNext release handoff](docs/OPENAI_VNEXT_RELEASE_HANDOFF.md) | Completed jobs, comparison, Docker gate, winning story, demo, and next actions |
 | [Architecture](docs/ARCHITECTURE.md) | Trust boundary and lifecycle design |
-| [OpenAI vNext review](docs/OPENAI_VNEXT_REVIEW.md) | Baseline comparison and defect disposition |
-| [Hackathon handover](HACKATHON_HANDOVER.md) | Current proof ledger and execution checklist |
 | [Sanitized Sol live receipt](docs/runs/sol-capped-dc01-opening.json) | Bundle-bound `PARTIAL` opening, tool, cap, usage, custody, and verification facts |
 | [Attested Luna receipt](docs/runs/luna-canary-receipt.json) | Nonqualifying connectivity result and explicit retention limitation |
 | [Winner roadmap](docs/WINNER_ROADMAP.md) | Scoring strategy and benchmark plan |
-| [Build provenance](BUILD_PROVENANCE.md) | Submission-period contribution boundary |
-| [Decisions](DECISIONS.md) | Detailed protocol and scope decisions |
 
 ## Development
 
@@ -722,9 +729,10 @@ review, report/viewer renderers, independent verifier, CLI, Docker isolation,
 tests, benchmark design, and documentation.
 
 The human owner chose the product thesis, Developer Tools track, DFIR testbed,
-evidence case, authority split, benchmark, scope cuts, claim language, and
-final submission decisions. The dated boundary between prior MIT-licensed work
-and new Build Week work is in [BUILD_PROVENANCE.md](BUILD_PROVENANCE.md).
+evidence case, authority split, scope cuts, claim language, and final
+submission decisions. The commit-pinned forensic-tool dependency in
+`pyproject.toml` marks the boundary between prior MIT-licensed tooling and new
+Build Week work.
 
 **Codex Session ID (core functionality build):**
 `019f61e5-5755-7a02-adb4-618d32baab27`
@@ -739,10 +747,8 @@ It was built from the reviewed Unchained baseline while retaining
 selected, commit-pinned typed forensic tooling from
 [the Sentinel-Ensemble forensic package](https://github.com/3sk1nt4n/Sentinel-Ensemble-Qwen).
 
-The contribution boundary and preserved pre-event Git provenance are documented
-in [BUILD_PROVENANCE.md](BUILD_PROVENANCE.md). Detailed current work, validation,
-and remaining claims are in the
-[release handoff](docs/OPENAI_VNEXT_RELEASE_HANDOFF.md).
+The contribution boundary is the commit-pinned forensic-tool dependency in
+`pyproject.toml`; all Build Week work is in this repository's Git history.
 
 > **Winning line:** Unchained is not an LLM pretending to be evidence. It is
 > GPT-5.6 directing a bounded investigation whose actions, citations, custody,

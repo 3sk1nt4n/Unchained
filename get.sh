@@ -29,7 +29,7 @@ printf '%s|                Unchained reasoning. Chained evidence.               
 printf '%s|    One command: build the hardened, offline container and explore.     |%s\n' "$GRAY" "$RESET"
 printf '%s+========================================================================+%s\n\n' "$CYAN" "$RESET"
 printf '%sThis bootstrap never reads evidence and never sends anything to OpenAI.%s\n' "$AMBER" "$RESET"
-printf '%sThe offline lane has no network at all; the paid Sol lane is Windows-native.%s\n\n' "$AMBER" "$RESET"
+printf '%sThe offline lane has no network at all; the paid Sol lane also runs natively via ./setup.sh.%s\n\n' "$AMBER" "$RESET"
 
 if ! command -v git >/dev/null 2>&1; then
   printf '%sGit was not found.%s Install it, then re-run this one-liner.\n' "$AMBER" "$RESET" >&2
@@ -41,11 +41,12 @@ if ! command -v docker >/dev/null 2>&1; then
   printf '%sInstall it once, then re-run this exact one-liner (it resumes where it left off):%s\n' "$GRAY" "$RESET" >&2
   case "$(uname -s)" in
     Darwin) printf '  macOS: install Docker Desktop -> https://www.docker.com/products/docker-desktop/\n' >&2 ;;
-    *)      printf '  Ubuntu/Debian: sudo apt update && sudo apt install -y docker.io docker-compose-plugin\n' >&2
+    *)      printf '  Ubuntu/Debian: sudo apt update && sudo apt install -y docker.io docker-compose-v2\n' >&2
             printf '  Any Linux:     https://docs.docker.com/engine/install/\n' >&2
             printf '  Then:          sudo usermod -aG docker $USER  (log out/in so docker runs without sudo)\n' >&2 ;;
   esac
-  printf '\n%sPrefer no Docker? On Windows the native lane needs only Python 3.11 - see the README.%s\n' "$GRAY" "$RESET" >&2
+  printf '\n%sPrefer no Docker? The native lane needs only Python 3.11 on Linux or Windows:%s\n' "$GRAY" "$RESET" >&2
+  printf '  git clone https://github.com/3sk1nt4n/Unchained.git && cd Unchained && ./setup.sh\n' >&2
   exit 1
 fi
 if ! docker info >/dev/null 2>&1; then
@@ -95,8 +96,7 @@ if [ -n "$KEY" ]; then
   KEY_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/sentinel-unchained"
   KEY_FILE="$KEY_DIR/openai_api_key"
   mkdir -p "$KEY_DIR"
-  umask 177
-  printf '%s\n' "$KEY" > "$KEY_FILE"
+  ( umask 177; printf '%s\n' "$KEY" > "$KEY_FILE" )
   chmod 600 "$KEY_FILE"
   KEY=""
   printf '      %sSaved to %s (chmod 600).%s\n' "$GREEN" "$KEY_FILE" "$RESET"
