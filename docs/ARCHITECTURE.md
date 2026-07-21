@@ -228,10 +228,10 @@ prototype's guarantee.
   check. The source tree is 19 modules, 16,133 physical source lines
   (14,728 nonblank).
 - An authentic `COMPLETE` GPT-5.6 Sol bundle **ships in this repository** at
-  [`examples/public-run-complete`](../examples/public-run-complete): 3 findings,
+  [`examples/public-run-complete`](../examples/public-run-complete): 4 findings,
   fresh-judge verdicts, and a sealed report on the public DC01 case; strict
-  `--require-complete --require-live-gpt56` verifies `VALID` (27 artifacts,
-  124 audit entries). A second authentic `gpt-5.6-luna` `PARTIAL` bundle ships
+  `--require-complete --require-live-gpt56` verifies `VALID` (37 artifacts,
+  194 audit entries). A second authentic `gpt-5.6-luna` `PARTIAL` bundle ships
   at [`examples/public-run-partial`](../examples/public-run-partial) (14/14
   typed tools, honest hard-cap stop, `VALID`: 20 artifacts, 62 audit entries).
 - Every pipeline stage in the diagram above has executed live end to end in the
